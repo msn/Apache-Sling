@@ -1,0 +1,21 @@
+Revision history for Perl extension Apache::Sling.
+
+0.05  Fri Jul  2 16:22:00 2010
+        - Adding a library to synchonize sling users with an
+          external LDAP server.
+        - Some minor bug fixes.
+
+0.04  Wed Jun 23 20:10:00 2010
+        - Adding support for group management.
+
+0.03  Wed Jun 23 16:45:00 2010
+        - Adding support for user management. Added a META.yml
+          to define dependencies.
+
+0.02  Wed Jun 23 11:15:00 2010
+        - Tidying up and adherence to perlcritic --harsh
+
+0.01  Wed Jun  2 08:05:00 2010
+	- original version; created by h2xs 1.23 with options
+		-AX Apache::Sling
+
