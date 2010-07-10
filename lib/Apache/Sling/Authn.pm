@@ -49,8 +49,8 @@ sub new {
 
     my $lwpUserAgent = LWP::UserAgent->new( keep_alive => 1 );
     push @{ $lwpUserAgent->requests_redirectable }, 'POST';
-    my ( $tmp_cookie_file_handle, $tmp_cookie_file_name ) =
-      File::Temp::tempfile();
+    my $tmp_cookie_file_name = File::Temp::tempnam(
+      File::Temp::tempdir( CLEANUP => 1 ), 'authn' );
     $lwpUserAgent->cookie_jar( { file => $tmp_cookie_file_name } );
 
     my $response;
