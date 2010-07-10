@@ -107,9 +107,9 @@ sub new {
 
 #{{{sub set_results
 sub set_results {
-    my ( $user, $message, $response ) = @_;
-    $user->{'Message'}  = $message;
-    $user->{'Response'} = $response;
+    my ( $class, $message, $response ) = @_;
+    $class->{'Message'}  = $message;
+    $class->{'Response'} = $response;
     return 1;
 }
 
