@@ -91,6 +91,9 @@ sub properties_array_to_string {
     if (defined $property_post_vars) {
         $property_post_vars =~ s/,$//x;
     }
+    else {
+        $property_post_vars = '';
+    }
     return $property_post_vars;
 }
 
