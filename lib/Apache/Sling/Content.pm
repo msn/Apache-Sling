@@ -18,43 +18,21 @@ our @EXPORT_OK = ();
 
 our $VERSION = '0.06';
 
-=head1 NAME
-
-Content - content related functionality for Sling implemented over rest
-APIs.
-
-=head1 ABSTRACT
-
-Perl library providing a layer of abstraction to the REST content methods
-
-=head2 Methods
-
-=cut
-
 #{{{sub new
-
-=pod
-
-=head2 new
-
-Create, set up, and return a Content object.
-
-=cut
-
 sub new {
     my ( $class, $authn, $verbose, $log ) = @_;
-    croak "no authn provided!" unless defined $authn;
+    if ( !defined $authn ) { croak 'no authn provided!'; }
     my $response;
     $verbose = ( defined $verbose ? $verbose : 0 );
     my $content = {
-        BaseURL  => $$authn->{'BaseURL'},
+        BaseURL  => ${$authn}->{'BaseURL'},
         Authn    => $authn,
-        Message  => "",
+        Message  => q{},
         Response => \$response,
         Verbose  => $verbose,
         Log      => $log
     };
-    bless( $content, $class );
+    bless $content, $class;
     return $content;
 }
 
@@ -72,16 +50,16 @@ sub set_results {
 
 #{{{sub add
 sub add {
-    my ( $content, $remoteDest, $properties ) = @_;
+    my ( $content, $remote_dest, $properties ) = @_;
     my $res = Apache::Sling::Request::request(
         \$content,
         Apache::Sling::ContentUtil::add_setup(
-            $content->{'BaseURL'}, $remoteDest, $properties
+            $content->{'BaseURL'}, $remote_dest, $properties
         )
     );
     my $success = Apache::Sling::ContentUtil::add_eval($res);
-    my $message = "Content addition to \"$remoteDest\" ";
-    $message .= ( $success ? "succeeded!" : "failed!" );
+    my $message = "Content addition to \"$remote_dest\" ";
+    $message .= ( $success ? 'succeeded!' : 'failed!' );
     $content->set_results( "$message", $res );
     return $success;
 }
@@ -90,16 +68,16 @@ sub add {
 
 #{{{sub copy
 sub copy {
-    my ( $content, $remoteSrc, $remoteDest, $replace ) = @_;
+    my ( $content, $remote_src, $remote_dest, $replace ) = @_;
     my $res = Apache::Sling::Request::request(
         \$content,
         Apache::Sling::ContentUtil::copy_setup(
-            $content->{'BaseURL'}, $remoteSrc, $remoteDest, $replace
+            $content->{'BaseURL'}, $remote_src, $remote_dest, $replace
         )
     );
     my $success = Apache::Sling::ContentUtil::copy_eval($res);
-    my $message = "Content copy from \"$remoteSrc\" to \"$remoteDest\" ";
-    $message .= ( $success ? "completed!" : "did not complete successfully!" );
+    my $message = "Content copy from \"$remote_src\" to \"$remote_dest\" ";
+    $message .= ( $success ? 'completed!' : 'did not complete successfully!' );
     $content->set_results( "$message", $res );
     return $success;
 }
@@ -108,16 +86,16 @@ sub copy {
 
 #{{{sub del
 sub del {
-    my ( $content, $remoteDest ) = @_;
+    my ( $content, $remote_dest ) = @_;
     my $res = Apache::Sling::Request::request(
         \$content,
         Apache::Sling::ContentUtil::delete_setup(
-            $content->{'BaseURL'}, $remoteDest
+            $content->{'BaseURL'}, $remote_dest
         )
     );
     my $success = Apache::Sling::ContentUtil::delete_eval($res);
-    my $message = "Content \"$remoteDest\" ";
-    $message .= ( $success ? "deleted!" : "was not deleted!" );
+    my $message = "Content \"$remote_dest\" ";
+    $message .= ( $success ? 'deleted!' : 'was not deleted!' );
     $content->set_results( "$message", $res );
     return $success;
 }
@@ -126,16 +104,16 @@ sub del {
 
 #{{{sub check_exists
 sub check_exists {
-    my ( $content, $remoteDest ) = @_;
+    my ( $content, $remote_dest ) = @_;
     my $res = Apache::Sling::Request::request(
         \$content,
         Apache::Sling::ContentUtil::exists_setup(
-            $content->{'BaseURL'}, $remoteDest
+            $content->{'BaseURL'}, $remote_dest
         )
     );
     my $success = Apache::Sling::ContentUtil::exists_eval($res);
-    my $message = "Content \"$remoteDest\" ";
-    $message .= ( $success ? "exists!" : "does not exist!" );
+    my $message = "Content \"$remote_dest\" ";
+    $message .= ( $success ? 'exists!' : 'does not exist!' );
     $content->set_results( "$message", $res );
     return $success;
 }
@@ -144,16 +122,16 @@ sub check_exists {
 
 #{{{sub move
 sub move {
-    my ( $content, $remoteSrc, $remoteDest, $replace ) = @_;
+    my ( $content, $remote_src, $remote_dest, $replace ) = @_;
     my $res = Apache::Sling::Request::request(
         \$content,
         Apache::Sling::ContentUtil::move_setup(
-            $content->{'BaseURL'}, $remoteSrc, $remoteDest, $replace
+            $content->{'BaseURL'}, $remote_src, $remote_dest, $replace
         )
     );
     my $success = Apache::Sling::ContentUtil::move_eval($res);
-    my $message = "Content move from \"$remoteSrc\" to \"$remoteDest\" ";
-    $message .= ( $success ? "completed!" : "did not complete successfully!" );
+    my $message = "Content move from \"$remote_src\" to \"$remote_dest\" ";
+    $message .= ( $success ? 'completed!' : 'did not complete successfully!' );
     $content->set_results( "$message", $res );
     return $success;
 }
@@ -162,20 +140,20 @@ sub move {
 
 #{{{sub upload_file
 sub upload_file {
-    my ( $content, $localPath, $remotePath, $filename ) = @_;
+    my ( $content, $local_path, $remote_path, $filename ) = @_;
     my $res = Apache::Sling::Request::request(
         \$content,
         Apache::Sling::ContentUtil::upload_file_setup(
-            $content->{'BaseURL'}, $localPath, $remotePath, $filename
+            $content->{'BaseURL'}, $local_path, $remote_path, $filename
         )
     );
     my $success  = Apache::Sling::ContentUtil::upload_file_eval($res);
-    my $basename = $localPath;
-    $basename =~ s/^(.*\/)([^\/]*)$/$2/x;
-    my $remoteDest =
-      $remotePath . ( $filename !~ /^$/x ? "/$filename" : "/$basename" );
-    my $message = "Content: \"$localPath\" upload to \"$remoteDest\" ";
-    $message .= ( $success ? "succeeded!" : "failed!" );
+    my $basename = $local_path;
+    $basename =~ s/^(.*\/)([^\/]*)$/$2/msx;
+    my $remote_dest =
+      $remote_path . ( $filename ne q{} ? "/$filename" : "/$basename" );
+    my $message = "Content: \"$local_path\" upload to \"$remote_dest\" ";
+    $message .= ( $success ? 'succeeded!' : 'failed!' );
     $content->set_results( "$message", $res );
     return $success;
 }
@@ -184,25 +162,27 @@ sub upload_file {
 
 #{{{sub upload_from_file
 sub upload_from_file {
-    my ( $content, $file, $forkId, $numberForks ) = @_;
+    my ( $content, $file, $fork_id, $number_of_forks ) = @_;
     my $count = 0;
-    if ( open my ($input), "<", $file ) {
+    if ( open my ($input), '<', $file ) {
         while (<$input>) {
-            if ( $forkId == ( $count++ % $numberForks ) ) {
+            if ( $fork_id == ( $count++ % $number_of_forks ) ) {
                 chomp;
-                $_ =~ /^(.*?),(.*?)$/x or croak "Problem parsing content to add";
-                my $localPath  = $1;
-                my $remotePath = $2;
-                if ( defined $localPath && defined $remotePath ) {
-                    $content->upload_file( $localPath, $remotePath, "" );
+                $_ =~ /^(.*?),(.*?)$/msx
+                  or croak 'Problem parsing content to add';
+                my $local_path  = $1;
+                my $remote_path = $2;
+                if ( defined $local_path && defined $remote_path ) {
+                    $content->upload_file( $local_path, $remote_path, q{} );
                     Apache::Sling::Print::print_result($content);
                 }
                 else {
-                    print "ERROR: Problem parsing content to add: \"$_\"\n";
+                    print "ERROR: Problem parsing content to add: \"$_\"\n"
+                      or croak 'Problem printing!';
                 }
             }
         }
-        close($input);
+        close $input or croak 'Problem closing input!';
     }
     else {
         croak "Problem opening file: $file";
@@ -214,18 +194,18 @@ sub upload_from_file {
 
 #{{{sub view
 sub view {
-    my ( $content, $remoteDest ) = @_;
+    my ( $content, $remote_dest ) = @_;
     my $res = Apache::Sling::Request::request(
         \$content,
         Apache::Sling::ContentUtil::exists_setup(
-            $content->{'BaseURL'}, $remoteDest
+            $content->{'BaseURL'}, $remote_dest
         )
     );
     my $success = Apache::Sling::ContentUtil::exists_eval($res);
     my $message = (
-          $success
-        ? $$res->content
-        : "Problem viewing content: \"$remoteDest\""
+        $success
+        ? ${$res}->content
+        : "Problem viewing content: \"$remote_dest\""
     );
     $content->set_results( "$message", $res );
     return $success;
@@ -235,14 +215,14 @@ sub view {
 
 #{{{sub view_file
 sub view_file {
-    my ( $content, $remoteDest ) = @_;
+    my ( $content, $remote_dest ) = @_;
     my $res = Apache::Sling::Request::request( \$content,
-        "get $content->{ 'BaseURL' }/$remoteDest" );
+        "get $content->{ 'BaseURL' }/$remote_dest" );
     my $success = Apache::Sling::ContentUtil::exists_eval($res);
     my $message = (
         $success
         ? ${$res}->content
-        : "Problem viewing content: \"$remoteDest\""
+        : "Problem viewing content: \"$remote_dest\""
     );
     $content->set_results( "$message", $res );
     return $success;
@@ -251,3 +231,46 @@ sub view_file {
 #}}}
 
 1;
+
+__END__
+
+=head1 NAME
+
+Content - content related functionality for Sling implemented over rest
+APIs.
+
+=head1 ABSTRACT
+
+Perl library providing a layer of abstraction to the REST content methods
+
+=head1 METHODS
+
+=head2 new
+
+Create, set up, and return a Content object.
+
+=head1 USAGE
+
+=head1 DESCRIPTION
+
+=head1 REQUIRED ARGUMENTS
+
+=head1 OPTIONS
+
+=head1 DIAGNOSTICS
+
+=head1 EXIT STATUS
+
+=head1 CONFIGURATION
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Daniel David Parry <perl@ddp.me.uk>
+
+=head1 LICENSE AND COPYRIGHT
