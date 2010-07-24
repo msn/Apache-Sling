@@ -1,5 +1,9 @@
 Revision history for Perl extension Apache::Sling.
 
+0.07  Sat Jul 24 11:00:00 2010
+        - Better conformance to PBP.
+        - Tweaked make file to note dependency on Text::CSV.
+
 0.06  Fri Jul 23 14:30:00 2010
         - Many tests added and some minor bug fixes.
 
