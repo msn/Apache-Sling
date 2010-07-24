@@ -21,46 +21,27 @@ our @EXPORT_OK = ();
 
 our $VERSION = '0.06';
 
-=head1 NAME
-
-Authn - useful utility functions for general Authn functionality.
-
-=head1 ABSTRACT
-
-Utility library providing useful utility functions for general Authn functionality.
-
-=cut
-
 #{{{sub new
-
-=pod
-
-=head2 new
-
-Create, set up, and return a User Agent.
-
-=cut
-
 sub new {
     my ( $class, $url, $username, $password, $type, $verbose, $log ) = @_;
-    croak "url not defined!" unless defined $url;
-    $type    = ( defined $type    ? $type    : "basic" );
+    if ( !defined $url ) { croak 'url not defined!'; }
+    $type    = ( defined $type    ? $type    : 'basic' );
     $verbose = ( defined $verbose ? $verbose : 0 );
 
-    my $lwpUserAgent = LWP::UserAgent->new( keep_alive => 1 );
-    push @{ $lwpUserAgent->requests_redirectable }, 'POST';
-    my $tmp_cookie_file_name = File::Temp::tempnam(
-      File::Temp::tempdir( CLEANUP => 1 ), 'authn' );
-    $lwpUserAgent->cookie_jar( { file => $tmp_cookie_file_name } );
+    my $lwp_user_agent = LWP::UserAgent->new( keep_alive => 1 );
+    push @{ $lwp_user_agent->requests_redirectable }, 'POST';
+    my $tmp_cookie_file_name =
+      File::Temp::tempnam( File::Temp::tempdir( CLEANUP => 1 ), 'authn' );
+    $lwp_user_agent->cookie_jar( { file => $tmp_cookie_file_name } );
 
     my $response;
     my $authn = {
         BaseURL  => "$url",
-        LWP      => \$lwpUserAgent,
+        LWP      => \$lwp_user_agent,
         Type     => $type,
         Username => $username,
         Password => $password,
-        Message  => "",
+        Message  => q{},
         Response => \$response,
         Verbose  => $verbose,
         Log      => $log
@@ -68,12 +49,12 @@ sub new {
 
 # Authn references itself to be compatibile with Apache::Sling::Request::request
     $authn->{'Authn'} = \$authn;
-    bless( $authn, $class );
+    bless $authn, $class;
 
     # Apply basic authentication to the user agent if url, username and
     # password are supplied:
     if ( defined $url && defined $username && defined $password ) {
-        if ( $type =~ /^basic$/x ) {
+        if ( $type eq 'basic' ) {
             my $success = $authn->basic_login();
             if ( !$success ) {
                 if ( $verbose >= 1 ) {
@@ -83,7 +64,7 @@ sub new {
 "Basic Auth log in for user \"$username\" at URL \"$url\" was unsuccessful\n";
             }
         }
-        elsif ( $type =~ /^form$/x ) {
+        elsif ( $type eq 'form' ) {
             my $success = $authn->form_login();
             if ( !$success ) {
                 if ( $verbose >= 1 ) {
@@ -94,7 +75,7 @@ sub new {
             }
         }
         else {
-            croak "Unsupported auth type: \"" . $type . "\"\n";
+            croak "Unsupported auth type: \"$type\"\n";
         }
         if ( $verbose >= 1 ) {
             Apache::Sling::Print::print_result($authn);
@@ -122,8 +103,8 @@ sub basic_login {
       Apache::Sling::Request::request( \$authn,
         Apache::Sling::AuthnUtil::basic_login_setup( $authn->{'BaseURL'} ) );
     my $success = Apache::Sling::AuthnUtil::basic_login_eval($res);
-    my $message = "Basic auth log in ";
-    $message .= ( $success ? "succeeded!" : "failed!" );
+    my $message = 'Basic auth log in ';
+    $message .= ( $success ? 'succeeded!' : 'failed!' );
     $authn->set_results( "$message", $res );
     return $success;
 }
@@ -143,7 +124,7 @@ sub form_login {
     );
     my $success = Apache::Sling::AuthnUtil::form_login_eval($res);
     my $message = "Form log in as user \"$username\" ";
-    $message .= ( $success ? "succeeded!" : "failed!" );
+    $message .= ( $success ? 'succeeded!' : 'failed!' );
     $authn->set_results( "$message", $res );
     return $success;
 }
@@ -157,8 +138,8 @@ sub form_logout {
       Apache::Sling::Request::request( \$authn,
         Apache::Sling::AuthnUtil::form_logout_setup( $authn->{'BaseURL'} ) );
     my $success = Apache::Sling::AuthnUtil::form_logout_eval($res);
-    my $message = "Form log out ";
-    $message .= ( $success ? "succeeded!" : "failed!" );
+    my $message = 'Form log out ';
+    $message .= ( $success ? 'succeeded!' : 'failed!' );
     $authn->set_results( "$message", $res );
     return $success;
 }
@@ -168,23 +149,26 @@ sub form_logout {
 #{{{sub switch_user
 sub switch_user {
     my ( $authn, $new_username, $new_password, $type, $check_basic ) = @_;
-    croak "New username to switch to not defined" unless defined $new_username;
-    croak "New password to use in switch not defined"
-      unless defined $new_password;
-    if (   ( $authn->{'Username'} !~ /^$new_username$/x )
-        || ( $authn->{'Password'} !~ /^$new_password$/x ) )
+    if ( !defined $new_username ) {
+        croak 'New username to switch to not defined';
+    }
+    if ( !defined $new_password ) {
+        croak 'New password to use in switch not defined';
+    }
+    if (   ( $authn->{'Username'} !~ /^$new_username$/msx )
+        || ( $authn->{'Password'} !~ /^$new_password$/msx ) )
     {
         $authn->{'Username'} = $new_username;
         $authn->{'Password'} = $new_password;
-        if ( $authn->{'Type'} =~ /^form$/x ) {
+        if ( $authn->{'Type'} eq 'form' ) {
 
             # If we were previously using form auth then we must log
             # out with form auth, even if we are switching to basic auth.
             my $success = $authn->form_logout();
             if ( !$success ) {
-                croak "Form Auth log out for user \""
+                croak 'Form Auth log out for user "'
                   . $authn->{'Username'}
-                  . "\" at URL \""
+                  . '" at URL "'
                   . $authn->{'BaseURL'}
                   . "\" was unsuccessful\n";
             }
@@ -193,20 +177,21 @@ sub switch_user {
             $authn->{'Type'} = $type;
         }
         $check_basic = ( defined $check_basic ? $check_basic : 0 );
-        if ( $authn->{'Type'} =~ /^basic$/x ) {
+        if ( $authn->{'Type'} eq 'basic' ) {
             if ($check_basic) {
                 my $success = $authn->basic_login();
                 if ( !$success ) {
-                    croak "Basic Auth log in for user \"$new_username\" at URL \""
+                    croak
+                      "Basic Auth log in for user \"$new_username\" at URL \""
                       . $authn->{'BaseURL'}
                       . "\" was unsuccessful\n";
                 }
             }
             else {
-                $authn->{'Message'} = "Fast User Switch completed!";
+                $authn->{'Message'} = 'Fast User Switch completed!';
             }
         }
-        elsif ( $authn->{'Type'} =~ /^form$/x ) {
+        elsif ( $authn->{'Type'} eq 'form' ) {
             my $success = $authn->form_login();
             if ( !$success ) {
                 croak "Form Auth log in for user \"$new_username\" at URL \""
@@ -215,11 +200,11 @@ sub switch_user {
             }
         }
         else {
-            croak "Unsupported auth type: \"" . $type . "\"\n";
+            croak "Unsupported auth type: \"$type\"\n";
         }
     }
     else {
-        $authn->{'Message'} = "User already active, no need to switch!";
+        $authn->{'Message'} = 'User already active, no need to switch!';
     }
     if ( $authn->{'Verbose'} >= 1 ) {
         Apache::Sling::Print::print_result($authn);
@@ -230,3 +215,39 @@ sub switch_user {
 #}}}
 
 1;
+
+__END__
+
+=head1 NAME
+
+Authn - useful utility functions for general Authn functionality.
+
+=head1 ABSTRACT
+
+Utility library providing useful utility functions for general Authn functionality.
+
+=head1 USAGE
+
+=head1 DESCRIPTION
+
+=head1 REQUIRED ARGUMENTS
+
+=head1 OPTIONS
+
+=head1 DIAGNOSTICS
+
+=head1 EXIT STATUS
+
+=head1 CONFIGURATION
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Daniel David Parry <perl@ddp.me.uk>
+
+=head1 LICENSE AND COPYRIGHT
