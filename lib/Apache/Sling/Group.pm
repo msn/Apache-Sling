@@ -43,12 +43,12 @@ Create, set up, and return a Group Object.
 
 sub new {
     my ( $class, $authn, $verbose, $log ) = @_;
-    croak "no authn provided!" unless defined $authn;
+    croak 'no authn provided!' unless defined $authn;
     my $response;
     $verbose = ( defined $verbose ? $verbose : 0 );
     my $group = { BaseURL => $$authn->{ 'BaseURL' },
                   Authn => $authn,
-		  Message => "",
+		  Message => q{},
 		  Response => \$response,
 		  Verbose => $verbose,
 		  Log => $log };
@@ -101,7 +101,7 @@ sub add_from_file {
 		    $numberColumns = @column_headings;
 	        }
 	        else {
-	            croak "CSV broken, failed to parse line: " . $csv->error_input;
+	            croak 'CSV broken, failed to parse line: ' . $csv->error_input;
 	        }
 	    }
             elsif ( $forkId == ( $count++ % $numberForks ) ) {
@@ -123,7 +123,7 @@ sub add_from_file {
 		    Apache::Sling::Print::print_result( $group );
 	        }
 	        else {
-	            croak "CSV broken, failed to parse line: " . $csv->error_input;
+	            croak 'CSV broken, failed to parse line: ' . $csv->error_input;
 	        }
 	    }
         }
@@ -254,7 +254,7 @@ sub member_exists {
         my $group_info = from_json( $$res->content );
 	my $is_member = 0;
         foreach my $member ( @{ $group_info->{ 'members' } } ) {
-            if ( $member =~ /^$existsMember$/x ) {
+            if ( $member eq "$existsMember" ) {
 	        $is_member = 1;
 		last;
 	    }
@@ -309,3 +309,55 @@ sub view {
 #}}}
 
 1;
+
+__END__
+
+=head1 NAME
+
+=head1 ABSTRACT
+
+=head1 METHODS
+
+=head1 USAGE
+
+=head1 DESCRIPTION
+
+=head1 REQUIRED ARGUMENTS
+
+None required.
+
+=head1 OPTIONS
+
+n/a
+
+=head1 DIAGNOSTICS
+
+n/a
+
+=head1 EXIT STATUS
+
+0 on success.
+
+=head1 CONFIGURATION
+
+None required.
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+None known.
+
+=head1 BUGS AND LIMITATIONS
+
+None known.
+
+=head1 AUTHOR
+
+Daniel David Parry <perl@ddp.me.uk>
+
+=head1 LICENSE AND COPYRIGHT
+
+LICENSE: http://dev.perl.org/licenses/artistic.html
+
+COPYRIGHT: Daniel David Parry <perl@ddp.me.uk>

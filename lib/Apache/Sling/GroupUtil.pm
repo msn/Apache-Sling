@@ -37,11 +37,11 @@ system.
 
 sub add_setup {
     my ( $baseURL, $actOnGroup, $properties ) = @_;
-    croak "No base url defined to add against!" unless defined $baseURL;
-    croak "No group name defined to add!" unless defined $actOnGroup;
+    croak 'No base url defined to add against!' unless defined $baseURL;
+    croak 'No group name defined to add!' unless defined $actOnGroup;
     my $property_post_vars = Apache::Sling::URL::properties_array_to_string( $properties );
     my $postVariables = "\$postVariables = [':name','$actOnGroup'";
-    if ( defined $property_post_vars && $property_post_vars !~ /^$/x ) {
+    if ( defined $property_post_vars && $property_post_vars ne q{} ) {
         $postVariables .= ",$property_post_vars";
     }
     $postVariables .= "]";
@@ -78,8 +78,8 @@ the system.
 
 sub delete_setup {
     my ( $baseURL, $actOnGroup ) = @_;
-    croak "No base url defined to delete against!" unless defined $baseURL;
-    croak "No group name defined to delete!" unless defined $actOnGroup;
+    croak 'No base url defined to delete against!' unless defined $baseURL;
+    croak 'No group name defined to delete!' unless defined $actOnGroup;
     my $postVariables = "\$postVariables = []";
     return "post $baseURL/system/userManager/group/$actOnGroup.delete.html $postVariables";
 }
@@ -114,8 +114,8 @@ group exists in the system.
 
 sub exists_setup {
     my ( $baseURL, $actOnGroup ) = @_;
-    croak "No base url to check existence against!" unless defined $actOnGroup;
-    croak "No group to check existence of defined!" unless defined $actOnGroup;
+    croak 'No base url to check existence against!' unless defined $actOnGroup;
+    croak 'No group to check existence of defined!' unless defined $actOnGroup;
     return "get $baseURL/system/userManager/group/$actOnGroup.json";
 }
 #}}}
@@ -151,9 +151,9 @@ group in the system.
 
 sub member_add_setup {
     my ( $baseURL, $actOnGroup, $addMember ) = @_;
-    croak "No base url defined to add against!" unless defined $baseURL;
-    croak "No group name defined to add member to!" unless defined $actOnGroup;
-    croak "No member name defined to add!" unless defined $addMember;
+    croak 'No base url defined to add against!' unless defined $baseURL;
+    croak 'No group name defined to add member to!' unless defined $actOnGroup;
+    croak 'No member name defined to add!' unless defined $addMember;
     my $postVariables = "\$postVariables = [':member','/system/userManager/user/$addMember']";
     return "post $baseURL/system/userManager/group/$actOnGroup.update.html $postVariables";
 }
@@ -188,9 +188,9 @@ a group in the system.
 
 sub member_delete_setup {
     my ( $baseURL, $actOnGroup, $deleteMember ) = @_;
-    croak "No base url defined to delete against!" unless defined $baseURL;
-    croak "No group name defined to delete member to!" unless defined $actOnGroup;
-    croak "No member name defined to delete!" unless defined $deleteMember;
+    croak 'No base url defined to delete against!' unless defined $baseURL;
+    croak 'No group name defined to delete member to!' unless defined $actOnGroup;
+    croak 'No member name defined to delete!' unless defined $deleteMember;
     my $postVariables = "\$postVariables = [':member\@Delete','/system/userManager/user/$deleteMember']";
     return "post $baseURL/system/userManager/group/$actOnGroup.update.html $postVariables";
 }
@@ -208,7 +208,7 @@ Check result of deleting a member from a group in the system.
 
 sub member_delete_eval {
     my ( $res ) = @_;
-    return ( $$res->code =~ /^200$/x && $$res->content !~ /^$/x );
+    return ( $$res->code =~ /^200$/x && $$res->content ne q{} );
 }
 #}}}
 
@@ -244,8 +244,60 @@ returning true if the result indicates the group view was returned, else false.
 
 sub view_eval {
     my ( $res ) = @_;
-    return ( $$res->code =~ /^200$/x && $$res->content !~ /^$/x );
+    return ( $$res->code =~ /^200$/x && $$res->content ne q{} );
 }
 #}}}
 
 1;
+
+__END__
+
+=head1 NAME
+
+=head1 ABSTRACT
+
+=head1 METHODS
+
+=head1 USAGE
+
+=head1 DESCRIPTION
+
+=head1 REQUIRED ARGUMENTS
+
+None required.
+
+=head1 OPTIONS
+
+n/a
+
+=head1 DIAGNOSTICS
+
+n/a
+
+=head1 EXIT STATUS
+
+0 on success.
+
+=head1 CONFIGURATION
+
+None required.
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+None known.
+
+=head1 BUGS AND LIMITATIONS
+
+None known.
+
+=head1 AUTHOR
+
+Daniel David Parry <perl@ddp.me.uk>
+
+=head1 LICENSE AND COPYRIGHT
+
+LICENSE: http://dev.perl.org/licenses/artistic.html
+
+COPYRIGHT: Daniel David Parry <perl@ddp.me.uk>

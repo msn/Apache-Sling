@@ -37,12 +37,12 @@ system.
 
 sub add_setup {
     my ( $baseURL, $actOnUser, $actOnPass, $properties ) = @_;
-    croak "No base url defined to add against!" unless defined $baseURL;
-    croak "No user name defined to add!" unless defined $actOnUser;
+    croak 'No base url defined to add against!' unless defined $baseURL;
+    croak 'No user name defined to add!' unless defined $actOnUser;
     croak "No user password defined to add for user $actOnUser!" unless defined $actOnPass;
     my $property_post_vars = Apache::Sling::URL::properties_array_to_string( $properties );
     my $postVariables = "\$postVariables = [':name','$actOnUser','pwd','$actOnPass','pwdConfirm','$actOnPass'";
-    if ( defined $property_post_vars && $property_post_vars !~ /^$/x ) {
+    if ( defined $property_post_vars && $property_post_vars ne q{} ) {
         $postVariables .= ",$property_post_vars";
     }
     $postVariables .= "]";
@@ -79,8 +79,8 @@ of the user in the system.
 
 sub change_password_setup {
     my ( $baseURL, $actOnUser, $actOnPass, $newPass, $newPassConfirm ) = @_;
-    croak "No base url defined to add against!" unless defined $baseURL;
-    croak "No user name defined to change password for!" unless defined $actOnUser;
+    croak 'No base url defined to add against!' unless defined $baseURL;
+    croak 'No user name defined to change password for!' unless defined $actOnUser;
     croak "No current password defined for $actOnUser!" unless defined $actOnPass;
     croak "No new password defined for $actOnUser!" unless defined $newPass;
     croak "No confirmation of new password defined for $actOnUser!" unless defined $newPassConfirm;
@@ -118,8 +118,8 @@ the system.
 
 sub delete_setup {
     my ( $baseURL, $actOnUser ) = @_;
-    croak "No base url defined to delete against!" unless defined $baseURL;
-    croak "No user name defined to delete!" unless defined $actOnUser;
+    croak 'No base url defined to delete against!' unless defined $baseURL;
+    croak 'No user name defined to delete!' unless defined $actOnUser;
     my $postVariables = "\$postVariables = []";
     return "post $baseURL/system/userManager/user/$actOnUser.delete.html $postVariables";
 }
@@ -154,8 +154,8 @@ username exists in the system.
 
 sub exists_setup {
     my ( $baseURL, $actOnUser ) = @_;
-    croak "No base url to check existence against!" unless defined $baseURL;
-    croak "No user to check existence of defined!" unless defined $actOnUser;
+    croak 'No base url to check existence against!' unless defined $baseURL;
+    croak 'No user to check existence of defined!' unless defined $actOnUser;
     return "get $baseURL/system/userManager/user/$actOnUser.tidy.json";
 }
 #}}}
@@ -191,7 +191,7 @@ about the current user.
 
 sub me_setup {
     my ( $baseURL ) = @_;
-    croak "No base url to check existence against!" unless defined $baseURL;
+    croak 'No base url to check existence against!' unless defined $baseURL;
     return "get $baseURL/system/me";
 }
 #}}}
@@ -227,7 +227,7 @@ sites the current user is a member of.
 
 sub sites_setup {
     my ( $baseURL ) = @_;
-    croak "No base url to check membership of sites against!" unless defined $baseURL;
+    croak 'No base url to check membership of sites against!' unless defined $baseURL;
     return "get $baseURL/system/sling/membership";
 }
 #}}}
@@ -263,11 +263,11 @@ system.
 
 sub update_setup {
     my ( $baseURL, $actOnUser, $properties ) = @_;
-    croak "No base url defined to update against!" unless defined $baseURL;
-    croak "No user name defined to update!" unless defined $actOnUser;
+    croak 'No base url defined to update against!' unless defined $baseURL;
+    croak 'No user name defined to update!' unless defined $actOnUser;
     my $property_post_vars = Apache::Sling::URL::properties_array_to_string( $properties );
     my $postVariables = "\$postVariables = [";
-    if ( $property_post_vars !~ /^$/x ) {
+    if ( $property_post_vars ne q{} ) {
         $postVariables .= "$property_post_vars";
     }
     $postVariables .= "]";
@@ -292,3 +292,55 @@ sub update_eval {
 #}}}
 
 1;
+
+__END__
+
+=head1 NAME
+
+=head1 ABSTRACT
+
+=head1 METHODS
+
+=head1 USAGE
+
+=head1 DESCRIPTION
+
+=head1 REQUIRED ARGUMENTS
+
+None required.
+
+=head1 OPTIONS
+
+n/a
+
+=head1 DIAGNOSTICS
+
+n/a
+
+=head1 EXIT STATUS
+
+0 on success.
+
+=head1 CONFIGURATION
+
+None required.
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+None known.
+
+=head1 BUGS AND LIMITATIONS
+
+None known.
+
+=head1 AUTHOR
+
+Daniel David Parry <perl@ddp.me.uk>
+
+=head1 LICENSE AND COPYRIGHT
+
+LICENSE: http://dev.perl.org/licenses/artistic.html
+
+COPYRIGHT: Daniel David Parry <perl@ddp.me.uk>

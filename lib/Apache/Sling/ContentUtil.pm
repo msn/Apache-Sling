@@ -45,9 +45,8 @@ system.
 
 sub add_setup {
     my ( $baseURL, $remoteDest, $properties ) = @_;
-    croak "No base URL provided!" unless defined $baseURL;
-    croak "No position or ID to perform action for specified!"
-      unless defined $remoteDest;
+    if ( ! defined $baseURL ) { croak 'No base URL provided!'; }
+    if ( ! defined $remoteDest ) { croak 'No position or ID to perform action for specified!'; }
     my $property_post_vars =
       Apache::Sling::URL::properties_array_to_string($properties);
     my $postVariables = "\$postVariables = [$property_post_vars]";
@@ -86,9 +85,9 @@ the system.
 
 sub copy_setup {
     my ( $baseURL, $remoteSrc, $remoteDest, $replace ) = @_;
-    croak "No base url defined!"                       unless defined $baseURL;
-    croak "No content destination to copy to defined!" unless defined $remoteDest;
-    croak "No content source to copy from defined!"    unless defined $remoteSrc;
+    if ( ! defined $baseURL )    { croak 'No base url defined!'; }
+    if ( ! defined $remoteDest ) { croak 'No content destination to copy to defined!'; }
+    if ( ! defined $remoteSrc )  { croak 'No content source to copy from defined!'; }
     my $postVariables =
       "\$postVariables = [':dest','$remoteDest',':operation','copy'";
     $postVariables .= ( defined $replace ? ",':replace','true'" : "" );
@@ -130,8 +129,8 @@ the system.
 
 sub delete_setup {
     my ( $baseURL, $remoteDest ) = @_;
-    croak "No base url defined!"                      unless defined $baseURL;
-    croak "No content destination to delete defined!" unless defined $remoteDest;
+    if ( ! defined $baseURL )    { croak 'No base url defined!'; }
+    if ( ! defined $remoteDest ) { croak 'No content destination to delete defined!'; }
     my $postVariables = "\$postVariables = [':operation','delete']";
     return "post $baseURL/$remoteDest $postVariables";
 }
@@ -170,9 +169,8 @@ exists in the system.
 
 sub exists_setup {
     my ( $baseURL, $remoteDest ) = @_;
-    croak "No base url defined!" unless defined $baseURL;
-    croak "No position or ID to perform exists for specified!"
-      unless defined $remoteDest;
+    if ( ! defined $baseURL ) { croak 'No base url defined!'; }
+    if ( ! defined $remoteDest ) { croak 'No position or ID to perform exists for specified!'; }
     return "get $baseURL/$remoteDest.json";
 }
 
@@ -210,9 +208,9 @@ the system.
 
 sub move_setup {
     my ( $baseURL, $remoteSrc, $remoteDest, $replace ) = @_;
-    croak "No base url defined!"                       unless defined $baseURL;
-    croak "No content destination to move to defined!" unless defined $remoteDest;
-    croak "No content source to move from defined!"    unless defined $remoteSrc;
+    if ( ! defined $baseURL )    { croak 'No base url defined!'; }
+    if ( ! defined $remoteDest ) { croak 'No content destination to move to defined!'; }
+    if ( ! defined $remoteSrc )  { croak 'No content source to move from defined!'; }
     my $postVariables =
       "\$postVariables = [':dest','$remoteDest',':operation','move'";
     $postVariables .= ( defined $replace ? ",':replace','true'" : "" );
@@ -253,11 +251,10 @@ Returns a textual representation of the request needed to upload a file to the s
 
 sub upload_file_setup {
     my ( $baseURL, $localPath, $remoteDest, $filename ) = @_;
-    croak "No base URL provided to upload against!" unless defined $baseURL;
-    croak "No local file to upload defined!"        unless defined $localPath;
-    croak "No remote path to upload to defined for file $localPath!"
-      unless defined $remoteDest;
-    $filename = "./*" if ( $filename =~ /^$/x );
+    if ( ! defined $baseURL )    { croak 'No base URL provided to upload against!'; }
+    if ( ! defined $localPath )  { croak 'No local file to upload defined!'; }
+    if ( ! defined $remoteDest ) { croak 'No remote path to upload to defined for file $localPath!'; }
+    $filename = "./*" if ( $filename eq q{} );
     my $postVariables = "\$postVariables = []";
     return
       "fileupload $baseURL/$remoteDest $filename $localPath $postVariables";
@@ -283,3 +280,55 @@ sub upload_file_eval {
 #}}}
 
 1;
+
+__END__
+
+=head1 NAME
+
+=head1 ABSTRACT
+
+=head1 METHODS
+
+=head1 USAGE
+
+=head1 DESCRIPTION
+
+=head1 REQUIRED ARGUMENTS
+
+None required.
+
+=head1 OPTIONS
+
+n/a
+
+=head1 DIAGNOSTICS
+
+n/a
+
+=head1 EXIT STATUS
+
+0 on success.
+
+=head1 CONFIGURATION
+
+None required.
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+None known.
+
+=head1 BUGS AND LIMITATIONS
+
+None known.
+
+=head1 AUTHOR
+
+Daniel David Parry <perl@ddp.me.uk>
+
+=head1 LICENSE AND COPYRIGHT
+
+LICENSE: http://dev.perl.org/licenses/artistic.html
+
+COPYRIGHT: Daniel David Parry <perl@ddp.me.uk>
