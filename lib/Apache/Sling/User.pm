@@ -43,7 +43,7 @@ Create, set up, and return a User Agent.
 
 sub new {
     my ( $class, $authn, $verbose, $log ) = @_;
-    croak 'no authn provided!' unless defined $authn;
+    if ( ! defined $authn ) { croak 'no authn provided!'; }
     my $response;
     $verbose = ( defined $verbose ? $verbose : 0 );
     my $user = { BaseURL => $$authn->{ 'BaseURL' },

@@ -45,9 +45,9 @@ system.
 
 sub add_setup {
     my ( $baseURL, $actOnUser, $actOnPass, $properties ) = @_;
-    croak 'No base url defined to add against!' unless defined $baseURL;
-    croak 'No user name defined to add!' unless defined $actOnUser;
-    croak "No user password defined to add for user $actOnUser!" unless defined $actOnPass;
+    if ( ! defined $baseURL ) { croak 'No base url defined to add against!'; }
+    if ( ! defined $actOnUser ) { croak 'No user name defined to add!'; }
+    if ( ! defined $actOnPass ) { croak "No user password defined to add for user $actOnUser!"; }
     my $property_post_vars = Apache::Sling::URL::properties_array_to_string( $properties );
     my $postVariables = "\$postVariables = [':name','$actOnUser','pwd','$actOnPass','pwdConfirm','$actOnPass'";
     if ( defined $property_post_vars && $property_post_vars ne q{} ) {
@@ -87,11 +87,11 @@ of the user in the system.
 
 sub change_password_setup {
     my ( $baseURL, $actOnUser, $actOnPass, $newPass, $newPassConfirm ) = @_;
-    croak 'No base url defined to add against!' unless defined $baseURL;
-    croak 'No user name defined to change password for!' unless defined $actOnUser;
-    croak "No current password defined for $actOnUser!" unless defined $actOnPass;
-    croak "No new password defined for $actOnUser!" unless defined $newPass;
-    croak "No confirmation of new password defined for $actOnUser!" unless defined $newPassConfirm;
+    if ( ! defined $baseURL ) { croak 'No base url defined to add against!'; }
+    if ( ! defined $actOnUser ) { croak 'No user name defined to change password for!'; }
+    if ( ! defined $actOnPass ) { croak "No current password defined for $actOnUser!"; }
+    if ( ! defined $newPass ) { croak "No new password defined for $actOnUser!"; }
+    if ( ! defined $newPassConfirm ) { croak "No confirmation of new password defined for $actOnUser!"; }
     my $postVariables = "\$postVariables = ['oldPwd','$actOnPass','newPwd','$newPass','newPwdConfirm','$newPassConfirm']";
     return "post $baseURL/system/userManager/user/$actOnUser.changePassword.html $postVariables";
 }
@@ -126,8 +126,8 @@ the system.
 
 sub delete_setup {
     my ( $baseURL, $actOnUser ) = @_;
-    croak 'No base url defined to delete against!' unless defined $baseURL;
-    croak 'No user name defined to delete!' unless defined $actOnUser;
+    if ( ! defined $baseURL ) { croak 'No base url defined to delete against!'; }
+    if ( ! defined $actOnUser ) { croak 'No user name defined to delete!'; }
     my $postVariables = "\$postVariables = []";
     return "post $baseURL/system/userManager/user/$actOnUser.delete.html $postVariables";
 }
@@ -162,8 +162,8 @@ username exists in the system.
 
 sub exists_setup {
     my ( $baseURL, $actOnUser ) = @_;
-    croak 'No base url to check existence against!' unless defined $baseURL;
-    croak 'No user to check existence of defined!' unless defined $actOnUser;
+    if ( ! defined $baseURL ) { croak 'No base url to check existence against!'; }
+    if ( ! defined $actOnUser ) { croak 'No user to check existence of defined!'; }
     return "get $baseURL/system/userManager/user/$actOnUser.tidy.json";
 }
 #}}}
@@ -199,7 +199,7 @@ about the current user.
 
 sub me_setup {
     my ( $baseURL ) = @_;
-    croak 'No base url to check existence against!' unless defined $baseURL;
+    if ( ! defined $baseURL ) { croak 'No base url to check existence against!'; }
     return "get $baseURL/system/me";
 }
 #}}}
@@ -235,7 +235,7 @@ sites the current user is a member of.
 
 sub sites_setup {
     my ( $baseURL ) = @_;
-    croak 'No base url to check membership of sites against!' unless defined $baseURL;
+    if ( ! defined $baseURL ) { croak 'No base url to check membership of sites against!'; }
     return "get $baseURL/system/sling/membership";
 }
 #}}}
@@ -271,8 +271,8 @@ system.
 
 sub update_setup {
     my ( $baseURL, $actOnUser, $properties ) = @_;
-    croak 'No base url defined to update against!' unless defined $baseURL;
-    croak 'No user name defined to update!' unless defined $actOnUser;
+    if ( ! defined $baseURL ) { croak 'No base url defined to update against!'; }
+    if ( ! defined $actOnUser ) { croak 'No user name defined to update!'; }
     my $property_post_vars = Apache::Sling::URL::properties_array_to_string( $properties );
     my $postVariables = "\$postVariables = [";
     if ( $property_post_vars ne q{} ) {

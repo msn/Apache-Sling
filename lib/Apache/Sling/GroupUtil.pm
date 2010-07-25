@@ -45,8 +45,8 @@ system.
 
 sub add_setup {
     my ( $baseURL, $actOnGroup, $properties ) = @_;
-    croak 'No base url defined to add against!' unless defined $baseURL;
-    croak 'No group name defined to add!' unless defined $actOnGroup;
+    if ( ! defined $baseURL ) { croak 'No base url defined to add against!'; }
+    if ( ! defined $actOnGroup ) { croak 'No group name defined to add!'; }
     my $property_post_vars = Apache::Sling::URL::properties_array_to_string( $properties );
     my $postVariables = "\$postVariables = [':name','$actOnGroup'";
     if ( defined $property_post_vars && $property_post_vars ne q{} ) {
@@ -86,8 +86,8 @@ the system.
 
 sub delete_setup {
     my ( $baseURL, $actOnGroup ) = @_;
-    croak 'No base url defined to delete against!' unless defined $baseURL;
-    croak 'No group name defined to delete!' unless defined $actOnGroup;
+    if ( ! defined $baseURL ) { croak 'No base url defined to delete against!'; }
+    if ( ! defined $actOnGroup ) { croak 'No group name defined to delete!'; }
     my $postVariables = "\$postVariables = []";
     return "post $baseURL/system/userManager/group/$actOnGroup.delete.html $postVariables";
 }
@@ -122,8 +122,8 @@ group exists in the system.
 
 sub exists_setup {
     my ( $baseURL, $actOnGroup ) = @_;
-    croak 'No base url to check existence against!' unless defined $actOnGroup;
-    croak 'No group to check existence of defined!' unless defined $actOnGroup;
+    if ( ! defined $baseURL ) { croak 'No base url to check existence against!'; }
+    if ( ! defined $actOnGroup ) { croak 'No group to check existence of defined!'; }
     return "get $baseURL/system/userManager/group/$actOnGroup.json";
 }
 #}}}
@@ -159,9 +159,9 @@ group in the system.
 
 sub member_add_setup {
     my ( $baseURL, $actOnGroup, $addMember ) = @_;
-    croak 'No base url defined to add against!' unless defined $baseURL;
-    croak 'No group name defined to add member to!' unless defined $actOnGroup;
-    croak 'No member name defined to add!' unless defined $addMember;
+    if ( ! defined $baseURL ) { croak 'No base url defined to add against!'; }
+    if ( ! defined $actOnGroup ) { croak 'No group name defined to add member to!'; }
+    if ( ! defined $addMember ) { croak 'No member name defined to add!'; }
     my $postVariables = "\$postVariables = [':member','/system/userManager/user/$addMember']";
     return "post $baseURL/system/userManager/group/$actOnGroup.update.html $postVariables";
 }
@@ -196,9 +196,9 @@ a group in the system.
 
 sub member_delete_setup {
     my ( $baseURL, $actOnGroup, $deleteMember ) = @_;
-    croak 'No base url defined to delete against!' unless defined $baseURL;
-    croak 'No group name defined to delete member to!' unless defined $actOnGroup;
-    croak 'No member name defined to delete!' unless defined $deleteMember;
+    if ( ! defined $baseURL ) { croak 'No base url defined to delete against!'; }
+    if ( ! defined $actOnGroup ) { croak 'No group name defined to delete member to!'; }
+    if ( ! defined $deleteMember ) { croak 'No member name defined to delete!'; }
     my $postVariables = "\$postVariables = [':member\@Delete','/system/userManager/user/$deleteMember']";
     return "post $baseURL/system/userManager/group/$actOnGroup.update.html $postVariables";
 }
@@ -233,8 +233,8 @@ the system. This function is similar to exists expect authentication is forced.
 
 sub view_setup {
     my ( $baseURL, $actOnGroup ) = @_;
-    croak "No base url to view with defined!" unless defined $baseURL;
-    croak "No group to view defined!" unless defined $actOnGroup;
+    if ( ! defined $baseURL ) { croak "No base url to view with defined!"; }
+    if ( ! defined $actOnGroup ) { croak "No group to view defined!"; }
     return "get $baseURL/system/userManager/group/$actOnGroup.tidy.json";
 }
 #}}}

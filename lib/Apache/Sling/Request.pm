@@ -40,9 +40,9 @@ Function taking a string and converting to a GET or POST HTTP request.
 
 sub string_to_request {
     my ( $string, $authn, $verbose, $log ) = @_;
-    croak 'No string defined to turn into request!' unless defined $string;
+    if ( ! defined $string ) { croak 'No string defined to turn into request!'; }
     my $lwp = $$authn->{'LWP'};
-    croak "No reference to an lwp user agent supplied!" unless defined $lwp;
+    if ( ! defined $lwp ) { croak "No reference to an lwp user agent supplied!"; }
     my ( $action, $target, @reqVariables ) = split( ' ', $string );
     my $request;
     if ( $action =~ /^post$/x ) {
@@ -128,11 +128,10 @@ object.
 
 sub request {
     my ( $object, $string ) = @_;
-    croak "No string defined to turn into request!"     unless defined $string;
-    croak "No reference to a suitable object supplied!" unless defined $object;
+    if ( ! defined $string ) { croak "No string defined to turn into request!"; }
+    if ( ! defined $object ) { croak "No reference to a suitable object supplied!"; }
     my $authn = $$object->{'Authn'};
-    croak "Object does not reference a suitable auth object"
-      unless defined $authn;
+    if ( ! defined $authn ) { croak "Object does not reference a suitable auth object"; }
     my $verbose = $$object->{'Verbose'};
     my $log     = $$object->{'Log'};
     my $lwp     = $$authn->{'LWP'};
