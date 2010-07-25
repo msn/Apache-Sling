@@ -18,4 +18,4 @@
  build_requires:
    Test: 0
  urls:
-   license: http://dev.perl.org/licenses/
+   license: http://dev.perl.org/licenses/artistic.html
