@@ -16,7 +16,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -40,31 +40,33 @@ Function taking a string and converting to a GET or POST HTTP request.
 
 sub string_to_request {
     my ( $string, $authn, $verbose, $log ) = @_;
-    if ( ! defined $string ) { croak 'No string defined to turn into request!'; }
+    if ( !defined $string ) { croak 'No string defined to turn into request!'; }
     my $lwp = $$authn->{'LWP'};
-    if ( ! defined $lwp ) { croak "No reference to an lwp user agent supplied!"; }
+    if ( !defined $lwp ) {
+        croak "No reference to an lwp user agent supplied!";
+    }
     my ( $action, $target, @reqVariables ) = split( ' ', $string );
     my $request;
     if ( $action =~ /^post$/x ) {
         my $variables = join( " ", @reqVariables );
-        my $postVariables;
-        my $success = eval ( $variables );
+        my $post_variables;
+        my $success = eval($variables);
         if ( !defined $success ) {
             croak "Error \"$@\" parsing post variables: \"$variables\"";
         }
-        $request = POST( "$target", $postVariables );
+        $request = POST( "$target", $post_variables );
     }
     if ( $action =~ /^data$/x ) {
 
         # multi-part form upload
         my $variables = join( " ", @reqVariables );
-        my $postVariables;
-        my $success = eval ( $variables );
+        my $post_variables;
+        my $success = eval($variables);
         if ( !defined $success ) {
             croak "Error \"$@\" parsing post variables: \"$variables\"";
         }
         $request =
-          POST( "$target", $postVariables, 'Content_Type' => 'form-data' );
+          POST( "$target", $post_variables, 'Content_Type' => 'form-data' );
     }
     if ( $action =~ /^fileupload$/x ) {
 
@@ -72,15 +74,15 @@ sub string_to_request {
         my $filename  = shift(@reqVariables);
         my $file      = shift(@reqVariables);
         my $variables = join( " ", @reqVariables );
-        my $postVariables;
-        my $success = eval ( $variables );
+        my $post_variables;
+        my $success = eval($variables);
 
         if ( !defined $success ) {
             croak "Error \"$@\" parsing post variables: \"$variables\"";
         }
-        push( @{$postVariables}, $filename => ["$file"] );
+        push( @{$post_variables}, $filename => ["$file"] );
         $request =
-          POST( "$target", $postVariables, 'Content_Type' => 'form-data' );
+          POST( "$target", $post_variables, 'Content_Type' => 'form-data' );
     }
     if ( $action =~ /^put$/x ) {
         $request = PUT "$target";
@@ -88,7 +90,7 @@ sub string_to_request {
     if ( $action =~ /^delete$/x ) {
         $request = DELETE "$target";
     }
-    if ( ! defined $request ) {
+    if ( !defined $request ) {
         $request = GET "$target";
     }
     if ( $$authn->{'Type'} =~ /^basic$/x ) {
@@ -128,10 +130,14 @@ object.
 
 sub request {
     my ( $object, $string ) = @_;
-    if ( ! defined $string ) { croak "No string defined to turn into request!"; }
-    if ( ! defined $object ) { croak "No reference to a suitable object supplied!"; }
+    if ( !defined $string ) { croak "No string defined to turn into request!"; }
+    if ( !defined $object ) {
+        croak "No reference to a suitable object supplied!";
+    }
     my $authn = $$object->{'Authn'};
-    if ( ! defined $authn ) { croak "Object does not reference a suitable auth object"; }
+    if ( !defined $authn ) {
+        croak "Object does not reference a suitable auth object";
+    }
     my $verbose = $$object->{'Verbose'};
     my $log     = $$object->{'Log'};
     my $lwp     = $$authn->{'LWP'};

@@ -14,7 +14,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -44,18 +44,23 @@ system.
 =cut
 
 sub add_setup {
-    my ( $baseURL, $actOnUser, $actOnPass, $properties ) = @_;
-    if ( ! defined $baseURL ) { croak 'No base url defined to add against!'; }
-    if ( ! defined $actOnUser ) { croak 'No user name defined to add!'; }
-    if ( ! defined $actOnPass ) { croak "No user password defined to add for user $actOnUser!"; }
-    my $property_post_vars = Apache::Sling::URL::properties_array_to_string( $properties );
-    my $postVariables = "\$postVariables = [':name','$actOnUser','pwd','$actOnPass','pwdConfirm','$actOnPass'";
-    if ( defined $property_post_vars && $property_post_vars ne q{} ) {
-        $postVariables .= ",$property_post_vars";
+    my ( $base_url, $actOnUser, $actOnPass, $properties ) = @_;
+    if ( !defined $base_url )   { croak 'No base url defined to add against!'; }
+    if ( !defined $actOnUser ) { croak 'No user name defined to add!'; }
+    if ( !defined $actOnPass ) {
+        croak "No user password defined to add for user $actOnUser!";
     }
-    $postVariables .= "]";
-    return "post $baseURL/system/userManager/user.create.html $postVariables";
+    my $property_post_vars =
+      Apache::Sling::URL::properties_array_to_string($properties);
+    my $post_variables =
+"\$post_variables = [':name','$actOnUser','pwd','$actOnPass','pwdConfirm','$actOnPass'";
+    if ( defined $property_post_vars && $property_post_vars ne q{} ) {
+        $post_variables .= ",$property_post_vars";
+    }
+    $post_variables .= "]";
+    return "post $base_url/system/userManager/user.create.html $post_variables";
 }
+
 #}}}
 
 #{{{sub add_eval
@@ -69,9 +74,10 @@ Check result of adding user to the system.
 =cut
 
 sub add_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
 }
+
 #}}}
 
 #{{{sub change_password_setup
@@ -86,15 +92,26 @@ of the user in the system.
 =cut
 
 sub change_password_setup {
-    my ( $baseURL, $actOnUser, $actOnPass, $newPass, $newPassConfirm ) = @_;
-    if ( ! defined $baseURL ) { croak 'No base url defined to add against!'; }
-    if ( ! defined $actOnUser ) { croak 'No user name defined to change password for!'; }
-    if ( ! defined $actOnPass ) { croak "No current password defined for $actOnUser!"; }
-    if ( ! defined $newPass ) { croak "No new password defined for $actOnUser!"; }
-    if ( ! defined $newPassConfirm ) { croak "No confirmation of new password defined for $actOnUser!"; }
-    my $postVariables = "\$postVariables = ['oldPwd','$actOnPass','newPwd','$newPass','newPwdConfirm','$newPassConfirm']";
-    return "post $baseURL/system/userManager/user/$actOnUser.changePassword.html $postVariables";
+    my ( $base_url, $actOnUser, $actOnPass, $newPass, $newPassConfirm ) = @_;
+    if ( !defined $base_url ) { croak 'No base url defined to add against!'; }
+    if ( !defined $actOnUser ) {
+        croak 'No user name defined to change password for!';
+    }
+    if ( !defined $actOnPass ) {
+        croak "No current password defined for $actOnUser!";
+    }
+    if ( !defined $newPass ) {
+        croak "No new password defined for $actOnUser!";
+    }
+    if ( !defined $newPassConfirm ) {
+        croak "No confirmation of new password defined for $actOnUser!";
+    }
+    my $post_variables =
+"\$post_variables = ['oldPwd','$actOnPass','newPwd','$newPass','newPwdConfirm','$newPassConfirm']";
+    return
+"post $base_url/system/userManager/user/$actOnUser.changePassword.html $post_variables";
 }
+
 #}}}
 
 #{{{sub change_password_eval
@@ -108,9 +125,10 @@ Verify whether the change password attempt for the user in the system was succes
 =cut
 
 sub change_password_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
 }
+
 #}}}
 
 #{{{sub delete_setup
@@ -125,12 +143,14 @@ the system.
 =cut
 
 sub delete_setup {
-    my ( $baseURL, $actOnUser ) = @_;
-    if ( ! defined $baseURL ) { croak 'No base url defined to delete against!'; }
-    if ( ! defined $actOnUser ) { croak 'No user name defined to delete!'; }
-    my $postVariables = "\$postVariables = []";
-    return "post $baseURL/system/userManager/user/$actOnUser.delete.html $postVariables";
+    my ( $base_url, $actOnUser ) = @_;
+    if ( !defined $base_url ) { croak 'No base url defined to delete against!'; }
+    if ( !defined $actOnUser ) { croak 'No user name defined to delete!'; }
+    my $post_variables = "\$post_variables = []";
+    return
+"post $base_url/system/userManager/user/$actOnUser.delete.html $post_variables";
 }
+
 #}}}
 
 #{{{sub delete_eval
@@ -144,9 +164,10 @@ Check result of deleting user from the system.
 =cut
 
 sub delete_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
 }
+
 #}}}
 
 #{{{sub exists_setup
@@ -161,11 +182,16 @@ username exists in the system.
 =cut
 
 sub exists_setup {
-    my ( $baseURL, $actOnUser ) = @_;
-    if ( ! defined $baseURL ) { croak 'No base url to check existence against!'; }
-    if ( ! defined $actOnUser ) { croak 'No user to check existence of defined!'; }
-    return "get $baseURL/system/userManager/user/$actOnUser.tidy.json";
+    my ( $base_url, $actOnUser ) = @_;
+    if ( !defined $base_url ) {
+        croak 'No base url to check existence against!';
+    }
+    if ( !defined $actOnUser ) {
+        croak 'No user to check existence of defined!';
+    }
+    return "get $base_url/system/userManager/user/$actOnUser.tidy.json";
 }
+
 #}}}
 
 #{{{sub exists_eval
@@ -181,9 +207,10 @@ else false.
 =cut
 
 sub exists_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
 }
+
 #}}}
 
 #{{{sub me_setup
@@ -198,10 +225,13 @@ about the current user.
 =cut
 
 sub me_setup {
-    my ( $baseURL ) = @_;
-    if ( ! defined $baseURL ) { croak 'No base url to check existence against!'; }
-    return "get $baseURL/system/me";
+    my ($base_url) = @_;
+    if ( !defined $base_url ) {
+        croak 'No base url to check existence against!';
+    }
+    return "get $base_url/system/me";
 }
+
 #}}}
 
 #{{{sub me_eval
@@ -217,9 +247,10 @@ else false.
 =cut
 
 sub me_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
 }
+
 #}}}
 
 #{{{sub sites_setup
@@ -234,10 +265,13 @@ sites the current user is a member of.
 =cut
 
 sub sites_setup {
-    my ( $baseURL ) = @_;
-    if ( ! defined $baseURL ) { croak 'No base url to check membership of sites against!'; }
-    return "get $baseURL/system/sling/membership";
+    my ($base_url) = @_;
+    if ( !defined $base_url ) {
+        croak 'No base url to check membership of sites against!';
+    }
+    return "get $base_url/system/sling/membership";
 }
+
 #}}}
 
 #{{{sub sites_eval
@@ -253,9 +287,10 @@ else false.
 =cut
 
 sub sites_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
 }
+
 #}}}
 
 #{{{sub update_setup
@@ -270,17 +305,20 @@ system.
 =cut
 
 sub update_setup {
-    my ( $baseURL, $actOnUser, $properties ) = @_;
-    if ( ! defined $baseURL ) { croak 'No base url defined to update against!'; }
-    if ( ! defined $actOnUser ) { croak 'No user name defined to update!'; }
-    my $property_post_vars = Apache::Sling::URL::properties_array_to_string( $properties );
-    my $postVariables = "\$postVariables = [";
+    my ( $base_url, $actOnUser, $properties ) = @_;
+    if ( !defined $base_url ) { croak 'No base url defined to update against!'; }
+    if ( !defined $actOnUser ) { croak 'No user name defined to update!'; }
+    my $property_post_vars =
+      Apache::Sling::URL::properties_array_to_string($properties);
+    my $post_variables = "\$post_variables = [";
     if ( $property_post_vars ne q{} ) {
-        $postVariables .= "$property_post_vars";
+        $post_variables .= "$property_post_vars";
     }
-    $postVariables .= "]";
-    return "post $baseURL/system/userManager/user/$actOnUser.update.html $postVariables";
+    $post_variables .= "]";
+    return
+"post $base_url/system/userManager/user/$actOnUser.update.html $post_variables";
 }
+
 #}}}
 
 #{{{sub update_eval
@@ -294,9 +332,10 @@ Check result of updateing user to the system.
 =cut
 
 sub update_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
 }
+
 #}}}
 
 1;

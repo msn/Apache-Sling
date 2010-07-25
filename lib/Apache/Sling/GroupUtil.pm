@@ -14,7 +14,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -44,17 +44,19 @@ system.
 =cut
 
 sub add_setup {
-    my ( $baseURL, $actOnGroup, $properties ) = @_;
-    if ( ! defined $baseURL ) { croak 'No base url defined to add against!'; }
-    if ( ! defined $actOnGroup ) { croak 'No group name defined to add!'; }
-    my $property_post_vars = Apache::Sling::URL::properties_array_to_string( $properties );
-    my $postVariables = "\$postVariables = [':name','$actOnGroup'";
+    my ( $base_url, $act_on_group, $properties ) = @_;
+    if ( !defined $base_url )    { croak 'No base url defined to add against!'; }
+    if ( !defined $act_on_group ) { croak 'No group name defined to add!'; }
+    my $property_post_vars =
+      Apache::Sling::URL::properties_array_to_string($properties);
+    my $post_variables = "\$post_variables = [':name','$act_on_group'";
     if ( defined $property_post_vars && $property_post_vars ne q{} ) {
-        $postVariables .= ",$property_post_vars";
+        $post_variables .= ",$property_post_vars";
     }
-    $postVariables .= "]";
-    return "post $baseURL/system/userManager/group.create.html $postVariables";
+    $post_variables .= "]";
+    return "post $base_url/system/userManager/group.create.html $post_variables";
 }
+
 #}}}
 
 #{{{sub add_eval
@@ -68,9 +70,10 @@ Check result of adding group to the system.
 =cut
 
 sub add_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
 }
+
 #}}}
 
 #{{{sub delete_setup
@@ -85,12 +88,14 @@ the system.
 =cut
 
 sub delete_setup {
-    my ( $baseURL, $actOnGroup ) = @_;
-    if ( ! defined $baseURL ) { croak 'No base url defined to delete against!'; }
-    if ( ! defined $actOnGroup ) { croak 'No group name defined to delete!'; }
-    my $postVariables = "\$postVariables = []";
-    return "post $baseURL/system/userManager/group/$actOnGroup.delete.html $postVariables";
+    my ( $base_url, $act_on_group ) = @_;
+    if ( !defined $base_url ) { croak 'No base url defined to delete against!'; }
+    if ( !defined $act_on_group ) { croak 'No group name defined to delete!'; }
+    my $post_variables = "\$post_variables = []";
+    return
+"post $base_url/system/userManager/group/$act_on_group.delete.html $post_variables";
 }
+
 #}}}
 
 #{{{sub delete_eval
@@ -104,9 +109,10 @@ Check result of deleting group from the system.
 =cut
 
 sub delete_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
 }
+
 #}}}
 
 #{{{sub exists_setup
@@ -121,11 +127,16 @@ group exists in the system.
 =cut
 
 sub exists_setup {
-    my ( $baseURL, $actOnGroup ) = @_;
-    if ( ! defined $baseURL ) { croak 'No base url to check existence against!'; }
-    if ( ! defined $actOnGroup ) { croak 'No group to check existence of defined!'; }
-    return "get $baseURL/system/userManager/group/$actOnGroup.json";
+    my ( $base_url, $act_on_group ) = @_;
+    if ( !defined $base_url ) {
+        croak 'No base url to check existence against!';
+    }
+    if ( !defined $act_on_group ) {
+        croak 'No group to check existence of defined!';
+    }
+    return "get $base_url/system/userManager/group/$act_on_group.json";
 }
+
 #}}}
 
 #{{{sub exists_eval
@@ -141,9 +152,10 @@ false.
 =cut
 
 sub exists_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
 }
+
 #}}}
 
 #{{{sub member_add_setup
@@ -158,13 +170,18 @@ group in the system.
 =cut
 
 sub member_add_setup {
-    my ( $baseURL, $actOnGroup, $addMember ) = @_;
-    if ( ! defined $baseURL ) { croak 'No base url defined to add against!'; }
-    if ( ! defined $actOnGroup ) { croak 'No group name defined to add member to!'; }
-    if ( ! defined $addMember ) { croak 'No member name defined to add!'; }
-    my $postVariables = "\$postVariables = [':member','/system/userManager/user/$addMember']";
-    return "post $baseURL/system/userManager/group/$actOnGroup.update.html $postVariables";
+    my ( $base_url, $act_on_group, $add_member ) = @_;
+    if ( !defined $base_url ) { croak 'No base url defined to add against!'; }
+    if ( !defined $act_on_group ) {
+        croak 'No group name defined to add member to!';
+    }
+    if ( !defined $add_member ) { croak 'No member name defined to add!'; }
+    my $post_variables =
+      "\$post_variables = [':member','/system/userManager/user/$add_member']";
+    return
+"post $base_url/system/userManager/group/$act_on_group.update.html $post_variables";
 }
+
 #}}}
 
 #{{{sub member_add_eval
@@ -178,9 +195,10 @@ Check result of adding a member to a group in the system.
 =cut
 
 sub member_add_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
 }
+
 #}}}
 
 #{{{sub member_delete_setup
@@ -195,13 +213,18 @@ a group in the system.
 =cut
 
 sub member_delete_setup {
-    my ( $baseURL, $actOnGroup, $deleteMember ) = @_;
-    if ( ! defined $baseURL ) { croak 'No base url defined to delete against!'; }
-    if ( ! defined $actOnGroup ) { croak 'No group name defined to delete member to!'; }
-    if ( ! defined $deleteMember ) { croak 'No member name defined to delete!'; }
-    my $postVariables = "\$postVariables = [':member\@Delete','/system/userManager/user/$deleteMember']";
-    return "post $baseURL/system/userManager/group/$actOnGroup.update.html $postVariables";
+    my ( $base_url, $act_on_group, $delete_member ) = @_;
+    if ( !defined $base_url ) { croak 'No base url defined to delete against!'; }
+    if ( !defined $act_on_group ) {
+        croak 'No group name defined to delete member to!';
+    }
+    if ( !defined $delete_member ) { croak 'No member name defined to delete!'; }
+    my $post_variables =
+"\$post_variables = [':member\@Delete','/system/userManager/user/$delete_member']";
+    return
+"post $base_url/system/userManager/group/$act_on_group.update.html $post_variables";
 }
+
 #}}}
 
 #{{{sub member_delete_eval
@@ -215,9 +238,10 @@ Check result of deleting a member from a group in the system.
 =cut
 
 sub member_delete_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/x && $$res->content ne q{} );
 }
+
 #}}}
 
 #{{{sub view_setup
@@ -232,11 +256,12 @@ the system. This function is similar to exists expect authentication is forced.
 =cut
 
 sub view_setup {
-    my ( $baseURL, $actOnGroup ) = @_;
-    if ( ! defined $baseURL ) { croak "No base url to view with defined!"; }
-    if ( ! defined $actOnGroup ) { croak "No group to view defined!"; }
-    return "get $baseURL/system/userManager/group/$actOnGroup.tidy.json";
+    my ( $base_url, $act_on_group ) = @_;
+    if ( !defined $base_url )    { croak "No base url to view with defined!"; }
+    if ( !defined $act_on_group ) { croak "No group to view defined!"; }
+    return "get $base_url/system/userManager/group/$act_on_group.tidy.json";
 }
+
 #}}}
 
 #{{{sub view_eval
@@ -251,9 +276,10 @@ returning true if the result indicates the group view was returned, else false.
 =cut
 
 sub view_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/x && $$res->content ne q{} );
 }
+
 #}}}
 
 1;

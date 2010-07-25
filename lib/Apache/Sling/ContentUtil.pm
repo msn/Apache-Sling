@@ -14,7 +14,167 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
+
+#{{{sub add_setup
+
+sub add_setup {
+    my ( $base_url, $remote_dest, $properties ) = @_;
+    if ( !defined $base_url ) { croak 'No base URL provided!'; }
+    if ( !defined $remote_dest ) {
+        croak 'No position or ID to perform action for specified!';
+    }
+    my $property_post_vars =
+      Apache::Sling::URL::properties_array_to_string($properties);
+    my $post_variables = "\$post_variables = [$property_post_vars]";
+    return "post $base_url/$remote_dest $post_variables";
+}
+
+#}}}
+
+#{{{sub add_eval
+
+sub add_eval {
+    my ($res) = @_;
+    return ( ${ $res->code } =~ /^20(0|1)$/msx );
+}
+
+#}}}
+
+#{{{sub copy_setup
+
+sub copy_setup {
+    my ( $base_url, $remote_src, $remote_dest, $replace ) = @_;
+    if ( !defined $base_url ) { croak 'No base url defined!'; }
+    if ( !defined $remote_dest ) {
+        croak 'No content destination to copy to defined!';
+    }
+    if ( !defined $remote_src ) {
+        croak 'No content source to copy from defined!';
+    }
+    my $post_variables =
+      "\$post_variables = [':dest','$remote_dest',':operation','copy'";
+    $post_variables .= ( defined $replace ? q{,':replace','true'} : q{} );
+    $post_variables .= ']';
+    return "post $base_url/$remote_src $post_variables";
+}
+
+#}}}
+
+#{{{sub copy_eval
+
+sub copy_eval {
+    my ($res) = @_;
+    return ( ${ $res->code } =~ /^20(0|1)$/msx );
+}
+
+#}}}
+
+#{{{sub delete_setup
+
+sub delete_setup {
+    my ( $base_url, $remote_dest ) = @_;
+    if ( !defined $base_url ) { croak 'No base url defined!'; }
+    if ( !defined $remote_dest ) {
+        croak 'No content destination to delete defined!';
+    }
+    my $post_variables = q{$post_variables = [':operation','delete']};
+    return "post $base_url/$remote_dest $post_variables";
+}
+
+#}}}
+
+#{{{sub delete_eval
+
+sub delete_eval {
+    my ($res) = @_;
+    return ( ${ $res->code } eq '200' );
+}
+
+#}}}
+
+#{{{sub exists_setup
+
+sub exists_setup {
+    my ( $base_url, $remote_dest ) = @_;
+    if ( !defined $base_url ) { croak 'No base url defined!'; }
+    if ( !defined $remote_dest ) {
+        croak 'No position or ID to perform exists for specified!';
+    }
+    return "get $base_url/$remote_dest.json";
+}
+
+#}}}
+
+#{{{sub exists_eval
+
+sub exists_eval {
+    my ($res) = @_;
+    return ( ${ $res->code } eq '200' );
+}
+
+#}}}
+
+#{{{sub move_setup
+
+sub move_setup {
+    my ( $base_url, $remote_src, $remote_dest, $replace ) = @_;
+    if ( !defined $base_url ) { croak 'No base url defined!'; }
+    if ( !defined $remote_dest ) {
+        croak 'No content destination to move to defined!';
+    }
+    if ( !defined $remote_src ) {
+        croak 'No content source to move from defined!';
+    }
+    my $post_variables =
+      "\$post_variables = [':dest','$remote_dest',':operation','move'";
+    $post_variables .= ( defined $replace ? q{,':replace','true'} : q{} );
+    $post_variables .= ']';
+    return "post $base_url/$remote_src $post_variables";
+}
+
+#}}}
+
+#{{{sub move_eval
+
+sub move_eval {
+    my ($res) = @_;
+    return ( ${ $res->code } =~ /^20(0|1)$/msx );
+}
+
+#}}}
+
+#{{{sub upload_file_setup
+
+sub upload_file_setup {
+    my ( $base_url, $local_path, $remote_dest, $filename ) = @_;
+    if ( !defined $base_url ) {
+        croak 'No base URL provided to upload against!';
+    }
+    if ( !defined $local_path ) { croak 'No local file to upload defined!'; }
+    if ( !defined $remote_dest ) {
+        croak "No remote path to upload to defined for file $local_path!";
+    }
+    if ( $filename eq q{} ) { $filename = './*'; }
+    my $post_variables = '$post_variables = []';
+    return
+      "fileupload $base_url/$remote_dest $filename $local_path $post_variables";
+}
+
+#}}}
+
+#{{{sub upload_file_eval
+
+sub upload_file_eval {
+    my ($res) = @_;
+    return ( ${ $res->code } =~ /^20(0|1)$/msx );
+}
+
+#}}}
+
+1;
+
+__END__
 
 =head1 NAME
 
@@ -30,76 +190,27 @@ Each interaction has a setup and eval method. setup provides the request,
 whilst eval interprets the response to give further information about the
 result of performing the request.
 
-=cut
+=head1 METHODS
 
-#{{{sub add_setup
+=head1 USAGE
 
-=pod
+=head1 DESCRIPTION
+
+=head1 METHODS
 
 =head2 add_setup
 
 Returns a textual representation of the request needed to add content to the
 system.
 
-=cut
-
-sub add_setup {
-    my ( $baseURL, $remoteDest, $properties ) = @_;
-    if ( ! defined $baseURL ) { croak 'No base URL provided!'; }
-    if ( ! defined $remoteDest ) { croak 'No position or ID to perform action for specified!'; }
-    my $property_post_vars =
-      Apache::Sling::URL::properties_array_to_string($properties);
-    my $postVariables = "\$postVariables = [$property_post_vars]";
-    return "post $baseURL/$remoteDest $postVariables";
-}
-
-#}}}
-
-#{{{sub add_eval
-
-=pod
-
 =head2 add_eval
 
 Check result of adding content.
-
-=cut
-
-sub add_eval {
-    my ($res) = @_;
-    return ( $$res->code =~ /^20(0|1)$/x );
-}
-
-#}}}
-
-#{{{sub copy_setup
-
-=pod
 
 =head2 copy_setup
 
 Returns a textual representation of the request needed to copy content within
 the system.
-
-=cut
-
-sub copy_setup {
-    my ( $baseURL, $remoteSrc, $remoteDest, $replace ) = @_;
-    if ( ! defined $baseURL )    { croak 'No base url defined!'; }
-    if ( ! defined $remoteDest ) { croak 'No content destination to copy to defined!'; }
-    if ( ! defined $remoteSrc )  { croak 'No content source to copy from defined!'; }
-    my $postVariables =
-      "\$postVariables = [':dest','$remoteDest',':operation','copy'";
-    $postVariables .= ( defined $replace ? ",':replace','true'" : "" );
-    $postVariables .= "]";
-    return "post $baseURL/$remoteSrc $postVariables";
-}
-
-#}}}
-
-#{{{sub copy_eval
-
-=pod
 
 =head2 copy_eval
 
@@ -107,39 +218,10 @@ Inspects the result returned from issuing the request generated in copy_setup
 returning true if the result indicates the content was copied successfully,
 else false.
 
-=cut
-
-sub copy_eval {
-    my ($res) = @_;
-    return ( $$res->code =~ /^20(0|1)$/x );
-}
-
-#}}}
-
-#{{{sub delete_setup
-
-=pod
-
 =head2 delete_setup
 
 Returns a textual representation of the request needed to delete content from
 the system.
-
-=cut
-
-sub delete_setup {
-    my ( $baseURL, $remoteDest ) = @_;
-    if ( ! defined $baseURL )    { croak 'No base url defined!'; }
-    if ( ! defined $remoteDest ) { croak 'No content destination to delete defined!'; }
-    my $postVariables = "\$postVariables = [':operation','delete']";
-    return "post $baseURL/$remoteDest $postVariables";
-}
-
-#}}}
-
-#{{{sub delete_eval
-
-=pod
 
 =head2 delete_eval
 
@@ -147,38 +229,10 @@ Inspects the result returned from issuing the request generated in delete_setup
 returning true if the result indicates the content was deleted successfully,
 else false.
 
-=cut
-
-sub delete_eval {
-    my ($res) = @_;
-    return ( $$res->code =~ /^200$/x );
-}
-
-#}}}
-
-#{{{sub exists_setup
-
-=pod
-
 =head2 exists_setup
 
 Returns a textual representation of the request needed to test whether content
 exists in the system.
-
-=cut
-
-sub exists_setup {
-    my ( $baseURL, $remoteDest ) = @_;
-    if ( ! defined $baseURL ) { croak 'No base url defined!'; }
-    if ( ! defined $remoteDest ) { croak 'No position or ID to perform exists for specified!'; }
-    return "get $baseURL/$remoteDest.json";
-}
-
-#}}}
-
-#{{{sub exists_eval
-
-=pod
 
 =head2 exists_eval
 
@@ -186,43 +240,10 @@ Inspects the result returned from issuing the request generated in exists_setup
 returning true if the result indicates the content does exist in the system,
 else false.
 
-=cut
-
-sub exists_eval {
-    my ($res) = @_;
-    return ( $$res->code =~ /^200$/x );
-}
-
-#}}}
-
-#{{{sub move_setup
-
-=pod
-
 =head2 move_setup
 
 Returns a textual representation of the request needed to move content within
 the system.
-
-=cut
-
-sub move_setup {
-    my ( $baseURL, $remoteSrc, $remoteDest, $replace ) = @_;
-    if ( ! defined $baseURL )    { croak 'No base url defined!'; }
-    if ( ! defined $remoteDest ) { croak 'No content destination to move to defined!'; }
-    if ( ! defined $remoteSrc )  { croak 'No content source to move from defined!'; }
-    my $postVariables =
-      "\$postVariables = [':dest','$remoteDest',':operation','move'";
-    $postVariables .= ( defined $replace ? ",':replace','true'" : "" );
-    $postVariables .= "]";
-    return "post $baseURL/$remoteSrc $postVariables";
-}
-
-#}}}
-
-#{{{sub move_eval
-
-=pod
 
 =head2 move_eval
 
@@ -230,68 +251,13 @@ Inspects the result returned from issuing the request generated in move_setup
 returning true if the result indicates the content was moved successfully,
 else false.
 
-=cut
-
-sub move_eval {
-    my ($res) = @_;
-    return ( $$res->code =~ /^20(0|1)$/x );
-}
-
-#}}}
-
-#{{{sub upload_file_setup
-
-=pod
-
 =head2 upload_file_setup
 
 Returns a textual representation of the request needed to upload a file to the system.
 
-=cut
-
-sub upload_file_setup {
-    my ( $baseURL, $localPath, $remoteDest, $filename ) = @_;
-    if ( ! defined $baseURL )    { croak 'No base URL provided to upload against!'; }
-    if ( ! defined $localPath )  { croak 'No local file to upload defined!'; }
-    if ( ! defined $remoteDest ) { croak 'No remote path to upload to defined for file $localPath!'; }
-    $filename = "./*" if ( $filename eq q{} );
-    my $postVariables = "\$postVariables = []";
-    return
-      "fileupload $baseURL/$remoteDest $filename $localPath $postVariables";
-}
-
-#}}}
-
-#{{{sub upload_file_eval
-
-=pod
-
 =head2 upload_file_eval
 
 Check result of system upload_file.
-
-=cut
-
-sub upload_file_eval {
-    my ($res) = @_;
-    return ( $$res->code =~ /^20(0|1)$/x );
-}
-
-#}}}
-
-1;
-
-__END__
-
-=head1 NAME
-
-=head1 ABSTRACT
-
-=head1 METHODS
-
-=head1 USAGE
-
-=head1 DESCRIPTION
 
 =head1 REQUIRED ARGUMENTS
 

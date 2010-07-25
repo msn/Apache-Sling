@@ -16,8 +16,8 @@ ok( Apache::Sling::AuthnUtil::basic_login_setup( 'http://localhost:8080' ) eq
   'get http://localhost:8080/system/sling/login?sling:authRequestLogin=1', 'Check basic_login_setup function' );
 
 ok( Apache::Sling::AuthnUtil::form_login_setup( 'http://localhost:8080', 'admin', 'admin') eq
-  q(post http://localhost:8080/system/sling/formlogin $postVariables = ['sakaiauth:un','admin','sakaiauth:pw','admin','sakaiauth:login','1']),
+  q(post http://localhost:8080/system/sling/formlogin $post_variables = ['sakaiauth:un','admin','sakaiauth:pw','admin','sakaiauth:login','1']),
   'Check form_login_setup function' );
 
 ok( Apache::Sling::AuthnUtil::form_logout_setup( 'http://localhost:8080' ) eq
-  q(post http://localhost:8080/system/sling/formlogin $postVariables = ['sakaiauth:logout','1']), 'Check form_logout_setup function' );
+  q(post http://localhost:8080/system/sling/formlogin $post_variables = ['sakaiauth:logout','1']), 'Check form_logout_setup function' );

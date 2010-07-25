@@ -15,7 +15,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -92,7 +92,8 @@ threads or forks from stepping on each others toes when printing to stdout.
 
 sub print_lock {
     my ($message) = @_;
-    my ( $tmp_print_file_handle, $tmp_print_file_name ) = File::Temp::tempfile();
+    my ( $tmp_print_file_handle, $tmp_print_file_name ) =
+      File::Temp::tempfile();
     if ( open my $lock, ">>", $tmp_print_file_name ) {
         flock( $lock, LOCK_EX );
         print $message . "\n";
@@ -163,7 +164,7 @@ sub dateTime {
         my $dayOfYear,
         my $daylightSavings
     ) = localtime();
-    $sec = "0$sec" if $sec < 10;
+    $sec = "0$sec"    if $sec < 10;
     $sec = "0$minute" if $minute < 10;
     my $year = 1900 + $yearOffset;
     return

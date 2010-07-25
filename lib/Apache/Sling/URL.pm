@@ -12,7 +12,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -81,6 +81,7 @@ sub properties_array_to_string {
     my ($properties) = @_;
     my $property_post_vars;
     foreach my $property ( @{$properties} ) {
+
         # Escaping single quotes:
         $property =~ s/'/\\'/g;
         $property =~ /^([^=]*)=(.*)/x;
@@ -88,7 +89,7 @@ sub properties_array_to_string {
             $property_post_vars .= "'$1','$2',";
         }
     }
-    if (defined $property_post_vars) {
+    if ( defined $property_post_vars ) {
         $property_post_vars =~ s/,$//x;
     }
     else {
