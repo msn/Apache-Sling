@@ -8,6 +8,14 @@ use warnings;
 use Carp;
 use Apache::Sling::URL;
 
+require Exporter;
+
+use base qw(Exporter);
+
+our @EXPORT_OK = ();
+
+our $VERSION = '0.07';
+
 =head1 NAME
 
 GroupUtil - Utility library returning strings representing Rest queries that
