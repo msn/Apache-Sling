@@ -19,26 +19,7 @@ our @EXPORT_OK = ();
 
 our $VERSION = '0.08';
 
-=head1 NAME
-
-User - user related functionality for Sling implemented over rest
-APIs.
-
-=head1 ABSTRACT
-
-Perl library providing a layer of abstraction to the REST user methods
-
-=cut
-
 #{{{sub new
-
-=pod
-
-=head2 new
-
-Create, set up, and return a User Agent.
-
-=cut
 
 sub new {
     my ( $class, $authn, $verbose, $log ) = @_;
@@ -277,13 +258,23 @@ __END__
 
 =head1 NAME
 
+User
+
 =head1 ABSTRACT
 
+user related functionality for Sling implemented over rest APIs.
+
 =head1 METHODS
+
+=head2 new
+
+Create, set up, and return a User Agent.
 
 =head1 USAGE
 
 =head1 DESCRIPTION
+
+Perl library providing a layer of abstraction to the REST user methods
 
 =head1 REQUIRED ARGUMENTS
 
