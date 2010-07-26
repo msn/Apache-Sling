@@ -20,7 +20,7 @@ our $VERSION = '0.08';
 
 sub add_setup {
     my ( $base_url, $act_on_user, $act_on_pass, $properties ) = @_;
-    if ( !defined $base_url )   { croak 'No base url defined to add against!'; }
+    if ( !defined $base_url ) { croak 'No base url defined to add against!'; }
     if ( !defined $act_on_user ) { croak 'No user name defined to add!'; }
     if ( !defined $act_on_pass ) {
         croak "No user password defined to add for user $act_on_user!";
@@ -50,7 +50,8 @@ sub add_eval {
 #{{{sub change_password_setup
 
 sub change_password_setup {
-    my ( $base_url, $act_on_user, $act_on_pass, $new_pass, $new_pass_confirm ) = @_;
+    my ( $base_url, $act_on_user, $act_on_pass, $new_pass, $new_pass_confirm ) =
+      @_;
     if ( !defined $base_url ) { croak 'No base url defined to add against!'; }
     if ( !defined $act_on_user ) {
         croak 'No user name defined to change password for!';
@@ -85,7 +86,9 @@ sub change_password_eval {
 
 sub delete_setup {
     my ( $base_url, $act_on_user ) = @_;
-    if ( !defined $base_url ) { croak 'No base url defined to delete against!'; }
+    if ( !defined $base_url ) {
+        croak 'No base url defined to delete against!';
+    }
     if ( !defined $act_on_user ) { croak 'No user name defined to delete!'; }
     my $post_variables = "\$post_variables = []";
     return
@@ -173,7 +176,9 @@ sub sites_eval {
 
 sub update_setup {
     my ( $base_url, $act_on_user, $properties ) = @_;
-    if ( !defined $base_url ) { croak 'No base url defined to update against!'; }
+    if ( !defined $base_url ) {
+        croak 'No base url defined to update against!';
+    }
     if ( !defined $act_on_user ) { croak 'No user name defined to update!'; }
     my $property_post_vars =
       Apache::Sling::URL::properties_array_to_string($properties);

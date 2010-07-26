@@ -14,25 +14,7 @@ our @EXPORT_OK = ();
 
 our $VERSION = '0.08';
 
-=head1 NAME
-
-URL - useful utility functions for manipulating URLs.
-
-=head1 ABSTRACT
-
-Utility library providing useful URL functions for general Rest functionality.
-
-=cut
-
 #{{{sub add_leading_slash
-
-=pod
-
-=head2 add_leading_slash
-
-Function to add a leading slash to a string if one does not exist.
-
-=cut
 
 sub add_leading_slash {
     my ($value) = @_;
@@ -48,14 +30,6 @@ sub add_leading_slash {
 
 #{{{sub strip_leading_slash
 
-=pod
-
-=head2 strip_leading_slash
-
-Function to remove any leading slashes from a string.
-
-=cut
-
 sub strip_leading_slash {
     my ($value) = @_;
     if ( defined $value ) {
@@ -67,15 +41,6 @@ sub strip_leading_slash {
 #}}}
 
 #{{{sub properties_array_to_string
-
-=pod
-
-=head2 properties_array_to_string
-
-Function to convert an array of a property values to a suitable string
-representation.
-
-=cut
 
 sub properties_array_to_string {
     my ($properties) = @_;
@@ -102,14 +67,6 @@ sub properties_array_to_string {
 
 #{{{sub urlencode
 
-=pod
-
-=head2 urlencode
-
-Function to encode a string so it is suitable for use in urls.
-
-=cut
-
 sub urlencode {
     my ($value) = @_;
     $value =~ s/([^a-zA-Z_0-9 ])/"%" . uc(sprintf "%lx" , unpack("C", $1))/egx;
@@ -120,15 +77,6 @@ sub urlencode {
 #}}}
 
 #{{{sub url_input_sanitize
-
-=pod
-
-=head2 url_input_sanitize
-
-Sanitizes input url by removing trailing slashes and adding a protocol if
-missing.
-
-=cut
 
 sub url_input_sanitize {
     my ($url) = @_;
@@ -147,13 +95,41 @@ __END__
 
 =head1 NAME
 
+URL
+
 =head1 ABSTRACT
 
+useful utility functions for manipulating URLs.
+
 =head1 METHODS
+
+=head2 add_leading_slash
+
+Function to add a leading slash to a string if one does not exist.
+
+=head2 strip_leading_slash
+
+Function to remove any leading slashes from a string.
+
+=head2 properties_array_to_string
+
+Function to convert an array of a property values to a suitable string
+representation.
+
+=head2 urlencode
+
+Function to encode a string so it is suitable for use in urls.
+
+=head2 url_input_sanitize
+
+Sanitizes input url by removing trailing slashes and adding a protocol if
+missing.
 
 =head1 USAGE
 
 =head1 DESCRIPTION
+
+Utility library providing useful URL functions for general Rest functionality.
 
 =head1 REQUIRED ARGUMENTS
 

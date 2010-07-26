@@ -17,27 +17,7 @@ our @EXPORT_OK = ();
 
 our $VERSION = '0.08';
 
-=head1 NAME
-
-Print - useful utility functions for general print to screeen and print to file
-functionality.
-
-=head1 ABSTRACT
-
-Utility library providing useful utility functions for general Print
-functionality.
-
-=cut
-
 #{{{sub print_with_lock
-
-=pod
-
-=head2 print_with_lock
-
-Selects printing to standard out or to log with locking based on whether a suitable log file is defined.
-
-=cut
 
 sub print_with_lock {
     my ( $message, $file ) = @_;
@@ -52,16 +32,6 @@ sub print_with_lock {
 #}}}
 
 #{{{sub print_file_lock
-
-=pod
-
-=head2 print_file_lock
-
-Prints out a specified message to a specified file with locking in an attempt
-to prevent competing threads or forks from stepping on each others toes when
-writing to the file.
-
-=cut
 
 sub print_file_lock {
     my ( $message, $file ) = @_;
@@ -80,15 +50,6 @@ sub print_file_lock {
 #}}}
 
 #{{{sub print_lock
-
-=pod
-
-=head2 print_lock
-
-Prints out a specified message with locking in an attempt to prevent competing
-threads or forks from stepping on each others toes when printing to stdout.
-
-=cut
 
 sub print_lock {
     my ($message) = @_;
@@ -111,18 +72,6 @@ sub print_lock {
 
 #{{{sub print_result
 
-=pod
-
-=head2 print_result
-
-Takes an object (user, group, site, etc) and prints out it's Message value,
-appending a new line. Also looks at the verbosity level and if greater than or
-equal to 1 will print extra information extracted from the object's Response
-object. At the moment, won't print if log is defined, as the prints to log
-happen elsewhere. TODO tidy that up.
-
-=cut
-
 sub print_result {
     my ($object) = @_;
     my $message = $object->{'Message'};
@@ -142,16 +91,8 @@ sub print_result {
 
 #{{{sub dateTime
 
-=pod
-
-=head2 dateTime
-
-Returns a current date time string, which is useful for log timestamps.
-
-=cut
-
 sub dateTime {
-    my @months   = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+    my @months    = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
     my @week_days = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
     (
         my $sec,
@@ -168,7 +109,7 @@ sub dateTime {
     $sec = "0$minute" if $minute < 10;
     my $year = 1900 + $year_offset;
     return
-      "$week_days[$day_of_week] $months[$month] $day_of_month $hour:$minute:$sec";
+"$week_days[$day_of_week] $months[$month] $day_of_month $hour:$minute:$sec";
 }
 
 #}}}
@@ -179,13 +120,48 @@ __END__
 
 =head1 NAME
 
+Print
+
 =head1 ABSTRACT
 
+useful utility functions for general print to screeen and print to file
+functionality.
+
 =head1 METHODS
+
+=head2 print_with_lock
+
+Selects printing to standard out or to log with locking based on whether a suitable log file is defined.
+
+=head2 print_file_lock
+
+Prints out a specified message to a specified file with locking in an attempt
+to prevent competing threads or forks from stepping on each others toes when
+writing to the file.
+
+=head2 print_lock
+
+Prints out a specified message with locking in an attempt to prevent competing
+threads or forks from stepping on each others toes when printing to stdout.
+
+=head2 print_result
+
+Takes an object (user, group, site, etc) and prints out it's Message value,
+appending a new line. Also looks at the verbosity level and if greater than or
+equal to 1 will print extra information extracted from the object's Response
+object. At the moment, won't print if log is defined, as the prints to log
+happen elsewhere. TODO tidy that up.
+
+=head2 dateTime
+
+Returns a current date time string, which is useful for log timestamps.
 
 =head1 USAGE
 
 =head1 DESCRIPTION
+
+Utility library providing useful utility functions for general Print
+functionality.
 
 =head1 REQUIRED ARGUMENTS
 

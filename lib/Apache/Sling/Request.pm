@@ -18,25 +18,7 @@ our @EXPORT_OK = ();
 
 our $VERSION = '0.08';
 
-=head1 NAME
-
-Request - useful utility functions for general Request functionality.
-
-=head1 ABSTRACT
-
-Utility library providing useful utility functions for general Request functionality.
-
-=cut
-
 #{{{sub string_to_request
-
-=pod
-
-=head2 string_to_request
-
-Function taking a string and converting to a GET or POST HTTP request.
-
-=cut
 
 sub string_to_request {
     my ( $string, $authn, $verbose, $log ) = @_;
@@ -118,16 +100,6 @@ sub string_to_request {
 
 #{{{sub request
 
-=pod
-
-=head2 request
-
-Function to actually issue an HTTP request given a suitable string
-representation of the request and an object which references a suitable LWP
-object.
-
-=cut
-
 sub request {
     my ( $object, $string ) = @_;
     if ( !defined $string ) { croak "No string defined to turn into request!"; }
@@ -154,13 +126,29 @@ __END__
 
 =head1 NAME
 
+Request
+
 =head1 ABSTRACT
 
+useful utility functions for general Request functionality.
+
 =head1 METHODS
+
+=head2 string_to_request
+
+Function taking a string and converting to a GET or POST HTTP request.
+
+=head2 request
+
+Function to actually issue an HTTP request given a suitable string
+representation of the request and an object which references a suitable LWP
+object.
 
 =head1 USAGE
 
 =head1 DESCRIPTION
+
+Utility library providing useful utility functions for general Request functionality.
 
 =head1 REQUIRED ARGUMENTS
 

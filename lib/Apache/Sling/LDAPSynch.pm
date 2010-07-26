@@ -543,9 +543,10 @@ sub synch_full {
     # process each DN using it as a key
     my @array_of_dns = sort ( keys %$search_result );
 
-    $class->perform_synchronization( \@array_of_dns, $search_result,
-        \%seen_user_ids, $synch_cache, \@ldap_attrs_array,
-        \@sling_attrs_array );
+    $class->perform_synchronization(
+        \@array_of_dns, $search_result,     \%seen_user_ids,
+        $synch_cache,   \@ldap_attrs_array, \@sling_attrs_array
+    );
 
     # Clean up records no longer in ldap:
     my @disable_property;

@@ -71,8 +71,8 @@ sub add {
 #{{{sub add_from_file
 sub add_from_file {
     my ( $user, $file, $fork_id, $number_of_forks ) = @_;
-    my $csv           = Text::CSV->new();
-    my $count         = 0;
+    my $csv               = Text::CSV->new();
+    my $count             = 0;
     my $number_of_columns = 0;
     my @column_headings;
     if ( open my ($input), "<", $file ) {
@@ -143,7 +143,7 @@ sub change_password {
         \$user,
         Apache::Sling::UserUtil::change_password_setup(
             $user->{'BaseURL'}, $act_on_user, $act_on_pass,
-            $new_pass,           $new_pass_confirm
+            $new_pass,          $new_pass_confirm
         )
     );
     my $success = Apache::Sling::UserUtil::change_password_eval($res);
@@ -158,8 +158,11 @@ sub change_password {
 #{{{sub del
 sub del {
     my ( $user, $act_on_user ) = @_;
-    my $res = Apache::Sling::Request::request( \$user,
-        Apache::Sling::UserUtil::delete_setup( $user->{'BaseURL'}, $act_on_user )
+    my $res = Apache::Sling::Request::request(
+        \$user,
+        Apache::Sling::UserUtil::delete_setup(
+            $user->{'BaseURL'}, $act_on_user
+        )
     );
     my $success = Apache::Sling::UserUtil::delete_eval($res);
     my $message = "User: \"$act_on_user\" ";
@@ -173,8 +176,11 @@ sub del {
 #{{{sub check_exists
 sub check_exists {
     my ( $user, $act_on_user ) = @_;
-    my $res = Apache::Sling::Request::request( \$user,
-        Apache::Sling::UserUtil::exists_setup( $user->{'BaseURL'}, $act_on_user )
+    my $res = Apache::Sling::Request::request(
+        \$user,
+        Apache::Sling::UserUtil::exists_setup(
+            $user->{'BaseURL'}, $act_on_user
+        )
     );
     my $success = Apache::Sling::UserUtil::exists_eval($res);
     my $message = "User \"$act_on_user\" ";
@@ -192,10 +198,11 @@ sub me {
       Apache::Sling::Request::request( \$user,
         Apache::Sling::UserUtil::me_setup( $user->{'BaseURL'} ) );
     my $success = Apache::Sling::UserUtil::me_eval($res);
-    my $message =
-      (   $success
+    my $message = (
+          $success
         ? $$res->content
-        : "Problem fetching details for current user" );
+        : "Problem fetching details for current user"
+    );
     $user->set_results( "$message", $res );
     return $success;
 }
@@ -209,10 +216,11 @@ sub sites {
       Apache::Sling::Request::request( \$user,
         Apache::Sling::UserUtil::sites_setup( $user->{'BaseURL'} ) );
     my $success = Apache::Sling::UserUtil::sites_eval($res);
-    my $message =
-      (   $success
+    my $message = (
+          $success
         ? $$res->content
-        : "Problem fetching details for current user" );
+        : "Problem fetching details for current user"
+    );
     $user->set_results( "$message", $res );
     return $success;
 }
@@ -240,8 +248,11 @@ sub update {
 #{{{sub view
 sub view {
     my ( $user, $act_on_user ) = @_;
-    my $res = Apache::Sling::Request::request( \$user,
-        Apache::Sling::UserUtil::exists_setup( $user->{'BaseURL'}, $act_on_user )
+    my $res = Apache::Sling::Request::request(
+        \$user,
+        Apache::Sling::UserUtil::exists_setup(
+            $user->{'BaseURL'}, $act_on_user
+        )
     );
     my $success = Apache::Sling::UserUtil::exists_eval($res);
     my $message =

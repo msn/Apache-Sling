@@ -45,7 +45,7 @@ system.
 
 sub add_setup {
     my ( $base_url, $act_on_group, $properties ) = @_;
-    if ( !defined $base_url )    { croak 'No base url defined to add against!'; }
+    if ( !defined $base_url ) { croak 'No base url defined to add against!'; }
     if ( !defined $act_on_group ) { croak 'No group name defined to add!'; }
     my $property_post_vars =
       Apache::Sling::URL::properties_array_to_string($properties);
@@ -54,7 +54,8 @@ sub add_setup {
         $post_variables .= ",$property_post_vars";
     }
     $post_variables .= "]";
-    return "post $base_url/system/userManager/group.create.html $post_variables";
+    return
+      "post $base_url/system/userManager/group.create.html $post_variables";
 }
 
 #}}}
@@ -89,7 +90,9 @@ the system.
 
 sub delete_setup {
     my ( $base_url, $act_on_group ) = @_;
-    if ( !defined $base_url ) { croak 'No base url defined to delete against!'; }
+    if ( !defined $base_url ) {
+        croak 'No base url defined to delete against!';
+    }
     if ( !defined $act_on_group ) { croak 'No group name defined to delete!'; }
     my $post_variables = "\$post_variables = []";
     return
@@ -214,11 +217,15 @@ a group in the system.
 
 sub member_delete_setup {
     my ( $base_url, $act_on_group, $delete_member ) = @_;
-    if ( !defined $base_url ) { croak 'No base url defined to delete against!'; }
+    if ( !defined $base_url ) {
+        croak 'No base url defined to delete against!';
+    }
     if ( !defined $act_on_group ) {
         croak 'No group name defined to delete member to!';
     }
-    if ( !defined $delete_member ) { croak 'No member name defined to delete!'; }
+    if ( !defined $delete_member ) {
+        croak 'No member name defined to delete!';
+    }
     my $post_variables =
 "\$post_variables = [':member\@Delete','/system/userManager/user/$delete_member']";
     return
@@ -257,7 +264,7 @@ the system. This function is similar to exists expect authentication is forced.
 
 sub view_setup {
     my ( $base_url, $act_on_group ) = @_;
-    if ( !defined $base_url )    { croak "No base url to view with defined!"; }
+    if ( !defined $base_url )     { croak "No base url to view with defined!"; }
     if ( !defined $act_on_group ) { croak "No group to view defined!"; }
     return "get $base_url/system/userManager/group/$act_on_group.tidy.json";
 }
