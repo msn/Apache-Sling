@@ -441,10 +441,10 @@ sub check_for_property_modifications {
 =cut
 
 sub perform_synchronization {
-    my ( $class, $arrayOfDNs, $search_result, $seen_user_ids, $synch_cache,
+    my ( $class, $array_of_dns, $search_result, $seen_user_ids, $synch_cache,
         $ldap_attrs_array, $sling_attrs_array )
       = @_;
-    foreach my $dn ( @{$arrayOfDNs} ) {
+    foreach my $dn ( @{$array_of_dns} ) {
         my $valref  = $search_result->{$dn};
         my $index   = 0;
         my $user_id = @{ $valref->{ $class->{'Filter'} } }[0];
@@ -541,9 +541,9 @@ sub synch_full {
     my %seen_user_ids;
 
     # process each DN using it as a key
-    my @arrayOfDNs = sort ( keys %$search_result );
+    my @array_of_dns = sort ( keys %$search_result );
 
-    $class->perform_synchronization( \@arrayOfDNs, $search_result,
+    $class->perform_synchronization( \@array_of_dns, $search_result,
         \%seen_user_ids, $synch_cache, \@ldap_attrs_array,
         \@sling_attrs_array );
 

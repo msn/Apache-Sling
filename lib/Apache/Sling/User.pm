@@ -71,15 +71,15 @@ sub set_results {
 
 #{{{sub add
 sub add {
-    my ( $user, $actOnUser, $actOnPass, $properties ) = @_;
+    my ( $user, $act_on_user, $act_on_pass, $properties ) = @_;
     my $res = Apache::Sling::Request::request(
         \$user,
         Apache::Sling::UserUtil::add_setup(
-            $user->{'BaseURL'}, $actOnUser, $actOnPass, $properties
+            $user->{'BaseURL'}, $act_on_user, $act_on_pass, $properties
         )
     );
     my $success = Apache::Sling::UserUtil::add_eval($res);
-    my $message = "User: \"$actOnUser\" ";
+    my $message = "User: \"$act_on_user\" ";
     $message .= ( $success ? "added!" : "was not added!" );
     $user->set_results( "$message", $res );
     return $success;
@@ -89,10 +89,10 @@ sub add {
 
 #{{{sub add_from_file
 sub add_from_file {
-    my ( $user, $file, $forkId, $numberForks ) = @_;
+    my ( $user, $file, $fork_id, $number_of_forks ) = @_;
     my $csv           = Text::CSV->new();
     my $count         = 0;
-    my $numberColumns = 0;
+    my $number_of_columns = 0;
     my @column_headings;
     if ( open my ($input), "<", $file ) {
         while (<$input>) {
@@ -115,27 +115,27 @@ sub add_from_file {
 "Second CSV column must be the user password, column heading must be \"password\". Found: \""
                           . $column_headings[0] . "\".\n";
                     }
-                    $numberColumns = @column_headings;
+                    $number_of_columns = @column_headings;
                 }
                 else {
                     croak "CSV broken, failed to parse line: "
                       . $csv->error_input;
                 }
             }
-            elsif ( $forkId == ( $count++ % $numberForks ) ) {
+            elsif ( $fork_id == ( $count++ % $number_of_forks ) ) {
                 my @properties;
                 if ( $csv->parse($_) ) {
                     my @columns      = $csv->fields();
                     my $columns_size = @columns;
 
            # Check row has same number of columns as there were column headings:
-                    if ( $columns_size != $numberColumns ) {
+                    if ( $columns_size != $number_of_columns ) {
                         croak
-"Found \"$columns_size\" columns. There should have been \"$numberColumns\".\nRow contents was: $_";
+"Found \"$columns_size\" columns. There should have been \"$number_of_columns\".\nRow contents was: $_";
                     }
                     my $id       = $columns[0];
                     my $password = $columns[1];
-                    for ( my $i = 2 ; $i < $numberColumns ; $i++ ) {
+                    for ( my $i = 2 ; $i < $number_of_columns ; $i++ ) {
                         my $value = $column_headings[$i] . "=" . $columns[$i];
                         push( @properties, $value );
                     }
@@ -157,16 +157,16 @@ sub add_from_file {
 
 #{{{sub change_password
 sub change_password {
-    my ( $user, $actOnUser, $actOnPass, $newPass, $newPassConfirm ) = @_;
+    my ( $user, $act_on_user, $act_on_pass, $new_pass, $new_pass_confirm ) = @_;
     my $res = Apache::Sling::Request::request(
         \$user,
         Apache::Sling::UserUtil::change_password_setup(
-            $user->{'BaseURL'}, $actOnUser, $actOnPass,
-            $newPass,           $newPassConfirm
+            $user->{'BaseURL'}, $act_on_user, $act_on_pass,
+            $new_pass,           $new_pass_confirm
         )
     );
     my $success = Apache::Sling::UserUtil::change_password_eval($res);
-    my $message = "User: \"$actOnUser\" ";
+    my $message = "User: \"$act_on_user\" ";
     $message .= ( $success ? "password changed!" : "password not changed!" );
     $user->set_results( "$message", $res );
     return $success;
@@ -176,12 +176,12 @@ sub change_password {
 
 #{{{sub del
 sub del {
-    my ( $user, $actOnUser ) = @_;
+    my ( $user, $act_on_user ) = @_;
     my $res = Apache::Sling::Request::request( \$user,
-        Apache::Sling::UserUtil::delete_setup( $user->{'BaseURL'}, $actOnUser )
+        Apache::Sling::UserUtil::delete_setup( $user->{'BaseURL'}, $act_on_user )
     );
     my $success = Apache::Sling::UserUtil::delete_eval($res);
-    my $message = "User: \"$actOnUser\" ";
+    my $message = "User: \"$act_on_user\" ";
     $message .= ( $success ? "deleted!" : "was not deleted!" );
     $user->set_results( "$message", $res );
     return $success;
@@ -191,12 +191,12 @@ sub del {
 
 #{{{sub check_exists
 sub check_exists {
-    my ( $user, $actOnUser ) = @_;
+    my ( $user, $act_on_user ) = @_;
     my $res = Apache::Sling::Request::request( \$user,
-        Apache::Sling::UserUtil::exists_setup( $user->{'BaseURL'}, $actOnUser )
+        Apache::Sling::UserUtil::exists_setup( $user->{'BaseURL'}, $act_on_user )
     );
     my $success = Apache::Sling::UserUtil::exists_eval($res);
-    my $message = "User \"$actOnUser\" ";
+    my $message = "User \"$act_on_user\" ";
     $message .= ( $success ? "exists!" : "does not exist!" );
     $user->set_results( "$message", $res );
     return $success;
@@ -240,15 +240,15 @@ sub sites {
 
 #{{{sub update
 sub update {
-    my ( $user, $actOnUser, $properties ) = @_;
+    my ( $user, $act_on_user, $properties ) = @_;
     my $res = Apache::Sling::Request::request(
         \$user,
         Apache::Sling::UserUtil::update_setup(
-            $user->{'BaseURL'}, $actOnUser, $properties
+            $user->{'BaseURL'}, $act_on_user, $properties
         )
     );
     my $success = Apache::Sling::UserUtil::update_eval($res);
-    my $message = "User: \"$actOnUser\" ";
+    my $message = "User: \"$act_on_user\" ";
     $message .= ( $success ? "updated!" : "was not updated!" );
     $user->set_results( "$message", $res );
     return $success;
@@ -258,13 +258,13 @@ sub update {
 
 #{{{sub view
 sub view {
-    my ( $user, $actOnUser ) = @_;
+    my ( $user, $act_on_user ) = @_;
     my $res = Apache::Sling::Request::request( \$user,
-        Apache::Sling::UserUtil::exists_setup( $user->{'BaseURL'}, $actOnUser )
+        Apache::Sling::UserUtil::exists_setup( $user->{'BaseURL'}, $act_on_user )
     );
     my $success = Apache::Sling::UserUtil::exists_eval($res);
     my $message =
-      ( $success ? $$res->content : "Problem viewing user: \"$actOnUser\"" );
+      ( $success ? $$res->content : "Problem viewing user: \"$act_on_user\"" );
     $user->set_results( "$message", $res );
     return $success;
 }

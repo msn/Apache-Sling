@@ -152,23 +152,23 @@ Returns a current date time string, which is useful for log timestamps.
 
 sub dateTime {
     my @months   = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
-    my @weekDays = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
+    my @week_days = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
     (
         my $sec,
         my $minute,
         my $hour,
-        my $dayOfMonth,
+        my $day_of_month,
         my $month,
-        my $yearOffset,
-        my $dayOfWeek,
-        my $dayOfYear,
-        my $daylightSavings
+        my $year_offset,
+        my $day_of_week,
+        my $day_of_year,
+        my $daylight_savings
     ) = localtime();
     $sec = "0$sec"    if $sec < 10;
     $sec = "0$minute" if $minute < 10;
-    my $year = 1900 + $yearOffset;
+    my $year = 1900 + $year_offset;
     return
-      "$weekDays[$dayOfWeek] $months[$month] $dayOfMonth $hour:$minute:$sec";
+      "$week_days[$day_of_week] $months[$month] $day_of_month $hour:$minute:$sec";
 }
 
 #}}}
