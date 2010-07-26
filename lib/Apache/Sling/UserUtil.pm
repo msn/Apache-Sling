@@ -16,32 +16,7 @@ our @EXPORT_OK = ();
 
 our $VERSION = '0.08';
 
-=head1 NAME
-
-UserUtil - Utility library returning strings representing Rest queries that
-perform user related actions in the system.
-
-=head1 ABSTRACT
-
-UserUtil perl library essentially provides the request strings needed to
-interact with user functionality exposed over the system rest interfaces.
-
-Each interaction has a setup and eval method. setup provides the request,
-whilst eval interprets the response to give further information about the
-result of performing the request.
-
-=cut
-
 #{{{sub add_setup
-
-=pod
-
-=head2 add_setup
-
-Returns a textual representation of the request needed to add the user to the
-system.
-
-=cut
 
 sub add_setup {
     my ( $base_url, $act_on_user, $act_on_pass, $properties ) = @_;
@@ -65,14 +40,6 @@ sub add_setup {
 
 #{{{sub add_eval
 
-=pod
-
-=head2 add_eval
-
-Check result of adding user to the system.
-
-=cut
-
 sub add_eval {
     my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
@@ -81,15 +48,6 @@ sub add_eval {
 #}}}
 
 #{{{sub change_password_setup
-
-=pod
-
-=head2 change_password_setup
-
-Returns a textual representation of the request needed to change the password
-of the user in the system.
-
-=cut
 
 sub change_password_setup {
     my ( $base_url, $act_on_user, $act_on_pass, $new_pass, $new_pass_confirm ) = @_;
@@ -116,14 +74,6 @@ sub change_password_setup {
 
 #{{{sub change_password_eval
 
-=pod
-
-=head2 change_password_eval
-
-Verify whether the change password attempt for the user in the system was successful.
-
-=cut
-
 sub change_password_eval {
     my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
@@ -132,15 +82,6 @@ sub change_password_eval {
 #}}}
 
 #{{{sub delete_setup
-
-=pod
-
-=head2 delete_setup
-
-Returns a textual representation of the request needed to delete the user from
-the system.
-
-=cut
 
 sub delete_setup {
     my ( $base_url, $act_on_user ) = @_;
@@ -155,14 +96,6 @@ sub delete_setup {
 
 #{{{sub delete_eval
 
-=pod
-
-=head2 delete_eval
-
-Check result of deleting user from the system.
-
-=cut
-
 sub delete_eval {
     my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
@@ -171,15 +104,6 @@ sub delete_eval {
 #}}}
 
 #{{{sub exists_setup
-
-=pod
-
-=head2 exists_setup
-
-Returns a textual representation of the request needed to test whether a given
-username exists in the system.
-
-=cut
 
 sub exists_setup {
     my ( $base_url, $act_on_user ) = @_;
@@ -196,16 +120,6 @@ sub exists_setup {
 
 #{{{sub exists_eval
 
-=pod
-
-=head2 exists_eval
-
-Inspects the result returned from issuing the request generated in exists_setup
-returning true if the result indicates the username does exist in the system,
-else false.
-
-=cut
-
 sub exists_eval {
     my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
@@ -214,15 +128,6 @@ sub exists_eval {
 #}}}
 
 #{{{sub me_setup
-
-=pod
-
-=head2 me_setup
-
-Returns a textual representation of the request needed to return information
-about the current user.
-
-=cut
 
 sub me_setup {
     my ($base_url) = @_;
@@ -236,16 +141,6 @@ sub me_setup {
 
 #{{{sub me_eval
 
-=pod
-
-=head2 me_eval
-
-Inspects the result returned from issuing the request generated in me_setup
-returning true if the result indicates information was returned successfully,
-else false.
-
-=cut
-
 sub me_eval {
     my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
@@ -254,15 +149,6 @@ sub me_eval {
 #}}}
 
 #{{{sub sites_setup
-
-=pod
-
-=head2 sites_setup
-
-Returns a textual representation of the request needed to return the list of
-sites the current user is a member of.
-
-=cut
 
 sub sites_setup {
     my ($base_url) = @_;
@@ -276,16 +162,6 @@ sub sites_setup {
 
 #{{{sub sites_eval
 
-=pod
-
-=head2 sites_eval
-
-Inspects the result returned from issuing the request generated in sites_setup
-returning true if the result indicates information was returned successfully,
-else false.
-
-=cut
-
 sub sites_eval {
     my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
@@ -294,15 +170,6 @@ sub sites_eval {
 #}}}
 
 #{{{sub update_setup
-
-=pod
-
-=head2 update_setup
-
-Returns a textual representation of the request needed to update the user in the
-system.
-
-=cut
 
 sub update_setup {
     my ( $base_url, $act_on_user, $properties ) = @_;
@@ -323,14 +190,6 @@ sub update_setup {
 
 #{{{sub update_eval
 
-=pod
-
-=head2 update_eval
-
-Check result of updateing user to the system.
-
-=cut
-
 sub update_eval {
     my ($res) = @_;
     return ( $$res->code =~ /^200$/x );
@@ -344,13 +203,96 @@ __END__
 
 =head1 NAME
 
+UserUtil
+
 =head1 ABSTRACT
+
+Utility library returning strings representing Rest queries that perform
+user related actions in the system.
 
 =head1 METHODS
 
+=head2 add_setup
+
+Returns a textual representation of the request needed to add the user to the
+system.
+
+=head2 add_eval
+
+Check result of adding user to the system.
+
+=head2 change_password_setup
+
+Returns a textual representation of the request needed to change the password
+of the user in the system.
+
+=head2 change_password_eval
+
+Verify whether the change password attempt for the user in the system was successful.
+
+=head2 delete_setup
+
+Returns a textual representation of the request needed to delete the user from
+the system.
+
+=head2 delete_eval
+
+Check result of deleting user from the system.
+
+=head2 exists_setup
+
+Returns a textual representation of the request needed to test whether a given
+username exists in the system.
+
+=head2 exists_eval
+
+Inspects the result returned from issuing the request generated in exists_setup
+returning true if the result indicates the username does exist in the system,
+else false.
+
+=head2 me_setup
+
+Returns a textual representation of the request needed to return information
+about the current user.
+
+=head2 me_eval
+
+Inspects the result returned from issuing the request generated in me_setup
+returning true if the result indicates information was returned successfully,
+else false.
+
+=head2 sites_setup
+
+Returns a textual representation of the request needed to return the list of
+sites the current user is a member of.
+
+=head2 sites_eval
+
+Inspects the result returned from issuing the request generated in sites_setup
+returning true if the result indicates information was returned successfully,
+else false.
+
+=head2 update_setup
+
+Returns a textual representation of the request needed to update the user in the
+system.
+
+=head2 update_eval
+
+Check result of updateing user to the system.
+
 =head1 USAGE
 
+use Apache::Sling::UserUtil;
+
 =head1 DESCRIPTION
+
+UserUtil perl library essentially provides the request strings needed to
+interact with user functionality exposed over the system rest interfaces.
+
+Each interaction has a setup and eval method. setup provides the request,
+whilst eval interprets the response to give further information about the
+result of performing the request.
 
 =head1 REQUIRED ARGUMENTS
 
