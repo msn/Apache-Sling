@@ -38,12 +38,7 @@ None by default.
 
 =head1 SEE ALSO
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
-
-If you have a web site set up for your module, mention it here.
+http://sling.apache.org
 
 =head1 AUTHOR
 
@@ -51,15 +46,10 @@ D. D. Parry, E<lt>perl@ddp.me.ukE<gt>
 
 =head1 VERSION
 
-0.03
+0.08
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2010 by D. D. Parry
+LICENSE: http://dev.perl.org/licenses/artistic.html
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.8 or,
-at your option, any later version of Perl 5 you may have available.
-
-
-=cut
+COPYRIGHT: Daniel David Parry <perl@ddp.me.uk>
