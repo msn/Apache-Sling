@@ -22,29 +22,7 @@ our @EXPORT_OK = ();
 
 our $VERSION = '0.08';
 
-=head1 NAME
-
-LDAPSynch - Synchronize users from an external LDAP server with the internal
-users in an Apache Sling instance.
-
-=head1 ABSTRACT
-
-Perl library providing a means to synchronize users from an external LDAP
-server with the internal users in an Apache Sling instance.
-
-=head2 Methods
-
-=cut
-
 #{{{sub new
-
-=pod
-
-=head2 new
-
-Create, set up, and return an LDAPSynch object.
-
-=cut
 
 sub new {
     my (
@@ -102,12 +80,6 @@ sub new {
 
 #{{{sub ldap_connect
 
-=head2 ldap_connect
-
-Connect to the ldap server.
-
-=cut
-
 sub ldap_connect {
     my ($class) = @_;
     $class->{'LDAP'} = Net::LDAP->new( $class->{'LDAPHost'} )
@@ -130,12 +102,6 @@ sub ldap_connect {
 
 #{{{sub ldap_search
 
-=head2 ldap_search
-
-Perform an ldap search.
-
-=cut
-
 sub ldap_search {
     my ( $class, $search, $attrs ) = @_;
     $class->ldap_connect;
@@ -150,12 +116,6 @@ sub ldap_search {
 #}}}
 
 #{{{sub init_synch_cache
-
-=head2 init_synch_cache
-
-Initialize the Apache Sling synch cache.
-
-=cut
 
 sub init_synch_cache {
     my ($class) = @_;
@@ -186,12 +146,6 @@ q(Problem closing temporary file handle when initializing synch cache);
 
 #{{{sub get_synch_cache
 
-=head2 get_synch_cache
-
-Fetch the synchronization cache file.
-
-=cut
-
 sub get_synch_cache {
     my ($class) = @_;
     $class->init_synch_cache();
@@ -214,12 +168,6 @@ sub get_synch_cache {
 #}}}
 
 #{{{sub update_synch_cache
-
-=head2 update_synch_cache
-
-Update the synchronization cache file with the latest state.
-
-=cut
 
 sub update_synch_cache {
     my ( $class, $synch_cache ) = @_;
@@ -250,12 +198,6 @@ sub update_synch_cache {
 
 #{{{sub get_synch_user_list
 
-=head2 get_synch_user_list
-
-Fetch the synchronization user list file.
-
-=cut
-
 sub get_synch_user_list {
     my ($class) = @_;
     if ( !${ $class->{'Content'} }
@@ -277,12 +219,6 @@ sub get_synch_user_list {
 #}}}
 
 #{{{sub update_synch_user_list
-
-=head2 update_synch_user_list
-
-Update the synchronization user_list file with the latest state.
-
-=cut
 
 sub update_synch_user_list {
     my ( $class, $synch_user_list ) = @_;
@@ -315,12 +251,6 @@ sub update_synch_user_list {
 
 #{{{sub download_synch_user_list
 
-=head2 download_synch_user_list
-
-Download the current synchronization user list file.
-
-=cut
-
 sub download_synch_user_list {
     my ( $class, $user_list_file ) = @_;
     my $synch_user_list = $class->get_synch_user_list;
@@ -348,12 +278,6 @@ q(Problem closing file handle when downloading synchronized user list!);
 
 #{{{sub upload_synch_user_list
 
-=head2 upload_synch_user_list
-
-Upload a list of users to be synchronized into the sling system.
-
-=cut
-
 sub upload_synch_user_list {
     my ( $class, $user_list_file ) = @_;
     my %user_list_hash;
@@ -377,13 +301,6 @@ q(Successfully uploaded user list for use in subsequent synchronizations!);
 
 #{{{sub parse_attributes
 
-=head2 parse_attributes
-
-Read the given ldap and sling attributes into two separate specified arrays.
-Check that the length of the arrays match.
-
-=cut
-
 sub parse_attributes {
     my ( $ldap_attrs, $sling_attrs, $ldap_attrs_array, $sling_attrs_array ) =
       @_;
@@ -405,13 +322,6 @@ sub parse_attributes {
 #}}}
 
 #{{{sub check_for_property_modifications
-
-=head2 check_for_property_modifications
-
-Compare a new property hash with a cached version. If any changes to properties
-have been made, then return true. Else return false.
-
-=cut
 
 sub check_for_property_modifications {
     my ( $new_properties, $cached_properties ) = @_;
@@ -435,10 +345,6 @@ sub check_for_property_modifications {
 #}}}
 
 #{{{sub perform_synchronization
-
-=head2 perform_synchronization
-
-=cut
 
 sub perform_synchronization {
     my ( $class, $array_of_dns, $search_result, $seen_user_ids, $synch_cache,
@@ -516,13 +422,6 @@ sub perform_synchronization {
 
 #{{{sub synch_full
 
-=head2 synch_full
-
-Perform a full synchronization of Sling internal users with the external LDAP
-users.
-
-=cut
-
 sub synch_full {
     my ( $class, $ldap_attrs, $sling_attrs ) = @_;
     my $search = q{(} . $class->{'Filter'} . q{=*)};
@@ -572,13 +471,6 @@ sub synch_full {
 
 #{{{sub synch_full_since
 
-=head2 synch_full_since
-
-Perform a synchronization of Sling internal users with the external LDAP users,
-using LDAP changes since a given timestamp.
-
-=cut
-
 sub synch_since {
     my ( $class, $ldap_attrs, $sling_attrs, $synch_since ) = @_;
     my $search = q{(modifytimestamp>=} . $synch_since . q{)};
@@ -591,15 +483,6 @@ sub synch_since {
 
 #{{{sub synch_listed
 
-=pod
-
-=head2 synch_listed
-
-Perform a synchronization of Sling internal users with the external LDAP users
-for a set of users listed in a specified file.
-
-=cut
-
 sub synch_listed {
     my ( $class, $ldap_attrs, $sling_attrs ) = @_;
     my $search = q{(} . $class->{'Filter'} . q{=*)};
@@ -611,14 +494,6 @@ sub synch_listed {
 #}}}
 
 #{{{sub synch_listed_since
-
-=head2 synch_listed_since
-
-Perform a synchronization of Sling internal users with the external LDAP users,
-using LDAP changes since a given timestamp for a set of users listed in a
-specified file.
-
-=cut
 
 sub synch_listed_since {
     my ( $class, $ldap_attrs, $sling_attrs, $synch_since ) = @_;
@@ -636,13 +511,96 @@ __END__
 
 =head1 NAME
 
+LDAPSynch
+
 =head1 ABSTRACT
+
+Synchronize users from an external LDAP server with the internal users
+in an Apache Sling instance.
 
 =head1 METHODS
 
+=head2 new
+
+Create, set up, and return an LDAPSynch object.
+
+=head2 synch_listed
+
+Perform a synchronization of Sling internal users with the external LDAP users
+for a set of users listed in a specified file.
+
+=head2 ldap_connect
+
+Connect to the ldap server.
+
+=head2 ldap_search
+
+Perform an ldap search.
+
+=head2 init_synch_cache
+
+Initialize the Apache Sling synch cache.
+
+=head2 get_synch_cache
+
+Fetch the synchronization cache file.
+
+=head2 update_synch_cache
+
+Update the synchronization cache file with the latest state.
+
+=head2 get_synch_user_list
+
+Fetch the synchronization user list file.
+
+=head2 update_synch_user_list
+
+Update the synchronization user_list file with the latest state.
+
+=head2 download_synch_user_list
+
+Download the current synchronization user list file.
+
+=head2 upload_synch_user_list
+
+Upload a list of users to be synchronized into the sling system.
+
+=head2 parse_attributes
+
+Read the given ldap and sling attributes into two separate specified arrays.
+Check that the length of the arrays match.
+
+=head2 check_for_property_modifications
+
+Compare a new property hash with a cached version. If any changes to properties
+have been made, then return true. Else return false.
+
+=head2 perform_synchronization
+
+=head2 synch_full
+
+Perform a full synchronization of Sling internal users with the external LDAP
+users.
+
+=head2 synch_full_since
+
+Perform a synchronization of Sling internal users with the external LDAP users,
+using LDAP changes since a given timestamp.
+
+=head2 synch_listed_since
+
+Perform a synchronization of Sling internal users with the external LDAP users,
+using LDAP changes since a given timestamp for a set of users listed in a
+specified file.
+
 =head1 USAGE
 
+use Apache::Sling::LDAPSynch;
+
 =head1 DESCRIPTION
+
+Perl library providing a means to synchronize users from an external
+LDAP server with the internal users in an Apache Sling instance.
 
 =head1 REQUIRED ARGUMENTS
 
