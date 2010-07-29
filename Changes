@@ -1,5 +1,10 @@
 Revision history for Perl extension Apache::Sling.
 
+0.09  Thu Jul 29 07:25:00 2010
+        - Better conformance to PBP.
+        - Tweaked make file to note dependencies on
+	  HTTP::Request::Common, LWP::UserAgent and JSON.
+
 0.08  Sun Jul 25 20:24:00 2010
         - Better conformance to PBP.
         - Tweaked make file to note dependency on Net::LDAP.

@@ -1,7 +1,7 @@
 --- #YAML:1.0
  name: Apache-Sling
  abstract: Perl interface to Apache Sling Web Framework
- version: 0.08
+ version: 0.09
  author:
    - Daniel Parry <perl@ddp.me.uk>
  license: perl
@@ -12,7 +12,6 @@
    File::Temp: 0
    HTTP::Request::Common: 0
    LWP::UserAgent: 0
-   MIME::Base64: 0
    Net::LDAP: 0
    Text::CSV: 0
  build_requires:

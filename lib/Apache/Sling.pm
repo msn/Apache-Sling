@@ -10,7 +10,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 
 # Preloaded methods go here.
@@ -46,7 +46,7 @@ D. D. Parry, E<lt>perl@ddp.me.ukE<gt>
 
 =head1 VERSION
 
-0.08
+0.09
 
 =head1 LICENSE AND COPYRIGHT
 

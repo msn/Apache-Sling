@@ -1,4 +1,4 @@
-Apache-Sling version 0.08
+Apache-Sling version 0.09
 =========================
 
 Welcome to the Apache Sling library for perl. This library sets out to make it
@@ -39,18 +39,11 @@ Fcntl
 File::Temp
 HTTP::Request::Common
 LWP::UserAgent
-MIME::Base64
 Net::LDAP
 Text::CSV
 
 COPYRIGHT AND LICENCE
 
-Put the correct copyright and licence information here.
+COPYRIGHT: (c) 2010 Daniel David Parry <perl@ddp.me.uk>
 
-Copyright (C) 2010 by D. D. Parry
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.8 or,
-at your option, any later version of Perl 5 you may have available.
-
-
+LICENSE: http://dev.perl.org/licenses/artistic.html
