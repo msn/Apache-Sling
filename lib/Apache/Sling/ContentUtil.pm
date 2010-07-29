@@ -178,10 +178,20 @@ __END__
 
 =head1 NAME
 
-ContentUtil - Utility library returning strings representing Rest queries that
-perform content operations in the system.
+ContentUtil
 
 =head1 ABSTRACT
+
+Utility library returning strings representing Rest queries that perform
+content operations in the system.
+
+=head1 METHODS
+
+=head1 USAGE
+
+use Apache::Sling::ContentUtil;
+
+=head1 DESCRIPTION
 
 ContentUtil perl library essentially provides the request strings needed to
 interact with content functionality exposed over the system rest interfaces.
@@ -189,12 +199,6 @@ interact with content functionality exposed over the system rest interfaces.
 Each interaction has a setup and eval method. setup provides the request,
 whilst eval interprets the response to give further information about the
 result of performing the request.
-
-=head1 METHODS
-
-=head1 USAGE
-
-=head1 DESCRIPTION
 
 =head1 METHODS
 

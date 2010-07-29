@@ -283,6 +283,8 @@ Create, set up, and return a User Agent.
 
 =head1 USAGE
 
+use Apache::Sling::User;
+
 =head1 DESCRIPTION
 
 Perl library providing a layer of abstraction to the REST user methods

@@ -82,11 +82,11 @@ __END__
 
 =head1 NAME
 
-AuthnUtil - useful utility functions for general Authn functionality.
+AuthnUtil
 
 =head1 ABSTRACT
 
-Utility library providing useful utility functions for general Authn functionality.
+useful utility functions for general Authn functionality.
 
 =head1 METHODS
 
@@ -119,7 +119,11 @@ Verify whether the log out attempt for the user from the system was successful.
 
 =head1 USAGE
 
+use Apache::Sling::AuthnUtil;
+
 =head1 DESCRIPTION
+
+Utility library providing useful utility functions for general Authn functionality.
 
 =head1 REQUIRED ARGUMENTS
 

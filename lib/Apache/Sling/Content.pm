@@ -236,12 +236,11 @@ __END__
 
 =head1 NAME
 
-Content - content related functionality for Sling implemented over rest
-APIs.
+Content
 
 =head1 ABSTRACT
 
-Perl library providing a layer of abstraction to the REST content methods
+content related functionality for Sling implemented over rest APIs.
 
 =head1 METHODS
 
@@ -252,6 +251,8 @@ Create, set up, and return a Content object.
 =head1 USAGE
 
 =head1 DESCRIPTION
+
+Perl library providing a layer of abstraction to the REST content methods
 
 =head1 REQUIRED ARGUMENTS
 

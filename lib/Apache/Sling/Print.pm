@@ -158,6 +158,8 @@ Returns a current date time string, which is useful for log timestamps.
 
 =head1 USAGE
 
+use Apache::Sling::Print;
+
 =head1 DESCRIPTION
 
 Utility library providing useful utility functions for general Print

@@ -220,15 +220,19 @@ __END__
 
 =head1 NAME
 
-Authn - useful utility functions for general Authn functionality.
+Authn
 
 =head1 ABSTRACT
 
-Utility library providing useful utility functions for general Authn functionality.
+useful utility functions for general Authn functionality.
 
 =head1 USAGE
 
+use Apache::Sling::Authn;
+
 =head1 DESCRIPTION
+
+Utility library providing useful utility functions for general Authn functionality.
 
 =head1 REQUIRED ARGUMENTS
 
@@ -251,6 +255,8 @@ n/a
 None required.
 
 =head1 DEPENDENCIES
+
+LWP::UserAgent
 
 =head1 INCOMPATIBILITIES
 

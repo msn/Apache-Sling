@@ -146,6 +146,8 @@ object.
 
 =head1 USAGE
 
+use Apache::Sling::Request;
+
 =head1 DESCRIPTION
 
 Utility library providing useful utility functions for general Request functionality.

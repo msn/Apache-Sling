@@ -242,6 +242,8 @@ returning true if the result indicates the group view was returned, else false.
 
 =head1 USAGE
 
+use Apache::Sling::GroupUtil;
+
 =head1 DESCRIPTION
 
 GroupUtil perl library essentially provides the request strings needed to

@@ -127,6 +127,8 @@ missing.
 
 =head1 USAGE
 
+use Apache::Sling::URL;
+
 =head1 DESCRIPTION
 
 Utility library providing useful URL functions for general Rest functionality.
