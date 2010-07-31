@@ -19,7 +19,7 @@ our $VERSION = '0.09';
 sub add_leading_slash {
     my ($value) = @_;
     if ( defined $value ) {
-        if ( $value !~ /^\//x ) {
+        if ( $value !~ /^\//msx ) {
             $value = "/$value";
         }
     }
@@ -33,7 +33,7 @@ sub add_leading_slash {
 sub strip_leading_slash {
     my ($value) = @_;
     if ( defined $value ) {
-        $value =~ s/^\///x;
+        $value =~ s/^\///msx;
     }
     return ($value);
 }
@@ -48,17 +48,17 @@ sub properties_array_to_string {
     foreach my $property ( @{$properties} ) {
 
         # Escaping single quotes:
-        $property =~ s/'/\\'/g;
-        $property =~ /^([^=]*)=(.*)/x;
+        $property =~ s/'/\\'/gmsx;
+        $property =~ /^([^=]*)=(.*)/msx;
         if ( defined $1 && defined $2 ) {
             $property_post_vars .= "'$1','$2',";
         }
     }
     if ( defined $property_post_vars ) {
-        $property_post_vars =~ s/,$//x;
+        $property_post_vars =~ s/,$//msx;
     }
     else {
-        $property_post_vars = '';
+        $property_post_vars = q{};
     }
     return $property_post_vars;
 }
@@ -69,7 +69,8 @@ sub properties_array_to_string {
 
 sub urlencode {
     my ($value) = @_;
-    $value =~ s/([^a-zA-Z_0-9 ])/"%" . uc(sprintf "%lx" , unpack("C", $1))/egx;
+    $value =~
+      s/([^a-zA-Z_0-9 ])/"%" . uc(sprintf "%lx" , unpack("C", $1))/egmsx;
     $value =~ tr/ /+/;
     return ($value);
 }
@@ -80,10 +81,10 @@ sub urlencode {
 
 sub url_input_sanitize {
     my ($url) = @_;
-    $url = ( defined $url ? $url : "http://localhost:8080" );
-    $url = ( $url ne q{} ? $url : "http://localhost:8080" );
-    $url =~ s/(.*)\/$/$1/x;
-    $url = ( $url !~ /^http/x ? "http://$url" : "$url" );
+    $url = ( defined $url ? $url : 'http://localhost:8080' );
+    $url = ( $url ne q{} ? $url : 'http://localhost:8080' );
+    $url =~ s/(.*)\/$/$1/msx;
+    $url = ( $url !~ /^http/msx ? "http://$url" : "$url" );
     return ($url);
 }
 

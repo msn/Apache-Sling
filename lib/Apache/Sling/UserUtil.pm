@@ -32,7 +32,7 @@ sub add_setup {
     if ( defined $property_post_vars && $property_post_vars ne q{} ) {
         $post_variables .= ",$property_post_vars";
     }
-    $post_variables .= "]";
+    $post_variables .= ']';
     return "post $base_url/system/userManager/user.create.html $post_variables";
 }
 
@@ -42,7 +42,7 @@ sub add_setup {
 
 sub add_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/x );
+    return ( ${ $res->code } eq '200' );
 }
 
 #}}}
@@ -77,7 +77,7 @@ sub change_password_setup {
 
 sub change_password_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/x );
+    return ( ${ $res->code } eq '200' );
 }
 
 #}}}
@@ -90,7 +90,7 @@ sub delete_setup {
         croak 'No base url defined to delete against!';
     }
     if ( !defined $act_on_user ) { croak 'No user name defined to delete!'; }
-    my $post_variables = "\$post_variables = []";
+    my $post_variables = '$post_variables = []';
     return
 "post $base_url/system/userManager/user/$act_on_user.delete.html $post_variables";
 }
@@ -101,7 +101,7 @@ sub delete_setup {
 
 sub delete_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/x );
+    return ( ${ $res->code } eq '200' );
 }
 
 #}}}
@@ -125,7 +125,7 @@ sub exists_setup {
 
 sub exists_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/x );
+    return ( ${ $res->code } eq '200' );
 }
 
 #}}}
@@ -146,7 +146,7 @@ sub me_setup {
 
 sub me_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/x );
+    return ( ${ $res->code } eq '200' );
 }
 
 #}}}
@@ -167,7 +167,7 @@ sub sites_setup {
 
 sub sites_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/x );
+    return ( ${ $res->code } eq '200' );
 }
 
 #}}}
@@ -182,11 +182,11 @@ sub update_setup {
     if ( !defined $act_on_user ) { croak 'No user name defined to update!'; }
     my $property_post_vars =
       Apache::Sling::URL::properties_array_to_string($properties);
-    my $post_variables = "\$post_variables = [";
+    my $post_variables = '$post_variables = [';
     if ( $property_post_vars ne q{} ) {
         $post_variables .= "$property_post_vars";
     }
-    $post_variables .= "]";
+    $post_variables .= ']';
     return
 "post $base_url/system/userManager/user/$act_on_user.update.html $post_variables";
 }
@@ -197,7 +197,7 @@ sub update_setup {
 
 sub update_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/x );
+    return ( ${$res}->code eq '200' );
 }
 
 #}}}

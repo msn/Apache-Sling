@@ -35,11 +35,11 @@ sub print_with_lock {
 
 sub print_file_lock {
     my ( $message, $file ) = @_;
-    if ( open my $out, ">>", $file ) {
-        flock( $out, LOCK_EX );
-        print $out $message . "\n";
-        flock( $out, LOCK_UN );
-        close($out);
+    if ( open my $out, '>>', $file ) {
+        flock $out, LOCK_EX;
+        print {$out} $message . "\n" or croak q{Problem printing!};
+        flock $out, LOCK_UN;
+        close $out or croak q{Problem closing!};
     }
     else {
         croak "Could not open file: $file";
@@ -55,11 +55,11 @@ sub print_lock {
     my ($message) = @_;
     my ( $tmp_print_file_handle, $tmp_print_file_name ) =
       File::Temp::tempfile();
-    if ( open my $lock, ">>", $tmp_print_file_name ) {
-        flock( $lock, LOCK_EX );
-        print $message . "\n";
-        flock( $lock, LOCK_UN );
-        close($lock);
+    if ( open my $lock, '>>', $tmp_print_file_name ) {
+        flock $lock, LOCK_EX;
+        print $message . "\n" or croak q{Problem printing!};
+        flock $lock, LOCK_UN;
+        close $lock or croak q{Problem closing!};
         unlink($tmp_print_file_name);
     }
     else {
@@ -89,9 +89,9 @@ sub print_result {
 
 #}}}
 
-#{{{sub dateTime
+#{{{sub date_time
 
-sub dateTime {
+sub date_time {
     my @months    = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
     my @week_days = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
     (
@@ -104,9 +104,9 @@ sub dateTime {
         my $day_of_week,
         my $day_of_year,
         my $daylight_savings
-    ) = localtime();
-    $sec = "0$sec"    if $sec < 10;
-    $sec = "0$minute" if $minute < 10;
+    ) = localtime;
+    if ( $sec    =~ /^[0-9]$/msx ) { $sec    = "0$sec"; }
+    if ( $minute =~ /^[0-9]$/msx ) { $minute = "0$minute"; }
     my $year = 1900 + $year_offset;
     return
 "$week_days[$day_of_week] $months[$month] $day_of_month $hour:$minute:$sec";
@@ -152,7 +152,7 @@ equal to 1 will print extra information extracted from the object's Response
 object. At the moment, won't print if log is defined, as the prints to log
 happen elsewhere. TODO tidy that up.
 
-=head2 dateTime
+=head2 date_time
 
 Returns a current date time string, which is useful for log timestamps.
 

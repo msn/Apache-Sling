@@ -48,12 +48,12 @@ sub new {
     my $synch_user_list = q(user_list.txt);
     my $ldap;
     my $authn =
-      new Apache::Sling::Authn( $sling_host, $sling_user, $sling_pass,
+      Apache::Sling::Authn::new( $sling_host, $sling_user, $sling_pass,
         $sling_auth, $verbose, $log )
       or croak q(Problem with Sling instance authentication!);
-    my $content = new Apache::Sling::Content( \$authn, $verbose, $log )
+    my $content = Apache::Sling::Content::new( \$authn, $verbose, $log )
       or croak q(Problem creating Sling content object!);
-    my $user = new Apache::Sling::User( \$authn, $verbose, $log )
+    my $user = Apache::Sling::User::new( \$authn, $verbose, $log )
       or croak q(Problem creating Sling user object!);
     my $ldap_synch = {
         CacheBackupPath => $synch_cache_backup_path,
@@ -160,7 +160,7 @@ sub get_synch_cache {
     my $synch_cache;
     my $success = eval ${ $class->{'Content'} }->{'Message'};
     if ( !defined $success ) {
-        croak "Error \"$@\" parsing synchronized cache dump.";
+        croak q{Error parsing synchronized cache dump.};
     }
     return $synch_cache;
 }
@@ -211,7 +211,7 @@ sub get_synch_user_list {
     my $synch_user_list;
     my $success = eval ${ $class->{'Content'} }->{'Message'};
     if ( !defined $success ) {
-        croak "Error \"$@\" parsing synchronized user list dump.";
+        croak q{Error parsing synchronized user list dump.};
     }
     return $synch_user_list;
 }
@@ -254,7 +254,7 @@ sub update_synch_user_list {
 sub download_synch_user_list {
     my ( $class, $user_list_file ) = @_;
     my $synch_user_list = $class->get_synch_user_list;
-    foreach my $user ( sort( keys %{$synch_user_list} ) ) {
+    foreach my $user ( sort keys %{$synch_user_list} ) {
         if ( open my $out, '>>', $user_list_file ) {
             flock $out, LOCK_EX;
             print {$out} $user . "\n"
@@ -305,15 +305,15 @@ sub parse_attributes {
     my ( $ldap_attrs, $sling_attrs, $ldap_attrs_array, $sling_attrs_array ) =
       @_;
     if ( defined $ldap_attrs ) {
-        @{$ldap_attrs_array} = split ',', $ldap_attrs;
+        @{$ldap_attrs_array} = split /,/msx, $ldap_attrs;
     }
     if ( defined $sling_attrs ) {
-        @{$sling_attrs_array} = split ',', $sling_attrs;
+        @{$sling_attrs_array} = split /,/msx, $sling_attrs;
     }
     if ( @{$ldap_attrs_array} != @{$sling_attrs_array} ) {
         croak
           q(Number of ldap attributes must match number of sling attributes, )
-          . @{$ldap_attrs_array} . " != "
+          . @{$ldap_attrs_array} . ' != '
           . @{$sling_attrs_array};
     }
     return 1;
@@ -325,7 +325,7 @@ sub parse_attributes {
 
 sub check_for_property_modifications {
     my ( $new_properties, $cached_properties ) = @_;
-    foreach my $property_key ( keys %$new_properties ) {
+    foreach my $property_key ( keys %{$new_properties} ) {
         if ( !defined $cached_properties->{$property_key} ) {
 
             # Found a newly specified property:
@@ -357,12 +357,12 @@ sub perform_synchronization {
         $seen_user_ids->{$user_id} = 1;
         my @properties_array;
         my %properties_hash;
-        foreach my $ldap_attr (@$ldap_attrs_array) {
+        foreach my $ldap_attr ( @{$ldap_attrs_array} ) {
             my $value = @{ $valref->{$ldap_attr} }[0];
             if ( defined $value ) {
                 push @properties_array,
-                  @$sling_attrs_array[$index] . q(=) . $value;
-                $properties_hash{ @$sling_attrs_array[$index] } = $value;
+                  @{$sling_attrs_array}[$index] . q(=) . $value;
+                $properties_hash{ @{$sling_attrs_array}[$index] } = $value;
             }
             $index++;
         }
@@ -373,7 +373,8 @@ sub perform_synchronization {
 
                 # User was previously disabled. Re-enabling:
                 push @properties_array, q(sakai:disabled=0);
-                print "Re-enabling previously disabled user: $user_id\n";
+                print "Re-enabling previously disabled user: $user_id\n"
+                  or croak q{Problem printing!};
                 ${ $class->{'User'} }->update( $user_id, \@properties_array )
                   or croak q(Problem re-enabling user in sling instance!);
                 $synch_cache->{$user_id} = \%properties_hash;
@@ -390,7 +391,8 @@ sub perform_synchronization {
                 {
 
                     # Modifications are present, so we need to update:
-                    print "Updating existing user $user_id\n";
+                    print "Updating existing user $user_id\n"
+                      or croak q{Problem printing!};
                     ${ $class->{'User'} }
                       ->update( $user_id, \@properties_array )
                       or croak q(Problem updating user in sling instance!);
@@ -400,16 +402,17 @@ sub perform_synchronization {
                 else {
 
                     # No modifications present, nothing to do!
-                    print "No user modifications, skipping: $user_id\n";
+                    print "No user modifications, skipping: $user_id\n"
+                      or croak q{Problem printing!};
                 }
             }
         }
         else {
 
             # We have never seen this user before:
-            print "Creating new user: $user_id\n";
+            print "Creating new user: $user_id\n" or croak q{Problem printing!};
             ${ $class->{'User'} }
-              ->add( $user_id, "password", \@properties_array )
+              ->add( $user_id, 'password', \@properties_array )
               or croak q(Problem adding new user to sling instance!);
             $properties_hash{'sakai:disabled'} = '0';
             $synch_cache->{$user_id} = \%properties_hash;
@@ -440,7 +443,7 @@ sub synch_full {
     my %seen_user_ids;
 
     # process each DN using it as a key
-    my @array_of_dns = sort ( keys %$search_result );
+    my @array_of_dns = sort keys %{$search_result};
 
     $class->perform_synchronization(
         \@array_of_dns, $search_result,     \%seen_user_ids,
@@ -449,13 +452,14 @@ sub synch_full {
 
     # Clean up records no longer in ldap:
     my @disable_property;
-    push @disable_property, "sakai:disabled=1";
-    foreach my $cache_entry ( sort( keys %{$synch_cache} ) ) {
+    push @disable_property, 'sakai:disabled=1';
+    foreach my $cache_entry ( sort keys %{$synch_cache} ) {
         if ( $synch_cache->{$cache_entry}->{'sakai:disabled'} eq '0'
             && !defined $seen_user_ids{$cache_entry} )
         {
             print
-"Disabling user record in sling that no longer exists in ldap: $cache_entry\n";
+"Disabling user record in sling that no longer exists in ldap: $cache_entry\n"
+              or croak q{Problem printing!};
             ${ $class->{'User'} }->update( $cache_entry, \@disable_property )
               or croak q(Problem disabling user in sling instance!);
             $synch_cache->{$cache_entry}->{'sakai:disabled'} = '1';
@@ -463,7 +467,7 @@ sub synch_full {
     }
     $class->update_synch_cache($synch_cache);
 
-    $class->{'Message'} = "Successfully performed a full synchronization!";
+    $class->{'Message'} = 'Successfully performed a full synchronization!';
     return 1;
 }
 
@@ -476,7 +480,8 @@ sub synch_since {
     my $search = q{(modifytimestamp>=} . $synch_since . q{)};
     my $search_result = $class->ldap_search( $search, $ldap_attrs );
     croak q(Function not yet fully supported!);
-    return 1;
+
+    # return 1;
 }
 
 #}}}
@@ -488,7 +493,8 @@ sub synch_listed {
     my $search = q{(} . $class->{'Filter'} . q{=*)};
     my $search_result = $class->ldap_search( $search, $ldap_attrs );
     croak q(Function not yet fully supported!);
-    return 1;
+
+    # return 1;
 }
 
 #}}}
@@ -500,7 +506,8 @@ sub synch_listed_since {
     my $search = q{(} . $class->{'Filter'} . q{=*)};
     my $search_result = $class->ldap_search( $search, $ldap_attrs );
     croak q(Function not yet fully supported!);
-    return 1;
+
+    # return 1;
 }
 
 #}}}

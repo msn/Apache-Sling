@@ -39,7 +39,7 @@ sub add_setup {
 
 sub add_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/x );
+    return ( ${ $res->code } eq '200' );
 }
 
 #}}}
@@ -52,7 +52,7 @@ sub delete_setup {
         croak 'No base url defined to delete against!';
     }
     if ( !defined $act_on_group ) { croak 'No group name defined to delete!'; }
-    my $post_variables = "\$post_variables = []";
+    my $post_variables = q{$post_variables = []};
     return
 "post $base_url/system/userManager/group/$act_on_group.delete.html $post_variables";
 }
@@ -63,7 +63,7 @@ sub delete_setup {
 
 sub delete_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/x );
+    return ( ${ $res->code } eq '200' );
 }
 
 #}}}
@@ -87,7 +87,7 @@ sub exists_setup {
 
 sub exists_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/x );
+    return ( ${ $res->code } eq '200' );
 }
 
 #}}}
@@ -113,7 +113,7 @@ sub member_add_setup {
 
 sub member_add_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/x );
+    return ( ${ $res->code } eq '200' );
 }
 
 #}}}
@@ -143,7 +143,7 @@ sub member_delete_setup {
 
 sub member_delete_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/x && $$res->content ne q{} );
+    return ( ${ $res->code } eq '200' && $$res->content ne q{} );
 }
 
 #}}}
@@ -152,8 +152,8 @@ sub member_delete_eval {
 
 sub view_setup {
     my ( $base_url, $act_on_group ) = @_;
-    if ( !defined $base_url )     { croak "No base url to view with defined!"; }
-    if ( !defined $act_on_group ) { croak "No group to view defined!"; }
+    if ( !defined $base_url )     { croak 'No base url to view with defined!'; }
+    if ( !defined $act_on_group ) { croak 'No group to view defined!'; }
     return "get $base_url/system/userManager/group/$act_on_group.tidy.json";
 }
 
@@ -163,7 +163,7 @@ sub view_setup {
 
 sub view_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/x && $$res->content ne q{} );
+    return ( ${$res}->code eq '200' && $$res->content ne q{} );
 }
 
 #}}}
