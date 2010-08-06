@@ -20,7 +20,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 #{{{sub new
 
