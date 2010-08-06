@@ -36,7 +36,7 @@ sub add_setup {
 
 sub add_eval {
     my ($res) = @_;
-    return ( ${ $res->code } =~ /^20(0|1)$/msx );
+    return ( ${$res}->code =~ /^20(0|1)$/msx );
 }
 
 #}}}
@@ -65,7 +65,7 @@ sub copy_setup {
 
 sub copy_eval {
     my ($res) = @_;
-    return ( ${ $res->code } =~ /^20(0|1)$/msx );
+    return ( ${$res}->code =~ /^20(0|1)$/msx );
 }
 
 #}}}
@@ -88,7 +88,7 @@ sub delete_setup {
 
 sub delete_eval {
     my ($res) = @_;
-    return ( ${ $res->code } eq '200' );
+    return ( ${$res}->code eq '200' );
 }
 
 #}}}
@@ -110,7 +110,7 @@ sub exists_setup {
 
 sub exists_eval {
     my ($res) = @_;
-    return ( ${ $res->code } eq '200' );
+    return ( ${$res}->code eq '200' );
 }
 
 #}}}
@@ -139,7 +139,7 @@ sub move_setup {
 
 sub move_eval {
     my ($res) = @_;
-    return ( ${ $res->code } =~ /^20(0|1)$/msx );
+    return ( ${$res}->code =~ /^20(0|1)$/msx );
 }
 
 #}}}
@@ -167,7 +167,7 @@ sub upload_file_setup {
 
 sub upload_file_eval {
     my ($res) = @_;
-    return ( ${ $res->code } =~ /^20(0|1)$/msx );
+    return ( ${$res}->code =~ /^20(0|1)$/msx );
 }
 
 #}}}

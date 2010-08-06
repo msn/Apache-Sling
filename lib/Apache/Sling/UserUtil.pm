@@ -42,7 +42,7 @@ sub add_setup {
 
 sub add_eval {
     my ($res) = @_;
-    return ( ${ $res->code } eq '200' );
+    return ( ${$res}->code eq '200' );
 }
 
 #}}}
@@ -77,7 +77,7 @@ sub change_password_setup {
 
 sub change_password_eval {
     my ($res) = @_;
-    return ( ${ $res->code } eq '200' );
+    return ( ${$res}->code eq '200' );
 }
 
 #}}}
@@ -101,7 +101,7 @@ sub delete_setup {
 
 sub delete_eval {
     my ($res) = @_;
-    return ( ${ $res->code } eq '200' );
+    return ( ${$res}->code eq '200' );
 }
 
 #}}}
@@ -125,7 +125,7 @@ sub exists_setup {
 
 sub exists_eval {
     my ($res) = @_;
-    return ( ${ $res->code } eq '200' );
+    return ( ${$res}->code eq '200' );
 }
 
 #}}}
@@ -146,7 +146,7 @@ sub me_setup {
 
 sub me_eval {
     my ($res) = @_;
-    return ( ${ $res->code } eq '200' );
+    return ( ${$res}->code eq '200' );
 }
 
 #}}}
@@ -167,7 +167,7 @@ sub sites_setup {
 
 sub sites_eval {
     my ($res) = @_;
-    return ( ${ $res->code } eq '200' );
+    return ( ${$res}->code eq '200' );
 }
 
 #}}}

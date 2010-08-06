@@ -39,7 +39,7 @@ sub add_setup {
 
 sub add_eval {
     my ($res) = @_;
-    return ( ${ $res->code } eq '200' );
+    return ( ${$res}->code eq '200' );
 }
 
 #}}}
@@ -63,7 +63,7 @@ sub delete_setup {
 
 sub delete_eval {
     my ($res) = @_;
-    return ( ${ $res->code } eq '200' );
+    return ( ${$res}->code eq '200' );
 }
 
 #}}}
@@ -87,7 +87,7 @@ sub exists_setup {
 
 sub exists_eval {
     my ($res) = @_;
-    return ( ${ $res->code } eq '200' );
+    return ( ${$res}->code eq '200' );
 }
 
 #}}}
@@ -113,7 +113,7 @@ sub member_add_setup {
 
 sub member_add_eval {
     my ($res) = @_;
-    return ( ${ $res->code } eq '200' );
+    return ( ${$res}->code eq '200' );
 }
 
 #}}}
@@ -143,7 +143,7 @@ sub member_delete_setup {
 
 sub member_delete_eval {
     my ($res) = @_;
-    return ( ${ $res->code } eq '200' && $$res->content ne q{} );
+    return ( ${$res}->code eq '200' && ${$res}->content ne q{} );
 }
 
 #}}}
@@ -163,7 +163,7 @@ sub view_setup {
 
 sub view_eval {
     my ($res) = @_;
-    return ( ${$res}->code eq '200' && $$res->content ne q{} );
+    return ( ${$res}->code eq '200' && ${$res}->content ne q{} );
 }
 
 #}}}

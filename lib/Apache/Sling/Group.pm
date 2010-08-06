@@ -285,7 +285,7 @@ sub member_exists {
     my $success = Apache::Sling::GroupUtil::view_eval($res);
     my $message;
     if ($success) {
-        my $group_info = from_json( ${ $res->content } );
+        my $group_info = from_json( ${$res}->content );
         my $is_member  = 0;
         foreach my $member ( @{ $group_info->{'members'} } ) {
             if ( $member eq "$exists_member" ) {
@@ -320,7 +320,7 @@ sub member_view {
     my $success = Apache::Sling::GroupUtil::view_eval($res);
     my $message;
     if ($success) {
-        my $group_info     = from_json( ${ $res->content } );
+        my $group_info     = from_json( ${$res}->content );
         my $number_members = @{ $group_info->{'members'} };
         my $members = "Group \"$act_on_group\" has $number_members member(s):";
         foreach my $member ( @{ $group_info->{'members'} } ) {
@@ -350,7 +350,7 @@ sub view {
     my $success = Apache::Sling::GroupUtil::view_eval($res);
     my $message = (
         $success
-        ? ${ $res->content }
+        ? ${$res}->content
         : "Problem viewing group: \"$act_on_group\""
     );
     $group->set_results( "$message", $res );
