@@ -1,3 +1,4 @@
+#!/usr/bin/perl -w
 package Apache::Sling;
 
 use 5.008008;
