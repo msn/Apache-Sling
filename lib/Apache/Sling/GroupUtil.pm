@@ -174,7 +174,7 @@ __END__
 
 =head1 NAME
 
-GroupUtil
+Apache::Sling::GroupUtil Methods to generate and check HTTP requests required for manipulating groups.
 
 =head1 ABSTRACT
 

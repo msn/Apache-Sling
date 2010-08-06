@@ -178,7 +178,7 @@ __END__
 
 =head1 NAME
 
-ContentUtil
+Apache::Sling::ContentUtil - Methods to generate and check HTTP requests required for manipulating content.
 
 =head1 ABSTRACT
 

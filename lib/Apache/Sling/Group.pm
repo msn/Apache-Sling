@@ -365,7 +365,7 @@ __END__
 
 =head1 NAME
 
-Group
+Apache::Sling::Group - Manipulate Groups in an Apache Sling instance.
 
 =head1 ABSTRACT
 

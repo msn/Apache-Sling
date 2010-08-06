@@ -21,8 +21,7 @@ __END__
 
 =head1 NAME
 
-Apache::Sling - Perl library for interacting with the apache sling web
-framework
+Apache::Sling - Perl library for interacting with the apache sling web framework
 
 =head1 SYNOPSIS
 

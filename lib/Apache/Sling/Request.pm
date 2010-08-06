@@ -126,7 +126,7 @@ __END__
 
 =head1 NAME
 
-Request
+Apache::Sling::Request - Functions used for making HTTP Requests to an Apache Sling instance.
 
 =head1 ABSTRACT
 

@@ -220,11 +220,11 @@ __END__
 
 =head1 NAME
 
-Authn
+Apache::Sling::Authn - Authenticate to an Apache Sling instance.
 
 =head1 ABSTRACT
 
-useful utility functions for general Authn functionality.
+Useful utility functions for general Authn functionality.
 
 =head1 USAGE
 
@@ -232,7 +232,7 @@ use Apache::Sling::Authn;
 
 =head1 DESCRIPTION
 
-Utility library providing useful utility functions for general Authn functionality.
+Library providing useful utility functions for general Authn functionality.
 
 =head1 REQUIRED ARGUMENTS
 

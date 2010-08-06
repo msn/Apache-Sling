@@ -82,7 +82,7 @@ __END__
 
 =head1 NAME
 
-AuthnUtil
+Apache::Sling::AuthnUtil - Methods to generate and check HTTP requests required for authentication.
 
 =head1 ABSTRACT
 

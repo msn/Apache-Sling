@@ -274,7 +274,7 @@ __END__
 
 =head1 NAME
 
-User
+Apache::Sling::User - Methods for manipulating users in an Apache Sling system.
 
 =head1 ABSTRACT
 

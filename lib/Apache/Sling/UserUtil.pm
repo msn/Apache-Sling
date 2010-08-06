@@ -208,7 +208,7 @@ __END__
 
 =head1 NAME
 
-UserUtil
+Apache::Sling::UserUtil - Methods to generate and check HTTP requests required for manipulating users.
 
 =head1 ABSTRACT
 

@@ -518,7 +518,7 @@ __END__
 
 =head1 NAME
 
-LDAPSynch
+Apache::Sling::LDAPSynch - synchronize users from an external LDAP server into an Apache Sling instance.
 
 =head1 ABSTRACT
 

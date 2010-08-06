@@ -96,7 +96,7 @@ __END__
 
 =head1 NAME
 
-URL
+Apache::Sling::URL - Functions for handling urls to be passed from/to an Apache Sling instance.
 
 =head1 ABSTRACT
 

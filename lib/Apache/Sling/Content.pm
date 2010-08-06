@@ -236,7 +236,7 @@ __END__
 
 =head1 NAME
 
-Content
+Apache::Sling::Content - Manipulate Content in an Apache SLing instance.
 
 =head1 ABSTRACT
 

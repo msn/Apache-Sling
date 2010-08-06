@@ -120,7 +120,7 @@ __END__
 
 =head1 NAME
 
-Print
+Apache::Sling::Print - functions used for printing by the Apache::Sling library.
 
 =head1 ABSTRACT
 
