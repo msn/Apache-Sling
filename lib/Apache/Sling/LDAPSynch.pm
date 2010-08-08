@@ -48,12 +48,12 @@ sub new {
     my $synch_user_list = q(user_list.txt);
     my $ldap;
     my $authn =
-      Apache::Sling::Authn::new( $sling_host, $sling_user, $sling_pass,
+      Apache::Sling::Authn->new( $sling_host, $sling_user, $sling_pass,
         $sling_auth, $verbose, $log )
       or croak q(Problem with Sling instance authentication!);
-    my $content = Apache::Sling::Content::new( \$authn, $verbose, $log )
+    my $content = Apache::Sling::Content->new( \$authn, $verbose, $log )
       or croak q(Problem creating Sling content object!);
-    my $user = Apache::Sling::User::new( \$authn, $verbose, $log )
+    my $user = Apache::Sling::User->new( \$authn, $verbose, $log )
       or croak q(Problem creating Sling user object!);
     my $ldap_synch = {
         CacheBackupPath => $synch_cache_backup_path,
