@@ -50,37 +50,7 @@ sub new {
 # Authn references itself to be compatibile with Apache::Sling::Request::request
     $authn->{'Authn'} = \$authn;
     bless $authn, $class;
-
-    # Apply basic authentication to the user agent if url, username and
-    # password are supplied:
-    if ( defined $url && defined $username && defined $password ) {
-        if ( $type eq 'basic' ) {
-            my $success = $authn->basic_login();
-            if ( !$success ) {
-                if ( $verbose >= 1 ) {
-                    Apache::Sling::Print::print_result($authn);
-                }
-                croak
-"Basic Auth log in for user \"$username\" at URL \"$url\" was unsuccessful\n";
-            }
-        }
-        elsif ( $type eq 'form' ) {
-            my $success = $authn->form_login();
-            if ( !$success ) {
-                if ( $verbose >= 1 ) {
-                    Apache::Sling::Print::print_result($authn);
-                }
-                croak
-"Form log in for user \"$username\" at URL \"$url\" was unsuccessful\n";
-            }
-        }
-        else {
-            croak "Unsupported auth type: \"$type\"\n";
-        }
-        if ( $verbose >= 1 ) {
-            Apache::Sling::Print::print_result($authn);
-        }
-    }
+    $authn->login_user;
     return $authn;
 }
 
@@ -145,6 +115,50 @@ sub form_logout {
 }
 
 #}}}
+
+sub login_user {
+    my ($authn) = @_;
+
+    # Apply basic authentication to the user agent if url, username and
+    # password are supplied:
+    if (   defined $authn->{'BaseURL'}
+        && defined $authn->{'Username'}
+        && defined $authn->{'Password'} )
+    {
+        if ( $authn->{'Type'} eq 'basic' ) {
+            my $success = $authn->basic_login();
+            if ( !$success ) {
+                if ( $authn->{'Verbose'} >= 1 ) {
+                    Apache::Sling::Print::print_result($authn);
+                }
+                croak 'Basic Auth log in for user "'
+                  . $authn->{'Username'}
+                  . '" at URL "'
+                  . $authn->{'BaseURL'}
+                  . "\" was unsuccessful\n";
+            }
+        }
+        elsif ( $authn->{'Type'} eq 'form' ) {
+            my $success = $authn->form_login();
+            if ( !$success ) {
+                if ( $authn->{'Verbose'} >= 1 ) {
+                    Apache::Sling::Print::print_result($authn);
+                }
+                croak 'Form Auth log in for user "'
+                  . $authn->{'Username'}
+                  . '" at URL "'
+                  . $authn->{'BaseURL'}
+                  . "\" was unsuccessful\n";
+            }
+        }
+        else {
+            croak 'Unsupported auth type: "' . $authn->{'Type'} . "\"\n";
+        }
+        if ( $authn->{'Verbose'} >= 1 ) {
+            Apache::Sling::Print::print_result($authn);
+        }
+    }
+}
 
 #{{{sub switch_user
 sub switch_user {
