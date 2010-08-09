@@ -370,7 +370,7 @@ sub perform_synchronization {
             if ( $synch_cache->{$user_id}->{ $class->{'Disabled'} } eq '1' ) {
 
                 # User was previously disabled. Re-enabling:
-                push @properties_array, q(sakai:disabled=0);
+                push @properties_array, $class->{'Disabled'} . '=0';
                 print "Re-enabling previously disabled user: $user_id\n"
                   or croak q{Problem printing!};
                 ${ $class->{'User'} }->update( $user_id, \@properties_array )
