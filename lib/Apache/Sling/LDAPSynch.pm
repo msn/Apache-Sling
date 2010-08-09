@@ -26,12 +26,13 @@ our $VERSION = '0.10';
 
 sub new {
     my (
-        $class,      $ldap_host,  $ldap_base,  $filter,
-        $dn,         $pass,       $sling_host, $sling_user,
-        $sling_pass, $sling_auth, $verbose,    $log
+        $class, $ldap_host, $ldap_base, $filter,  $dn,
+        $pass,  $authn,     $disabled,  $verbose, $log
     ) = @_;
-    $filter  = ( defined $filter  ? $filter  : q(uid) );
-    $verbose = ( defined $verbose ? $verbose : 0 );
+    if ( !defined $authn ) { croak 'no authn provided!'; }
+    $disabled = ( defined $disabled ? $disabled : q(sling:disabled) );
+    $filter   = ( defined $filter   ? $filter   : q(uid) );
+    $verbose  = ( defined $verbose  ? $verbose  : 0 );
 
     # Directory containing the cache and user_list files:
     my $synch_cache_path =
@@ -47,10 +48,6 @@ sub new {
    # List of specific ldap users that are to be ingested in to the sling system:
     my $synch_user_list = q(user_list.txt);
     my $ldap;
-    my $authn =
-      Apache::Sling::Authn->new( $sling_host, $sling_user, $sling_pass,
-        $sling_auth, $verbose, $log )
-      or croak q(Problem with Sling instance authentication!);
     my $content = Apache::Sling::Content->new( \$authn, $verbose, $log )
       or croak q(Problem creating Sling content object!);
     my $user = Apache::Sling::User->new( \$authn, $verbose, $log )
@@ -60,6 +57,7 @@ sub new {
         CachePath       => $synch_cache_path,
         CacheFile       => $synch_cache_file,
         Content         => \$content,
+        Disabled        => $disabled,
         LDAP            => \$ldap,
         LDAPbase        => $ldap_base,
         LDAPDN          => $dn,
@@ -369,7 +367,7 @@ sub perform_synchronization {
         if ( defined $synch_cache->{$user_id} ) {
 
             # We already know about this user from a previous run:
-            if ( $synch_cache->{$user_id}->{'sakai:disabled'} eq '1' ) {
+            if ( $synch_cache->{$user_id}->{ $class->{'Disabled'} } eq '1' ) {
 
                 # User was previously disabled. Re-enabling:
                 push @properties_array, q(sakai:disabled=0);
@@ -378,7 +376,7 @@ sub perform_synchronization {
                 ${ $class->{'User'} }->update( $user_id, \@properties_array )
                   or croak q(Problem re-enabling user in sling instance!);
                 $synch_cache->{$user_id} = \%properties_hash;
-                $synch_cache->{$user_id}->{'sakai:disabled'} = '0';
+                $synch_cache->{$user_id}->{ $class->{'Disabled'} } = '0';
             }
             else {
 
@@ -396,7 +394,7 @@ sub perform_synchronization {
                     ${ $class->{'User'} }
                       ->update( $user_id, \@properties_array )
                       or croak q(Problem updating user in sling instance!);
-                    $properties_hash{'sakai:disabled'} = '0';
+                    $properties_hash{ $class->{'Disabled'} } = '0';
                     $synch_cache->{$user_id} = \%properties_hash;
                 }
                 else {
@@ -414,7 +412,7 @@ sub perform_synchronization {
             ${ $class->{'User'} }
               ->add( $user_id, 'password', \@properties_array )
               or croak q(Problem adding new user to sling instance!);
-            $properties_hash{'sakai:disabled'} = '0';
+            $properties_hash{ $class->{'Disabled'} } = '0';
             $synch_cache->{$user_id} = \%properties_hash;
         }
     }
@@ -452,9 +450,9 @@ sub synch_full {
 
     # Clean up records no longer in ldap:
     my @disable_property;
-    push @disable_property, 'sakai:disabled=1';
+    push @disable_property, $class->{'Disabled'} . '=1';
     foreach my $cache_entry ( sort keys %{$synch_cache} ) {
-        if ( $synch_cache->{$cache_entry}->{'sakai:disabled'} eq '0'
+        if ( $synch_cache->{$cache_entry}->{ $class->{'Disabled'} } eq '0'
             && !defined $seen_user_ids{$cache_entry} )
         {
             print
@@ -462,7 +460,7 @@ sub synch_full {
               or croak q{Problem printing!};
             ${ $class->{'User'} }->update( $cache_entry, \@disable_property )
               or croak q(Problem disabling user in sling instance!);
-            $synch_cache->{$cache_entry}->{'sakai:disabled'} = '1';
+            $synch_cache->{$cache_entry}->{ $class->{'Disabled'} } = '1';
         }
     }
     $class->update_synch_cache($synch_cache);
