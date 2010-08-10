@@ -14,7 +14,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 #{{{sub add_setup
 
@@ -130,27 +130,6 @@ sub exists_eval {
 
 #}}}
 
-#{{{sub me_setup
-
-sub me_setup {
-    my ($base_url) = @_;
-    if ( !defined $base_url ) {
-        croak 'No base url to check existence against!';
-    }
-    return "get $base_url/system/me";
-}
-
-#}}}
-
-#{{{sub me_eval
-
-sub me_eval {
-    my ($res) = @_;
-    return ( ${$res}->code eq '200' );
-}
-
-#}}}
-
 #{{{sub sites_setup
 
 sub sites_setup {
@@ -253,17 +232,6 @@ username exists in the system.
 
 Inspects the result returned from issuing the request generated in exists_setup
 returning true if the result indicates the username does exist in the system,
-else false.
-
-=head2 me_setup
-
-Returns a textual representation of the request needed to return information
-about the current user.
-
-=head2 me_eval
-
-Inspects the result returned from issuing the request generated in me_setup
-returning true if the result indicates information was returned successfully,
 else false.
 
 =head2 sites_setup

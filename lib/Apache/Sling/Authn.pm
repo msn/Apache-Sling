@@ -19,7 +19,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 #{{{sub new
 sub new {
@@ -81,41 +81,7 @@ sub basic_login {
 
 #}}}
 
-#{{{sub form_login
-sub form_login {
-    my ($authn)  = @_;
-    my $username = $authn->{'Username'};
-    my $password = $authn->{'Password'};
-    my $res      = Apache::Sling::Request::request(
-        \$authn,
-        Apache::Sling::AuthnUtil::form_login_setup(
-            $authn->{'BaseURL'}, $username, $password
-        )
-    );
-    my $success = Apache::Sling::AuthnUtil::form_login_eval($res);
-    my $message = "Form log in as user \"$username\" ";
-    $message .= ( $success ? 'succeeded!' : 'failed!' );
-    $authn->set_results( "$message", $res );
-    return $success;
-}
-
-#}}}
-
-#{{{sub form_logout
-sub form_logout {
-    my ($authn) = @_;
-    my $res =
-      Apache::Sling::Request::request( \$authn,
-        Apache::Sling::AuthnUtil::form_logout_setup( $authn->{'BaseURL'} ) );
-    my $success = Apache::Sling::AuthnUtil::form_logout_eval($res);
-    my $message = 'Form log out ';
-    $message .= ( $success ? 'succeeded!' : 'failed!' );
-    $authn->set_results( "$message", $res );
-    return $success;
-}
-
-#}}}
-
+#{{{sub login_user
 sub login_user {
     my ($authn) = @_;
 
@@ -138,19 +104,6 @@ sub login_user {
                   . "\" was unsuccessful\n";
             }
         }
-        elsif ( $authn->{'Type'} eq 'form' ) {
-            my $success = $authn->form_login();
-            if ( !$success ) {
-                if ( $authn->{'Verbose'} >= 1 ) {
-                    Apache::Sling::Print::print_result($authn);
-                }
-                croak 'Form Auth log in for user "'
-                  . $authn->{'Username'}
-                  . '" at URL "'
-                  . $authn->{'BaseURL'}
-                  . "\" was unsuccessful\n";
-            }
-        }
         else {
             croak 'Unsupported auth type: "' . $authn->{'Type'} . "\"\n";
         }
@@ -159,6 +112,7 @@ sub login_user {
         }
     }
 }
+#}}}
 
 #{{{sub switch_user
 sub switch_user {
@@ -174,19 +128,6 @@ sub switch_user {
     {
         $authn->{'Username'} = $new_username;
         $authn->{'Password'} = $new_password;
-        if ( $authn->{'Type'} eq 'form' ) {
-
-            # If we were previously using form auth then we must log
-            # out with form auth, even if we are switching to basic auth.
-            my $success = $authn->form_logout();
-            if ( !$success ) {
-                croak 'Form Auth log out for user "'
-                  . $authn->{'Username'}
-                  . '" at URL "'
-                  . $authn->{'BaseURL'}
-                  . "\" was unsuccessful\n";
-            }
-        }
         if ( defined $type ) {
             $authn->{'Type'} = $type;
         }
@@ -203,14 +144,6 @@ sub switch_user {
             }
             else {
                 $authn->{'Message'} = 'Fast User Switch completed!';
-            }
-        }
-        elsif ( $authn->{'Type'} eq 'form' ) {
-            my $success = $authn->form_login();
-            if ( !$success ) {
-                croak "Form Auth log in for user \"$new_username\" at URL \""
-                  . $authn->{'BaseURL'}
-                  . "\" was unsuccessful\n";
             }
         }
         else {

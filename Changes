@@ -1,5 +1,8 @@
 Revision history for Perl extension Apache::Sling.
 
+0.11  Tue Aug 10 20:00:00 2010
+        - Moving sakai specific code into Sakai::Nakamura.
+
 0.10  Fri Aug 06 09:20:00 2010
         - Better conformance to PBP.
         - Tweaked make file to note relaxed dependencies

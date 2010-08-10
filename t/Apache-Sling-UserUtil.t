@@ -5,7 +5,7 @@
 
 # change 'tests => 1' to 'tests => last_test_to_print';
 
-use Test::More tests => 9;
+use Test::More tests => 8;
 BEGIN { use_ok( 'Apache::Sling::UserUtil' ); }
 
 #########################
@@ -24,8 +24,6 @@ ok( Apache::Sling::UserUtil::delete_setup( 'http://localhost:8080', 'user' ) eq
   "post http://localhost:8080/system/userManager/user/user.delete.html \$post_variables = []", 'Check delete_setup function' );
 ok( Apache::Sling::UserUtil::exists_setup( 'http://localhost:8080', 'user' ) eq
   "get http://localhost:8080/system/userManager/user/user.tidy.json", 'Check exists_setup function' );
-ok( Apache::Sling::UserUtil::me_setup( 'http://localhost:8080' ) eq
-  "get http://localhost:8080/system/me", 'Check me_setup function' );
 ok( Apache::Sling::UserUtil::sites_setup( 'http://localhost:8080' ) eq
   "get http://localhost:8080/system/sling/membership", 'Check sites_setup function' );
 ok( Apache::Sling::UserUtil::update_setup( 'http://localhost:8080','user',\@properties ) eq

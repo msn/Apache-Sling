@@ -13,7 +13,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 #{{{sub basic_login_setup
 sub basic_login_setup {
@@ -26,50 +26,6 @@ sub basic_login_setup {
 
 #{{{sub basic_login_eval
 sub basic_login_eval {
-    my ($res) = @_;
-    return ( ${$res}->code eq '200' );
-}
-
-#}}}
-
-#{{{sub form_login_setup
-sub form_login_setup {
-    my ( $base_url, $username, $password ) = @_;
-    if ( !defined $base_url ) { croak 'No base url defined!'; }
-    if ( !defined $username ) {
-        croak 'No username supplied to attempt logging in with!';
-    }
-    if ( !defined $password ) {
-        croak
-"No password supplied to attempt logging in with for user name: $username!";
-    }
-    my $post_variables =
-"\$post_variables = ['sakaiauth:un','$username','sakaiauth:pw','$password','sakaiauth:login','1']";
-    return "post $base_url/system/sling/formlogin $post_variables";
-}
-
-#}}}
-
-#{{{sub form_login_eval
-sub form_login_eval {
-    my ($res) = @_;
-    return ( ${$res}->code eq '200' );
-}
-
-#}}}
-
-#{{{sub form_logout_setup
-sub form_logout_setup {
-    my ($base_url) = @_;
-    if ( !defined $base_url ) { croak 'No base url defined!'; }
-    my $post_variables = q{$post_variables = ['sakaiauth:logout','1']};
-    return "post $base_url/system/sling/formlogin $post_variables";
-}
-
-#}}}
-
-#{{{sub form_logout_eval
-sub form_logout_eval {
     my ($res) = @_;
     return ( ${$res}->code eq '200' );
 }
@@ -98,24 +54,6 @@ the system via a basic auth based login.
 =head2 basic_login_eval
 
 Verify whether the log in attempt for the user to the system was successful.
-
-=head2 form_login_setup
-
-Returns a textual representation of the request needed to log the user in to
-the system via a form based login.
-
-=head2 form_login_eval
-
-Verify whether the log in attempt for the user to the system was successful.
-
-=head2 form_logout_setup
-
-Returns a textual representation of the request needed to log the user out of
-the system via a form based mechanism.
-
-=head2 form_logout_eval
-
-Verify whether the log out attempt for the user from the system was successful.
 
 =head1 USAGE
 

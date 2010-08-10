@@ -17,7 +17,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 #{{{sub new
 
@@ -187,24 +187,6 @@ sub check_exists {
     my $success = Apache::Sling::UserUtil::exists_eval($res);
     my $message = "User \"$act_on_user\" ";
     $message .= ( $success ? 'exists!' : 'does not exist!' );
-    $user->set_results( "$message", $res );
-    return $success;
-}
-
-#}}}
-
-#{{{sub me
-sub me {
-    my ($user) = @_;
-    my $res =
-      Apache::Sling::Request::request( \$user,
-        Apache::Sling::UserUtil::me_setup( $user->{'BaseURL'} ) );
-    my $success = Apache::Sling::UserUtil::me_eval($res);
-    my $message = (
-        $success
-        ? ${$res}->content
-        : 'Problem fetching details for current user'
-    );
     $user->set_results( "$message", $res );
     return $success;
 }
