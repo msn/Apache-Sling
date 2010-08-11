@@ -1,3 +1,8 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
 use Test::More tests => 10;
 BEGIN { use_ok( 'Apache::Sling::Authn' ); }
 BEGIN { use_ok( 'Apache::Sling::Group' ); }

@@ -1,3 +1,8 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
 use Test::More tests => 2;
 
 BEGIN { use_ok( 'Apache::Sling::AuthnUtil' ); }

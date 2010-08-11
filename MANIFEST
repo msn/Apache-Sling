@@ -31,3 +31,6 @@ t/Local/Apache-Sling-UserUtil.t
 t/Local/Apache-Sling-Print.t
 t/Local/Apache-Sling-Group.t
 t/External/Apache-Sling-Authn.t
+t/External/Apache-Sling-Content.t
+t/External/Apache-Sling-User.t
+t/External/Apache-Sling-Group.t

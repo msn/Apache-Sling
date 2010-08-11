@@ -1,3 +1,8 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
 use Test::More tests => 16;
 
 my $sling_host = 'http://localhost:8080';
@@ -21,10 +26,10 @@ my @test_properties;
 
 # authn object:
 my $authn = Apache::Sling::Authn->new( $sling_host, $super_user, $super_pass, 'basic', $verbose, $log );
-isa_ok $authn, Apache::Sling::Authn, 'authentication';
+isa_ok $authn, 'Apache::Sling::Authn', 'authentication';
 # user object:
 my $user = Apache::Sling::User->new( \$authn, $verbose, $log );
-isa_ok $user, Apache::Sling::User, 'user';
+isa_ok $user, 'Apache::Sling::User', 'user';
 
 # Run tests:
 ok( defined $user,
