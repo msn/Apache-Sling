@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 package Apache::Sling;
 
-use 5.008008;
+use 5.008001;
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 
 # Preloaded methods go here.
@@ -46,7 +46,7 @@ D. D. Parry, E<lt>perl@ddp.me.ukE<gt>
 
 =head1 VERSION
 
-0.11
+0.12
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 23;
 
 my $sling_host = 'http://localhost:8080';
 my $super_user = 'admin';
@@ -58,14 +58,20 @@ ok( ! $content->check_exists( $test_content2 ),
     "Content Test: Content \"$test_content2\" no longer exists." );
 ok( ! $content->move( $test_content1, $test_content3 ),
     "Content Test: Can't move content \"$test_content1\" to \"$test_content3\" without :replace." );
-ok( $content->move( $test_content1, $test_content3, 1 ),
-    "Content Test: Can move content \"$test_content1\" to \"$test_content3\" with :replace." );
+TODO: {
+    local $TODO = "https://issues.apache.org/jira/browse/SLING-1648";
+    ok( $content->move( $test_content1, $test_content3, 1 ),
+        "Content Test: Can move content \"$test_content1\" to \"$test_content3\" with :replace." );
+    ok( ! $content->check_exists( $test_content1 ),
+        "Content Test: Content \"$test_content1\" no longer exists." );
+}
 ok( $content->check_exists( $test_content3 ),
     "Content Test: Content \"$test_content3\" exists." );
-ok( ! $content->check_exists( $test_content1 ),
-    "Content Test: Content \"$test_content2\" no longer exists." );
 
 # Cleanup
+# Remove this following delete when move with :replace starts working!
+ok( $content->del( $test_content1 ),
+    "Content Test: Content \"$test_content1\" deleted successfully." );
 ok( $content->del( $test_content3 ),
     "Content Test: Content \"$test_content3\" deleted successfully." );
 ok( ! $content->check_exists( $test_content3 ),

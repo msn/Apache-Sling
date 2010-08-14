@@ -2,7 +2,7 @@
 
 package Apache::Sling::Request;
 
-use 5.008008;
+use 5.008001;
 use strict;
 use warnings;
 use Carp;
@@ -16,7 +16,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 #{{{sub string_to_request
 

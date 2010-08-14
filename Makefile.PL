@@ -1,13 +1,15 @@
-use 5.008008;
+use 5.008001;
 use ExtUtils::MakeMaker;
 
 my $tests = 't/Local/*.t';
-if ( prompt(
-    "External tests require a running apache sling instance to test against!\n".
-    'Skip external tests?',
-    'y',
-    ) =~ /^n/i ) {
-    $tests = 't/Local/*.t t/External/*.t';
+if( ! $ENV{AUTOMATED_TESTING} ) {
+    if ( prompt(
+        "External tests require a running apache sling instance to test against!\n".
+        'Skip external tests?',
+        'y',
+        ) =~ /^n/i ) {
+        $tests = 't/Local/*.t t/External/*.t';
+    }
 }
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence

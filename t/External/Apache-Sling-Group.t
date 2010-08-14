@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 44;
+use Test::More tests => 42;
 
 my $sling_host = 'http://localhost:8080';
 my $super_user = 'admin';
@@ -78,8 +78,11 @@ ok( $group->member_exists( $test_group1, $test_group2 ),
 ok( $group->member_view( $test_group1 ) == 2,
     "Group Test: 2 Members in \"$test_group1\"." );
 
-ok( ! $group->member_add( $test_group2, $test_group1 ),
-    "Group Test: Member \"$test_group1\" should not be added to \"$test_group2\"." );
+TODO: {
+    local $TODO = "This should give an error, not a 200 as the group does _not_ get added!";
+    ok( ! $group->member_add( $test_group2, $test_group1 ),
+        "Group Test: Member \"$test_group1\" should not be added to \"$test_group2\"." );
+}
 ok( ! $group->member_exists( $test_group2, $test_group1 ),
     "Group Test: Member \"$test_group1\" should not exist in \"$test_group2\"." );
 ok( $group->member_view( $test_group2 ) == 1,

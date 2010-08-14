@@ -80,7 +80,7 @@ ok( ! $group->check_exists( $test_group ),
     "User Test: Group \"$test_group\" should no longer exist." );
 
 # Switch to test_user
-ok( $$authn->switch_user( $test_user, $test_pass ),
+ok( $authn->switch_user( $test_user, $test_pass ),
     "User Test: Successfully switched to user: \"$test_user\" with basic auth" );
 
 # Check can update properties:
@@ -89,7 +89,7 @@ ok( $user->update( $test_user, \@test_properties ),
     "User Test: User \"$test_user\" updated successfully." );
 
 # switch back to admin user:
-ok( $$authn->switch_user( $super_user, $super_pass ),
+ok( $authn->switch_user( $super_user, $super_pass ),
     "User Test: Successfully switched to user: \"$super_user\" with basic auth" );
 
 # Check user deletion:

@@ -2,7 +2,7 @@
 
 package Apache::Sling::Group;
 
-use 5.008008;
+use 5.008001;
 use strict;
 use warnings;
 use Carp;
@@ -18,7 +18,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 #{{{sub new
 
@@ -288,7 +288,9 @@ sub member_exists {
         my $group_info = from_json( ${$res}->content );
         my $is_member  = 0;
         foreach my $member ( @{ $group_info->{'members'} } ) {
-            if ( $member eq "$exists_member" ) {
+            if (   $member eq "/system/userManager/user/$exists_member"
+                || $member eq "/system/userManager/group/$exists_member" )
+            {
                 $is_member = 1;
                 last;
             }
