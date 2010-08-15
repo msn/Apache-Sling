@@ -36,9 +36,9 @@ sub print_with_lock {
 sub print_file_lock {
     my ( $message, $file ) = @_;
     if ( open my $out, '>>', $file ) {
-        flock $out, LOCK_EX;
+        flock $out, LOCK_EX or croak q{Unable to obtain exclusive lock};
         print {$out} $message . "\n" or croak q{Problem printing!};
-        flock $out, LOCK_UN;
+        flock $out, LOCK_UN or croak q{Problem releasing exclusive lock};
         close $out or croak q{Problem closing!};
     }
     else {
@@ -56,9 +56,9 @@ sub print_lock {
     my ( $tmp_print_file_handle, $tmp_print_file_name ) =
       File::Temp::tempfile();
     if ( open my $lock, '>>', $tmp_print_file_name ) {
-        flock $lock, LOCK_EX;
+        flock $lock, LOCK_EX or croak q{Unable to obtain exclusive lock};
         print $message . "\n" or croak q{Problem printing!};
-        flock $lock, LOCK_UN;
+        flock $lock, LOCK_UN or croak q{Problem releasing exclusive lock};
         close $lock or croak q{Problem closing!};
         unlink($tmp_print_file_name);
     }
