@@ -157,6 +157,24 @@ sub change_password {
 
 #}}}
 
+#{{{sub check_exists
+sub check_exists {
+    my ( $user, $act_on_user ) = @_;
+    my $res = Apache::Sling::Request::request(
+        \$user,
+        Apache::Sling::UserUtil::exists_setup(
+            $user->{'BaseURL'}, $act_on_user
+        )
+    );
+    my $success = Apache::Sling::UserUtil::exists_eval($res);
+    my $message = "User \"$act_on_user\" ";
+    $message .= ( $success ? 'exists!' : 'does not exist!' );
+    $user->set_results( "$message", $res );
+    return $success;
+}
+
+#}}}
+
 #{{{sub del
 sub del {
     my ( $user, $act_on_user ) = @_;
@@ -175,20 +193,44 @@ sub del {
 
 #}}}
 
-#{{{sub check_exists
-sub check_exists {
-    my ( $user, $act_on_user ) = @_;
-    my $res = Apache::Sling::Request::request(
-        \$user,
-        Apache::Sling::UserUtil::exists_setup(
-            $user->{'BaseURL'}, $act_on_user
-        )
-    );
-    my $success = Apache::Sling::UserUtil::exists_eval($res);
-    my $message = "User \"$act_on_user\" ";
-    $message .= ( $success ? 'exists!' : 'does not exist!' );
-    $user->set_results( "$message", $res );
-    return $success;
+#{{{sub execute
+sub execute {
+    my ( $user, $options ) = @_;
+    if ( defined ${ $options->{'exists'} } ) {
+        $user->check_exists( ${ $options->{'exists'} } );
+    }
+    elsif ( defined ${ $options->{'me'} } ) {
+        $user->me();
+    }
+    elsif ( defined ${ $options->{'sites'} } ) {
+        $user->sites();
+    }
+    elsif ( defined ${ $options->{'add'} } ) {
+        $user->add(
+            ${ $options->{'add'} },
+            ${ $options->{'password'} },
+            @{ $options->{'property'} }
+        );
+    }
+    elsif ( defined ${ $options->{'update'} } ) {
+        $user->update( ${ $options->{'update'} }, @{ $options->{'property'} } );
+    }
+    elsif ( defined ${ $options->{'change-password'} } ) {
+        $user->change_password(
+            ${ $options->{'change-password'} },
+            ${ $options->{'password'} },
+            ${ $options->{'new-password'} },
+            ${ $options->{'new-password'} }
+        );
+    }
+    elsif ( defined ${ $options->{'delete'} } ) {
+        $user->del( ${ $options->{'delete'} } );
+    }
+    elsif ( defined ${ $options->{'view'} } ) {
+        $user->view( ${ $options->{'view'} } );
+    }
+    Apache::Sling::Print::print_result($user);
+    return 1;
 }
 
 #}}}

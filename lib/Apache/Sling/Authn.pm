@@ -25,7 +25,8 @@ our $VERSION = '0.12';
 sub new {
     my ( $class, $url, $username, $password, $type, $verbose, $log ) = @_;
     if ( !defined $url ) { croak 'url not defined!'; }
-    $type    = ( defined $type    ? $type    : 'basic' );
+    $url     = Apache::Sling::URL::url_input_sanitize($url);
+    $type    = ( defined $type ? $type : 'basic' );
     $verbose = ( defined $verbose ? $verbose : 0 );
 
     my $lwp_user_agent = LWP::UserAgent->new( keep_alive => 1 );
@@ -111,7 +112,9 @@ sub login_user {
             Apache::Sling::Print::print_result($authn);
         }
     }
+    return 1;
 }
+
 #}}}
 
 #{{{sub switch_user
