@@ -193,48 +193,6 @@ sub del {
 
 #}}}
 
-#{{{sub execute
-sub execute {
-    my ( $user, $options ) = @_;
-    if ( defined ${ $options->{'exists'} } ) {
-        $user->check_exists( ${ $options->{'exists'} } );
-    }
-    elsif ( defined ${ $options->{'me'} } ) {
-        $user->me();
-    }
-    elsif ( defined ${ $options->{'sites'} } ) {
-        $user->sites();
-    }
-    elsif ( defined ${ $options->{'add'} } ) {
-        $user->add(
-            ${ $options->{'add'} },
-            ${ $options->{'password'} },
-            @{ $options->{'property'} }
-        );
-    }
-    elsif ( defined ${ $options->{'update'} } ) {
-        $user->update( ${ $options->{'update'} }, @{ $options->{'property'} } );
-    }
-    elsif ( defined ${ $options->{'change-password'} } ) {
-        $user->change_password(
-            ${ $options->{'change-password'} },
-            ${ $options->{'password'} },
-            ${ $options->{'new-password'} },
-            ${ $options->{'new-password'} }
-        );
-    }
-    elsif ( defined ${ $options->{'delete'} } ) {
-        $user->del( ${ $options->{'delete'} } );
-    }
-    elsif ( defined ${ $options->{'view'} } ) {
-        $user->view( ${ $options->{'view'} } );
-    }
-    Apache::Sling::Print::print_result($user);
-    return 1;
-}
-
-#}}}
-
 #{{{sub sites
 sub sites {
     my ($user) = @_;
