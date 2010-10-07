@@ -192,8 +192,8 @@ sub user_run {
             $user->view( ${ $options->{'view'} } );
         }
         Apache::Sling::Print::print_result($user);
-        return 1;
     }
+    return 1;
 }
 
 #}}}
@@ -205,33 +205,62 @@ __END__
 
 Apache::Sling - Perl library for interacting with the apache sling web framework
 
-=head1 SYNOPSIS
+=head1 ABSTRACT
 
-  use Apache::Sling;
+Top level Entry point to the Apache Sling libraries. Provides a layer of
+abstraction for configuring and running the various Sling operations.
+
+=head1 METHODS
+
+=head2 new
+
+Create, set up, and return a Sling object.
+
+=head1 USAGE
+
+use Apache::Sling;
 
 =head1 DESCRIPTION
 
 The Apache::Sling perl library is designed to provide a perl based interface on
 to the Apache sling web framework. 
 
-=head2 EXPORT
+=head1 REQUIRED ARGUMENTS
 
-None by default.
+None required.
 
-=head1 SEE ALSO
+=head1 OPTIONS
 
-http://sling.apache.org
+n/a
+
+=head1 DIAGNOSTICS
+
+n/a
+
+=head1 EXIT STATUS
+
+1 on success.
+
+=head1 CONFIGURATION
+
+None required.
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+None known.
+
+=head1 BUGS AND LIMITATIONS
+
+None known.
 
 =head1 AUTHOR
 
-D. D. Parry, E<lt>perl@ddp.me.ukE<gt>
-
-=head1 VERSION
-
-0.12
+Daniel David Parry <perl@ddp.me.uk>
 
 =head1 LICENSE AND COPYRIGHT
 
 LICENSE: http://dev.perl.org/licenses/artistic.html
 
-COPYRIGHT: Daniel David Parry <perl@ddp.me.uk>
+COPYRIGHT: (c) 2010 Daniel David Parry <perl@ddp.me.uk>
