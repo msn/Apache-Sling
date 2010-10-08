@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use Carp;
 use Apache::Sling::Authn;
+use Apache::Sling::Content;
 use Apache::Sling::Group;
 use Apache::Sling::User;
 
@@ -68,16 +69,155 @@ sub check_forks {
 
 #}}}
 
+#{{{sub content_config
+
+sub content_config {
+    my ($sling) = @_;
+    my $add;
+    my $additions;
+    my $copy;
+    my $delete;
+    my $exists;
+    my $filename;
+    my $local;
+    my $move;
+    my @property;
+    my $remote;
+    my $remote_source;
+    my $replace;
+    my $view;
+
+    my %content_config = (
+        'auth'          => \$sling->{'Auth'},
+        'help'          => \$sling->{'Help'},
+        'log'           => \$sling->{'Log'},
+        'man'           => \$sling->{'Man'},
+        'pass'          => \$sling->{'Pass'},
+        'threads'       => \$sling->{'Threads'},
+        'url'           => \$sling->{'URL'},
+        'user'          => \$sling->{'User'},
+        'verbose'       => \$sling->{'Verbose'},
+        'add'           => \$add,
+        'additions'     => \$additions,
+        'copy'          => \$copy,
+        'delete'        => \$delete,
+        'exists'        => \$exists,
+        'filename'      => \$filename,
+        'local'         => \$local,
+        'move'          => \$move,
+        'property'      => \@property,
+        'remote'        => \$remote,
+        'remote-source' => \$remote_source,
+        'replace'       => \$replace,
+        'view'          => \$view
+    );
+
+    return \%content_config;
+}
+
+#}}}
+
+#{{{sub content_run
+sub content_run {
+    my ( $sling, $config ) = @_;
+    if ( !defined $config ) {
+        croak 'No content config supplied!';
+    }
+    $sling->check_forks;
+    ${ $config->{'remote'} } =
+      Apache::Sling::URL::strip_leading_slash( ${ $config->{'remote'} } );
+    ${ $config->{'remote-source'} } = Apache::Sling::URL::strip_leading_slash(
+        ${ $config->{'remote-source'} } );
+
+    if ( defined ${ $config->{'additions'} } ) {
+        my $message =
+          "Adding content from file \"" . ${ $config->{'additions'} } . "\":\n";
+        Apache::Sling::Print::print_with_lock( "$message", $sling->{'Log'} );
+        my @childs = ();
+        for my $i ( 0 .. $sling->{'Threads'} ) {
+            my $pid = fork;
+            if ($pid) { push @childs, $pid; }    # parent
+            elsif ( $pid == 0 ) {                # child
+                    # Create a separate authorization per fork:
+                my $authn = new Apache::Sling::Authn(
+                    $sling->{'URL'},     $sling->{'User'},
+                    $sling->{'Pass'},    $sling->{'Auth'},
+                    $sling->{'Verbose'}, $sling->{'Log'}
+                );
+                my $content =
+                  new Apache::Sling::Content( \$authn, $sling->{'Verbose'},
+                    $sling->{'Log'} );
+                $content->upload_from_file( { $config->{'additions'} },
+                    $i, $sling->{'Threads'} );
+                exit 0;
+            }
+            else {
+                croak "Could not fork $i!";
+            }
+        }
+        foreach (@childs) { waitpid $_, 0; }
+    }
+    else {
+        my $authn = new Apache::Sling::Authn(
+            $sling->{'URL'},  $sling->{'User'},    $sling->{'Pass'},
+            $sling->{'Auth'}, $sling->{'Verbose'}, $sling->{'Log'}
+        );
+        my $content =
+          new Apache::Sling::Content( \$authn, $sling->{'Verbose'},
+            $sling->{'Log'} );
+        if (   defined ${ $config->{'local'} }
+            && defined ${ $config->{'remote'} } )
+        {
+            $content->upload_file(
+                ${ $config->{'local'} },
+                ${ $config->{'remote'} },
+                ${ $config->{'filename'} }
+            );
+        }
+        elsif ( defined ${ $config->{'exists'} } ) {
+            $content->check_exists( ${ $config->{'remote'} } );
+        }
+        elsif ( defined ${ $config->{'add'} } ) {
+            $content->add( ${ $config->{'remote'} },
+                @{ $config->{'property'} } );
+        }
+        elsif ( defined ${ $config->{'copy'} } ) {
+            $content->copy(
+                ${ $config->{'remote-source'} },
+                ${ $config->{'remote'} },
+                ${ $config->{'replace'} }
+            );
+        }
+        elsif ( defined ${ $config->{'delete'} } ) {
+            $content->del( ${ $config->{'remote'} } );
+        }
+        elsif ( defined ${ $config->{'move'} } ) {
+            $content->move(
+                ${ $config->{'remote-source'} },
+                ${ $config->{'remote'} },
+                ${ $config->{'replace'} }
+            );
+        }
+        elsif ( defined ${ $config->{'view'} } ) {
+            $content->view( ${ $config->{'remote'} } );
+        }
+        Apache::Sling::Print::print_result($content);
+    }
+    return 1;
+}
+
+#}}}
+
 #{{{sub group_config
 
 sub group_config {
     my ($sling) = @_;
     my $additions;
-    my $add_group;
-    my $delete_group;
-    my $exists_group;
-    my @properties;
-    my $view_group;
+    my $add;
+    my $delete;
+    my $exists;
+    my @property;
+    my $view;
 
     my %group_config = (
         'auth'      => \$sling->{'Auth'},
@@ -89,12 +229,12 @@ sub group_config {
         'url'       => \$sling->{'URL'},
         'user'      => \$sling->{'User'},
         'verbose'   => \$sling->{'Verbose'},
-        'add'       => \$add_group,
+        'add'       => \$add,
         'additions' => \$additions,
-        'delete'    => \$delete_group,
-        'exists'    => \$exists_group,
-        'property'  => \@properties,
-        'view'      => \$view_group
+        'delete'    => \$delete,
+        'exists'    => \$exists,
+        'property'  => \@property,
+        'view'      => \$view
     );
 
     return \%group_config;
@@ -169,18 +309,18 @@ sub group_run {
 
 sub user_config {
     my ($sling) = @_;
-    my $act_on_pass;
+    my $password;
     my $additions;
-    my $add_user;
-    my $change_pass_user;
-    my $delete_user;
-    my $exists_user;
-    my $me_user;
-    my $new_pass;
-    my @properties;
-    my $sites_user;
-    my $update_user;
-    my $view_user;
+    my $add;
+    my $change_password;
+    my $delete;
+    my $exists;
+    my $me;
+    my $new_password;
+    my @property;
+    my $sites;
+    my $update;
+    my $view;
 
     my %user_config = (
         'auth'            => \$sling->{'Auth'},
@@ -192,18 +332,18 @@ sub user_config {
         'url'             => \$sling->{'URL'},
         'user'            => \$sling->{'User'},
         'verbose'         => \$sling->{'Verbose'},
-        'add'             => \$add_user,
+        'add'             => \$add,
         'additions'       => \$additions,
-        'change-password' => \$change_pass_user,
-        'delete'          => \$delete_user,
-        'exists'          => \$exists_user,
-        'me'              => \$me_user,
-        'new-password'    => \$new_pass,
-        'password'        => \$act_on_pass,
-        'property'        => \@properties,
-        'sites'           => \$sites_user,
-        'update'          => \$update_user,
-        'view'            => \$view_user
+        'change-password' => \$change_password,
+        'delete'          => \$delete,
+        'exists'          => \$exists,
+        'me'              => \$me,
+        'new-password'    => \$new_password,
+        'password'        => \$password,
+        'property'        => \@property,
+        'sites'           => \$sites,
+        'update'          => \$update,
+        'view'            => \$view
     );
 
     return \%user_config;
