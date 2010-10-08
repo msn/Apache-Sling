@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use Carp;
 use Apache::Sling::Authn;
+use Apache::Sling::Group;
 use Apache::Sling::User;
 
 require Exporter;
@@ -25,6 +26,7 @@ sub new {
     # created when testing concurrency:
     $max_allowed_forks =
       ( defined $max_allowed_forks ? $max_allowed_forks : 32 );
+    my $auth;
     my $help;
     my $log;
     my $man;
@@ -34,15 +36,18 @@ sub new {
     my $user;
     my $verbose;
 
-    my $sling = { MaxForks => $max_allowed_forks,
-                  Help     => $help,
-		  Log      => $log,
-		  Man      => $man,
-		  Pass     => $password,
-		  Threads  => $number_forks,
-		  URL      => $url,
-		  User     => $user,
-		  Verbose  => $verbose };
+    my $sling = {
+        MaxForks => $max_allowed_forks,
+        Auth     => $auth,
+        Help     => $help,
+        Log      => $log,
+        Man      => $man,
+        Pass     => $password,
+        Threads  => $number_forks,
+        URL      => $url,
+        User     => $user,
+        Verbose  => $verbose
+    };
     bless $sling, $class;
     return $sling;
 }
@@ -52,12 +57,109 @@ sub new {
 #{{{sub check_forks
 
 sub check_forks {
-    my ( $sling ) = @_;
+    my ($sling) = @_;
     $sling->{'Threads'} = ( $sling->{'Threads'} || 1 );
-    $sling->{'Threads'} = ( $sling->{'Threads'} =~ /^[0-9]+$/xms ?
-    $sling->{'Threads'} : 1 );
+    $sling->{'Threads'} =
+      ( $sling->{'Threads'} =~ /^[0-9]+$/xms ? $sling->{'Threads'} : 1 );
     $sling->{'Threads'} =
       ( $sling->{'Threads'} < $sling->{'MaxForks'} ? $sling->{'Threads'} : 1 );
+    return 1;
+}
+
+#}}}
+
+#{{{sub group_config
+
+sub group_config {
+    my ($sling) = @_;
+    my $additions;
+    my $add_group;
+    my $delete_group;
+    my $exists_group;
+    my @properties;
+    my $view_group;
+
+    my %group_config = (
+        'auth'      => \$sling->{'Auth'},
+        'help'      => \$sling->{'Help'},
+        'log'       => \$sling->{'Log'},
+        'man'       => \$sling->{'Man'},
+        'pass'      => \$sling->{'Pass'},
+        'threads'   => \$sling->{'Threads'},
+        'url'       => \$sling->{'URL'},
+        'user'      => \$sling->{'User'},
+        'verbose'   => \$sling->{'Verbose'},
+        'add'       => \$add_group,
+        'additions' => \$additions,
+        'delete'    => \$delete_group,
+        'exists'    => \$exists_group,
+        'property'  => \@properties,
+        'view'      => \$view_group
+    );
+
+    return \%group_config;
+}
+
+#}}}
+
+#{{{sub group_run
+sub group_run {
+    my ( $sling, $config ) = @_;
+    if ( !defined $config ) {
+        croak 'No group config supplied!';
+    }
+    $sling->check_forks;
+
+    if ( defined ${ $config->{'additions'} } ) {
+        my $message =
+          "Adding groups from file \"" . ${ $config->{'additions'} } . "\":\n";
+        Apache::Sling::Print::print_with_lock( "$message", $sling->{'Log'} );
+        my @childs = ();
+        for my $i ( 0 .. $sling->{'Threads'} ) {
+            my $pid = fork;
+            if ($pid) { push @childs, $pid; }    # parent
+            elsif ( $pid == 0 ) {                # child
+                    # Create a separate authorization per fork:
+                my $authn = new Apache::Sling::Authn(
+                    $sling->{'URL'},     $sling->{'User'},
+                    $sling->{'Pass'},    $sling->{'Auth'},
+                    $sling->{'Verbose'}, $sling->{'Log'}
+                );
+                my $group =
+                  new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
+                    $sling->{'Log'} );
+                $group->add_from_file( { $config->{'additions'} },
+                    $i, $sling->{'Threads'} );
+                exit 0;
+            }
+            else {
+                croak "Could not fork $i!";
+            }
+        }
+        foreach (@childs) { waitpid $_, 0; }
+    }
+    else {
+        my $authn = new Apache::Sling::Authn(
+            $sling->{'URL'},  $sling->{'User'},    $sling->{'Pass'},
+            $sling->{'Auth'}, $sling->{'Verbose'}, $sling->{'Log'}
+        );
+        my $group =
+          new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
+            $sling->{'Log'} );
+        if ( defined ${ $config->{'exists'} } ) {
+            $group->check_exists( ${ $config->{'exists'} } );
+        }
+        elsif ( defined ${ $config->{'add'} } ) {
+            $group->add( ${ $config->{'add'} }, @{ $config->{'property'} } );
+        }
+        elsif ( defined ${ $config->{'delete'} } ) {
+            $group->del( ${ $config->{'delete'} } );
+        }
+        elsif ( defined ${ $config->{'view'} } ) {
+            $group->view( ${ $config->{'view'} } );
+        }
+        Apache::Sling::Print::print_result($group);
+    }
     return 1;
 }
 
@@ -70,7 +172,6 @@ sub user_config {
     my $act_on_pass;
     my $additions;
     my $add_user;
-    my $auth;
     my $change_pass_user;
     my $delete_user;
     my $exists_user;
@@ -82,6 +183,7 @@ sub user_config {
     my $view_user;
 
     my %user_config = (
+        'auth'            => \$sling->{'Auth'},
         'help'            => \$sling->{'Help'},
         'log'             => \$sling->{'Log'},
         'man'             => \$sling->{'Man'},
@@ -92,7 +194,6 @@ sub user_config {
         'verbose'         => \$sling->{'Verbose'},
         'add'             => \$add_user,
         'additions'       => \$additions,
-        'auth'            => \$auth,
         'change-password' => \$change_pass_user,
         'delete'          => \$delete_user,
         'exists'          => \$exists_user,
@@ -121,8 +222,7 @@ sub user_run {
     if ( defined ${ $config->{'additions'} } ) {
         my $message =
           "Adding users from file \"" . ${ $config->{'additions'} } . "\":\n";
-        Apache::Sling::Print::print_with_lock( "$message",
-            $sling->{'Log'} );
+        Apache::Sling::Print::print_with_lock( "$message", $sling->{'Log'} );
         my @childs = ();
         for my $i ( 0 .. $sling->{'Threads'} ) {
             my $pid = fork;
@@ -130,18 +230,13 @@ sub user_run {
             elsif ( $pid == 0 ) {                # child
                     # Create a separate authorization per fork:
                 my $authn = new Apache::Sling::Authn(
-                    $sling->{'URL'},
-                    $sling->{'User'},
-                    $sling->{'Pass'},
-                    ${ $config->{'auth'} },
-                    $sling->{'Verbose'},
-                    $sling->{'Log'}
+                    $sling->{'URL'},     $sling->{'User'},
+                    $sling->{'Pass'},    $sling->{'Auth'},
+                    $sling->{'Verbose'}, $sling->{'Log'}
                 );
-                my $user = new Apache::Sling::User(
-                    \$authn,
-                    $sling->{'verbose'},
-                    $sling->{'log'}
-                );
+                my $user =
+                  new Apache::Sling::User( \$authn, $sling->{'Verbose'},
+                    $sling->{'Log'} );
                 $user->add_from_file( { $config->{'additions'} },
                     $i, $sling->{'Threads'} );
                 exit 0;
@@ -154,18 +249,12 @@ sub user_run {
     }
     else {
         my $authn = new Apache::Sling::Authn(
-                    $sling->{'URL'},
-                    $sling->{'User'},
-                    $sling->{'Pass'},
-                    ${ $config->{'auth'} },
-                    $sling->{'Verbose'},
-                    $sling->{'Log'}
+            $sling->{'URL'},  $sling->{'User'},    $sling->{'Pass'},
+            $sling->{'Auth'}, $sling->{'Verbose'}, $sling->{'Log'}
         );
-        my $user = new Apache::Sling::User(
-                    \$authn,
-                    $sling->{'verbose'},
-                    $sling->{'log'}
-        );
+        my $user =
+          new Apache::Sling::User( \$authn, $sling->{'Verbose'},
+            $sling->{'Log'} );
         if ( defined ${ $config->{'exists'} } ) {
             $user->check_exists( ${ $config->{'exists'} } );
         }
