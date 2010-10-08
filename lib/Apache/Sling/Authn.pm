@@ -24,7 +24,6 @@ our $VERSION = '0.12';
 #{{{sub new
 sub new {
     my ( $class, $url, $username, $password, $type, $verbose, $log ) = @_;
-    if ( !defined $url ) { croak 'url not defined!'; }
     $url     = Apache::Sling::URL::url_input_sanitize($url);
     $type    = ( defined $type ? $type : 'basic' );
     $verbose = ( defined $verbose ? $verbose : 0 );
