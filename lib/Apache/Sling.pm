@@ -343,7 +343,7 @@ sub group_member_config {
 sub group_member_run {
     my ( $sling, $config ) = @_;
     if ( !defined $config ) {
-        croak 'No group config supplied!';
+        croak 'No group_member config supplied!';
     }
     $sling->check_forks;
 
@@ -400,6 +400,115 @@ sub group_member_run {
         }
         Apache::Sling::Print::print_result($group);
     }
+    return 1;
+}
+
+#}}}
+
+#{{{sub ldap_synch_config
+
+sub ldap_synch_config {
+    my ($sling) = @_;
+    my $attributes;
+    my $download_user_list;
+    my $flag_disabled;
+    my $ldap_attributes;
+    my $ldap_base;
+    my $ldap_dn;
+    my $ldap_filter;
+    my $ldap_host;
+    my $ldap_pass;
+    my $synch_full;
+    my $synch_full_since;
+    my $synch_listed;
+    my $synch_listed_since;
+    my $upload_user_list;
+
+    my %ldap_synch_config = (
+        'auth'               => \$sling->{'Auth'},
+        'help'               => \$sling->{'Help'},
+        'log'                => \$sling->{'Log'},
+        'man'                => \$sling->{'Man'},
+        'pass'               => \$sling->{'Pass'},
+        'threads'            => \$sling->{'Threads'},
+        'url'                => \$sling->{'URL'},
+        'user'               => \$sling->{'User'},
+        'verbose'            => \$sling->{'Verbose'},
+        'attributes'         => $attributes,
+        'download-user-list' => $download_user_list,
+        'flag-disabled'      => $flag_disabled,
+        'ldap-attributes'    => $ldap_attributes,
+        'ldap-base'          => $ldap_base,
+        'ldap-dn'            => $ldap_dn,
+        'ldap-filter'        => $ldap_filter,
+        'ldap-host'          => $ldap_host,
+        'ldap-pass'          => $ldap_pass,
+        'synch-full'         => $synch_full,
+        'synch-full-since'   => $synch_full_since,
+        'synch-listed'       => $synch_listed,
+        'synch-listed-since' => $synch_listed_since,
+        'upload-user-list'   => $upload_user_list
+    );
+
+    return \%ldap_synch_config;
+}
+
+#}}}
+
+#{{{sub ldap_synch_run
+sub ldap_synch_run {
+    my ( $sling, $config ) = @_;
+    if ( !defined $config ) {
+        croak 'No ldap_synch config supplied!';
+    }
+    $sling->check_forks;
+
+    my $authn = new Apache::Sling::Authn(
+        $sling->{'URL'},  $sling->{'User'},    $sling->{'Pass'},
+        $sling->{'Auth'}, $sling->{'Verbose'}, $sling->{'Log'}
+    );
+    my $ldap_synch = new Apache::Sling::LDAPSynch(
+        ${ $config->{'ldap-host'} },
+        ${ $config->{'ldap-base'} },
+        ${ $config->{'ldap-filter'} },
+        ${ $config->{'ldap-dn'} },
+        ${ $config->{'ldap-pass'} },
+        \$authn,
+        ${ $config->{'flag-disabled'} },
+        $sling->{'Verbose'},
+        $sling->{'Log'}
+    );
+    if ( defined ${ $config->{'download-user-list'} } ) {
+        $ldap_synch->download_synch_user_list(
+            ${ $config->{'download-user-list'} } );
+    }
+    elsif ( defined ${ $config->{'upload-user-list'} } ) {
+        $ldap_synch->upload_synch_user_list(
+            ${ $config->{'upload-user-list'} } );
+    }
+    elsif ( defined ${ $config->{'synch-full'} } ) {
+        $ldap_synch->synch_full( ${ $config->{'ldap-attributes'} },
+            ${ $config->{'attributes'} } );
+    }
+    elsif ( defined ${ $config->{'synch-full-since'} } ) {
+        $ldap_synch->synch_full_since(
+            ${ $config->{'ldap-attributes'} },
+            ${ $config->{'attributes'} },
+            ${ $config->{'synch-full-since'} }
+        );
+    }
+    elsif ( defined ${ $config->{'synch-listed'} } ) {
+        $ldap_synch->synch_listed( ${ $config->{'ldap-attributes'} },
+            ${ $config->{'attributes'} } );
+    }
+    elsif ( defined ${ $config->{'synch-listed-since'} } ) {
+        $ldap_synch->synch_listed_since(
+            ${ $config->{'ldap-attributes'} },
+            ${ $config->{'attributes'} },
+            ${ $config->{'synch-listed-since'} }
+        );
+    }
+    Apache::Sling::Print::print_result($ldap_synch);
     return 1;
 }
 
