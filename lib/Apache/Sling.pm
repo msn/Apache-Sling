@@ -305,6 +305,106 @@ sub group_run {
 
 #}}}
 
+#{{{sub group_member_config
+
+sub group_member_config {
+    my ($sling) = @_;
+    my $additions;
+    my $add;
+    my $delete;
+    my $exists;
+    my $group;
+    my $view;
+
+    my %group_member_config = (
+        'auth'      => \$sling->{'Auth'},
+        'help'      => \$sling->{'Help'},
+        'log'       => \$sling->{'Log'},
+        'man'       => \$sling->{'Man'},
+        'pass'      => \$sling->{'Pass'},
+        'threads'   => \$sling->{'Threads'},
+        'url'       => \$sling->{'URL'},
+        'user'      => \$sling->{'User'},
+        'verbose'   => \$sling->{'Verbose'},
+        'add'       => \$add,
+        'additions' => \$additions,
+        'delete'    => \$delete,
+        'exists'    => \$exists,
+        'group'     => \$group,
+        'view'      => \$view
+    );
+
+    return \%group_member_config;
+}
+
+#}}}
+
+#{{{sub group_member_run
+sub group_member_run {
+    my ( $sling, $config ) = @_;
+    if ( !defined $config ) {
+        croak 'No group config supplied!';
+    }
+    $sling->check_forks;
+
+    if ( defined ${ $config->{'additions'} } ) {
+        my $message =
+          "Adding groups from file \"" . ${ $config->{'additions'} } . "\":\n";
+        Apache::Sling::Print::print_with_lock( "$message", $sling->{'Log'} );
+        my @childs = ();
+        for my $i ( 0 .. $sling->{'Threads'} ) {
+            my $pid = fork;
+            if ($pid) { push @childs, $pid; }    # parent
+            elsif ( $pid == 0 ) {                # child
+                    # Create a separate authorization per fork:
+                my $authn = new Apache::Sling::Authn(
+                    $sling->{'URL'},     $sling->{'User'},
+                    $sling->{'Pass'},    $sling->{'Auth'},
+                    $sling->{'Verbose'}, $sling->{'Log'}
+                );
+                my $group =
+                  new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
+                    $sling->{'Log'} );
+                $group->member_add_from_file( { $config->{'additions'} },
+                    $i, $sling->{'Threads'} );
+                exit 0;
+            }
+            else {
+                croak "Could not fork $i!";
+            }
+        }
+        foreach (@childs) { waitpid $_, 0; }
+    }
+    else {
+        my $authn = new Apache::Sling::Authn(
+            $sling->{'URL'},  $sling->{'User'},    $sling->{'Pass'},
+            $sling->{'Auth'}, $sling->{'Verbose'}, $sling->{'Log'}
+        );
+        my $group =
+          new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
+            $sling->{'Log'} );
+        if ( defined ${ $config->{'exists'} } ) {
+            $group->member_exists( ${ $config->{'group'} },
+                ${ $config->{'exists'} } );
+        }
+        elsif ( defined ${ $config->{'add'} } ) {
+            $group->member_add( ${ $config->{'group'} },
+                ${ $config->{'add'} } );
+        }
+        elsif ( defined ${ $config->{'delete'} } ) {
+            $group->member_delete( ${ $config->{'group'} },
+                ${ $config->{'delete'} } );
+        }
+        elsif ( defined ${ $config->{'view'} } ) {
+            $group->member_view( ${ $config->{'group'} } );
+        }
+        Apache::Sling::Print::print_result($group);
+    }
+    return 1;
+}
+
+#}}}
+
 #{{{sub user_config
 
 sub user_config {
