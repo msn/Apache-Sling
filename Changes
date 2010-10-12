@@ -1,5 +1,9 @@
 Revision history for Perl extension Apache::Sling.
 
+0.13  Tue Oct 12 10:45:00 2010
+        - Pulling functionality from user scripts into Sling.pm.
+	- Fixing bugs with user / group additions from file.
+
 0.12  Sat Aug 14 11:35:00 2010
         - Adding external tests.
         - Fixing bugs in group membership.
@@ -46,4 +50,3 @@ Revision history for Perl extension Apache::Sling.
 0.01  Wed Jun  2 08:05:00 2010
 	- original version; created by h2xs 1.23 with options
 		-AX Apache::Sling
-
