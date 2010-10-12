@@ -114,7 +114,7 @@ sub add_from_file {
                     for ( my $i = 1 ; $i < $number_of_columns ; $i++ ) {
                         my $heading = $column_headings[$i];
                         my $data    = $columns[$i];
-                        my $value   = "$heading = $data";
+                        my $value   = "$heading=$data";
                         push @properties, $value;
                     }
                     $group->add( $id, \@properties );

@@ -147,7 +147,7 @@ sub content_run {
                 my $content =
                   new Apache::Sling::Content( \$authn, $sling->{'Verbose'},
                     $sling->{'Log'} );
-                $content->upload_from_file( { $config->{'additions'} },
+                $content->upload_from_file( ${ $config->{'additions'} },
                     $i, $sling->{'Threads'} );
                 exit 0;
             }
@@ -268,7 +268,7 @@ sub group_run {
                 my $group =
                   new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
                     $sling->{'Log'} );
-                $group->add_from_file( { $config->{'additions'} },
+                $group->add_from_file( ${ $config->{'additions'} },
                     $i, $sling->{'Threads'} );
                 exit 0;
             }
@@ -365,7 +365,7 @@ sub group_member_run {
                 my $group =
                   new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
                     $sling->{'Log'} );
-                $group->member_add_from_file( { $config->{'additions'} },
+                $group->member_add_from_file( ${ $config->{'additions'} },
                     $i, $sling->{'Threads'} );
                 exit 0;
             }
@@ -586,7 +586,7 @@ sub user_run {
                 my $user =
                   new Apache::Sling::User( \$authn, $sling->{'Verbose'},
                     $sling->{'Log'} );
-                $user->add_from_file( { $config->{'additions'} },
+                $user->add_from_file( ${ $config->{'additions'} },
                     $i, $sling->{'Threads'} );
                 exit 0;
             }
