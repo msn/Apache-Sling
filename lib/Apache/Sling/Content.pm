@@ -170,9 +170,9 @@ sub upload_from_file {
                 chomp;
                 $_ =~ /^(.*?),(.*?)$/msx
                   or croak 'Problem parsing content to add';
-                my $local_path  = $1;
-                my $remote_path = $2;
-                if ( defined $local_path && defined $remote_path ) {
+                if ( defined $1 && defined $2 ) {
+                    my $local_path  = $1;
+                    my $remote_path = $2;
                     $content->upload_file( $local_path, $remote_path, q{} );
                     Apache::Sling::Print::print_result($content);
                 }
