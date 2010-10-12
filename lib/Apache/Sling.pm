@@ -139,11 +139,7 @@ sub content_run {
             if ($pid) { push @childs, $pid; }    # parent
             elsif ( $pid == 0 ) {                # child
                     # Create a separate authorization per fork:
-                my $authn = new Apache::Sling::Authn(
-                    $sling->{'URL'},     $sling->{'User'},
-                    $sling->{'Pass'},    $sling->{'Auth'},
-                    $sling->{'Verbose'}, $sling->{'Log'}
-                );
+                my $authn = new Apache::Sling::Authn( \$sling );
                 my $content =
                   new Apache::Sling::Content( \$authn, $sling->{'Verbose'},
                     $sling->{'Log'} );
@@ -158,10 +154,7 @@ sub content_run {
         foreach (@childs) { waitpid $_, 0; }
     }
     else {
-        my $authn = new Apache::Sling::Authn(
-            $sling->{'URL'},  $sling->{'User'},    $sling->{'Pass'},
-            $sling->{'Auth'}, $sling->{'Verbose'}, $sling->{'Log'}
-        );
+        my $authn = new Apache::Sling::Authn( \$sling );
         my $content =
           new Apache::Sling::Content( \$authn, $sling->{'Verbose'},
             $sling->{'Log'} );
@@ -260,11 +253,7 @@ sub group_run {
             if ($pid) { push @childs, $pid; }    # parent
             elsif ( $pid == 0 ) {                # child
                     # Create a separate authorization per fork:
-                my $authn = new Apache::Sling::Authn(
-                    $sling->{'URL'},     $sling->{'User'},
-                    $sling->{'Pass'},    $sling->{'Auth'},
-                    $sling->{'Verbose'}, $sling->{'Log'}
-                );
+                my $authn = new Apache::Sling::Authn( \$sling );
                 my $group =
                   new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
                     $sling->{'Log'} );
@@ -279,10 +268,7 @@ sub group_run {
         foreach (@childs) { waitpid $_, 0; }
     }
     else {
-        my $authn = new Apache::Sling::Authn(
-            $sling->{'URL'},  $sling->{'User'},    $sling->{'Pass'},
-            $sling->{'Auth'}, $sling->{'Verbose'}, $sling->{'Log'}
-        );
+        my $authn = new Apache::Sling::Authn( \$sling );
         my $group =
           new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
             $sling->{'Log'} );
@@ -357,11 +343,7 @@ sub group_member_run {
             if ($pid) { push @childs, $pid; }    # parent
             elsif ( $pid == 0 ) {                # child
                     # Create a separate authorization per fork:
-                my $authn = new Apache::Sling::Authn(
-                    $sling->{'URL'},     $sling->{'User'},
-                    $sling->{'Pass'},    $sling->{'Auth'},
-                    $sling->{'Verbose'}, $sling->{'Log'}
-                );
+                my $authn = new Apache::Sling::Authn( \$sling );
                 my $group =
                   new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
                     $sling->{'Log'} );
@@ -376,10 +358,7 @@ sub group_member_run {
         foreach (@childs) { waitpid $_, 0; }
     }
     else {
-        my $authn = new Apache::Sling::Authn(
-            $sling->{'URL'},  $sling->{'User'},    $sling->{'Pass'},
-            $sling->{'Auth'}, $sling->{'Verbose'}, $sling->{'Log'}
-        );
+        my $authn = new Apache::Sling::Authn( \$sling );
         my $group =
           new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
             $sling->{'Log'} );
@@ -463,10 +442,7 @@ sub ldap_synch_run {
     }
     $sling->check_forks;
 
-    my $authn = new Apache::Sling::Authn(
-        $sling->{'URL'},  $sling->{'User'},    $sling->{'Pass'},
-        $sling->{'Auth'}, $sling->{'Verbose'}, $sling->{'Log'}
-    );
+    my $authn      = new Apache::Sling::Authn( \$sling );
     my $ldap_synch = new Apache::Sling::LDAPSynch(
         ${ $config->{'ldap-host'} },
         ${ $config->{'ldap-base'} },
@@ -578,11 +554,7 @@ sub user_run {
             if ($pid) { push @childs, $pid; }    # parent
             elsif ( $pid == 0 ) {                # child
                     # Create a separate authorization per fork:
-                my $authn = new Apache::Sling::Authn(
-                    $sling->{'URL'},     $sling->{'User'},
-                    $sling->{'Pass'},    $sling->{'Auth'},
-                    $sling->{'Verbose'}, $sling->{'Log'}
-                );
+                my $authn = new Apache::Sling::Authn( \$sling );
                 my $user =
                   new Apache::Sling::User( \$authn, $sling->{'Verbose'},
                     $sling->{'Log'} );
@@ -597,10 +569,7 @@ sub user_run {
         foreach (@childs) { waitpid $_, 0; }
     }
     else {
-        my $authn = new Apache::Sling::Authn(
-            $sling->{'URL'},  $sling->{'User'},    $sling->{'Pass'},
-            $sling->{'Auth'}, $sling->{'Verbose'}, $sling->{'Log'}
-        );
+        my $authn = new Apache::Sling::Authn( \$sling );
         my $user =
           new Apache::Sling::User( \$authn, $sling->{'Verbose'},
             $sling->{'Log'} );

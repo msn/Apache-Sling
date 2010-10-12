@@ -23,10 +23,12 @@ our $VERSION = '0.13';
 
 #{{{sub new
 sub new {
-    my ( $class, $url, $username, $password, $type, $verbose, $log ) = @_;
-    $url     = Apache::Sling::URL::url_input_sanitize($url);
-    $type    = ( defined $type ? $type : 'basic' );
-    $verbose = ( defined $verbose ? $verbose : 0 );
+    my ( $class, $sling ) = @_;
+    my $url = Apache::Sling::URL::url_input_sanitize( ${ $sling->{'URL'} } );
+    my $type =
+      ( defined ${ $sling->{'Auth'} } ? ${ $sling->{'Auth'} } : 'basic' );
+    my $verbose =
+      ( defined ${ $sling->{'Verbose'} } ? ${ $sling->{'Verbose'} } : 0 );
 
     my $lwp_user_agent = LWP::UserAgent->new( keep_alive => 1 );
     push @{ $lwp_user_agent->requests_redirectable }, 'POST';
@@ -39,12 +41,12 @@ sub new {
         BaseURL  => "$url",
         LWP      => \$lwp_user_agent,
         Type     => $type,
-        Username => $username,
-        Password => $password,
+        Username => ${ $sling->{'User'} },
+        Password => ${ $sling->{'Pass'} },
         Message  => q{},
         Response => \$response,
         Verbose  => $verbose,
-        Log      => $log
+        Log      => ${ $sling->{'Log'} }
     };
 
 # Authn references itself to be compatibile with Apache::Sling::Request::request
