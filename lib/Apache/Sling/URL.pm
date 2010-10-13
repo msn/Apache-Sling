@@ -50,7 +50,7 @@ sub properties_array_to_string {
         # Escaping single quotes:
         $property =~ s/'/\\'/gmsx;
         $property =~ /^([^=]*)=(.*)/msx;
-        if ( defined $1 && defined $2 ) {
+        if ( defined $1 ) {
             $property_post_vars .= "'$1','$2',";
         }
     }

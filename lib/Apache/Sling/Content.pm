@@ -25,7 +25,7 @@ sub new {
     my $response;
     $verbose = ( defined $verbose ? $verbose : 0 );
     my $content = {
-        BaseURL  => ${$authn}->{'BaseURL'},
+        BaseURL  => ${ $authn }->{'BaseURL'},
         Authn    => $authn,
         Message  => q{},
         Response => \$response,

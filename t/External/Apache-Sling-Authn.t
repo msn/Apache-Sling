@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 18;
 
 my $sling_host = 'http://localhost:8080';
 my $super_user = 'admin';
@@ -11,6 +11,7 @@ my $super_pass = 'admin';
 my $verbose    = 0;
 my $log;
 
+BEGIN { use_ok( 'Apache::Sling' ); }
 BEGIN { use_ok( 'Apache::Sling::Authn' ); }
 BEGIN { use_ok( 'Apache::Sling::User' ); }
 
@@ -24,8 +25,17 @@ my $test_pass = "pass";
 # test properties:
 my @test_properties;
 
+# sling object:
+my $sling = Apache::Sling->new();
+isa_ok $sling, 'Apache::Sling', 'sling';
+$sling->{'URL'}     = $sling_host;
+$sling->{'User'}    = $super_user;
+$sling->{'Pass'}    = $super_pass;
+$sling->{'Verbose'} = $verbose;
+$sling->{'Log'}     = $log;
+
 # authn object:
-my $authn = Apache::Sling::Authn->new( $sling_host, $super_user, $super_pass, 'basic', $verbose, $log );
+my $authn = Apache::Sling::Authn->new( \$sling );
 isa_ok $authn, 'Apache::Sling::Authn', 'authentication';
 # user object:
 my $user = Apache::Sling::User->new( \$authn, $verbose, $log );

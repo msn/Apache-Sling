@@ -3,15 +3,19 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 16;
 BEGIN { use_ok( 'Apache::Sling::URL' ); }
 
+ok( ! defined Apache::Sling::URL::add_leading_slash(), 'Check add_leading_slash function' );
 ok( Apache::Sling::URL::add_leading_slash( 'value' ) eq '/value', 'Check add_leading_slash function' );
 ok( Apache::Sling::URL::add_leading_slash( '/value' ) eq '/value', 'Check add_leading_slash function' );
+ok( ! defined Apache::Sling::URL::strip_leading_slash(), 'Check add_leading_slash function' );
 ok( Apache::Sling::URL::strip_leading_slash( 'value' ) eq 'value', 'Check add_leading_slash function' );
 ok( Apache::Sling::URL::strip_leading_slash( '/value' ) eq 'value', 'Check add_leading_slash function' );
 my @properties;
 ok( Apache::Sling::URL::properties_array_to_string( \@properties ) eq '', 'Check properties_array_to_string function empty array' );
+@properties = ('a=');
+ok( Apache::Sling::URL::properties_array_to_string( \@properties ) eq "'a',''", 'Check properties_array_to_string function 1 blank item' );
 @properties = ('a=b');
 ok( Apache::Sling::URL::properties_array_to_string( \@properties ) eq "'a','b'", 'Check properties_array_to_string function 1 item' );
 push @properties, "c\'=d";
