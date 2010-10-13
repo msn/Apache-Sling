@@ -172,7 +172,7 @@ sub content_run {
         }
         elsif ( defined ${ $config->{'add'} } ) {
             $content->add( ${ $config->{'remote'} },
-                @{ $config->{'property'} } );
+                $config->{'property'} );
         }
         elsif ( defined ${ $config->{'copy'} } ) {
             $content->copy(
@@ -276,7 +276,7 @@ sub group_run {
             $group->check_exists( ${ $config->{'exists'} } );
         }
         elsif ( defined ${ $config->{'add'} } ) {
-            $group->add( ${ $config->{'add'} }, @{ $config->{'property'} } );
+            $group->add( ${ $config->{'add'} }, $config->{'property'} );
         }
         elsif ( defined ${ $config->{'delete'} } ) {
             $group->del( ${ $config->{'delete'} } );
@@ -605,12 +605,12 @@ sub user_run {
             $user->add(
                 ${ $config->{'add'} },
                 ${ $config->{'password'} },
-                @{ $config->{'property'} }
+                $config->{'property'}
             );
         }
         elsif ( defined ${ $config->{'update'} } ) {
             $user->update( ${ $config->{'update'} },
-                @{ $config->{'property'} } );
+                $config->{'property'} );
         }
         elsif ( defined ${ $config->{'change-password'} } ) {
             $user->change_password(
