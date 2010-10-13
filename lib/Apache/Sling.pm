@@ -499,7 +499,10 @@ sub user_config {
     my $add;
     my $change_password;
     my $delete;
+    my $email;
     my $exists;
+    my $first_name;
+    my $last_name;
     my $me;
     my $new_password;
     my @property;
@@ -521,7 +524,10 @@ sub user_config {
         'additions'       => \$additions,
         'change-password' => \$change_password,
         'delete'          => \$delete,
+        'email'           => \$email,
         'exists'          => \$exists,
+        'first-name'      => \$first_name,
+        'last-name'       => \$last_name,
         'me'              => \$me,
         'new-password'    => \$new_password,
         'password'        => \$password,
@@ -543,6 +549,19 @@ sub user_run {
         croak 'No user config supplied!';
     }
     $sling->check_forks;
+
+    # Handle the three special case commonly used properties:
+    if ( defined ${ $config->{'email'} } ) {
+        push @{ $config->{'property'} }, "email=" . ${ $config->{'email'} };
+    }
+    if ( defined ${ $config->{'first-name'} } ) {
+        push @{ $config->{'property'} },
+          "firstName=" . ${ $config->{'first-name'} };
+    }
+    if ( defined ${ $config->{'last-name'} } ) {
+        push @{ $config->{'property'} },
+          "lastName=" . ${ $config->{'last-name'} };
+    }
 
     if ( defined ${ $config->{'additions'} } ) {
         my $message =
