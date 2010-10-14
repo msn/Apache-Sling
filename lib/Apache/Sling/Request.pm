@@ -28,6 +28,7 @@ sub string_to_request {
         croak 'No reference to an lwp user agent supplied!';
     }
     my ( $action, $target, @req_variables ) = split q{ }, $string;
+    $action = ( defined $action ? $action : '' );
     my $request;
     if ( $action eq 'post' ) {
         my $variables = join q{ }, @req_variables;
@@ -73,7 +74,12 @@ sub string_to_request {
         $request = DELETE "$target";
     }
     if ( !defined $request ) {
-        $request = GET "$target";
+        if ( defined $target ) {
+            $request = GET "$target";
+        }
+        else {
+            croak 'Error generating request for blank target!';
+        }
     }
     if ( ${$authn}->{'Type'} eq 'basic' ) {
         my $username = ${$authn}->{'Username'};
@@ -102,10 +108,10 @@ sub string_to_request {
 
 sub request {
     my ( $object, $string ) = @_;
-    if ( !defined $string ) { croak 'No string defined to turn into request!'; }
     if ( !defined $object ) {
         croak 'No reference to a suitable object supplied!';
     }
+    if ( !defined $string ) { croak 'No string defined to turn into request!'; }
     my $authn = ${$object}->{'Authn'};
     if ( !defined $authn ) {
         croak 'Object does not reference a suitable auth object';
