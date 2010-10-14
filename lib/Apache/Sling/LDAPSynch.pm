@@ -48,9 +48,9 @@ sub new {
    # List of specific ldap users that are to be ingested in to the sling system:
     my $synch_user_list = q(user_list.txt);
     my $ldap;
-    my $content = Apache::Sling::Content->new( \$authn, $verbose, $log )
+    my $content = Apache::Sling::Content->new( $authn, $verbose, $log )
       or croak q(Problem creating Sling content object!);
-    my $user = Apache::Sling::User->new( \$authn, $verbose, $log )
+    my $user = Apache::Sling::User->new( $authn, $verbose, $log )
       or croak q(Problem creating Sling user object!);
     my $ldap_synch = {
         CacheBackupPath => $synch_cache_backup_path,

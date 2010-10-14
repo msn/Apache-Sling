@@ -8,6 +8,7 @@ use Carp;
 use Apache::Sling::Authn;
 use Apache::Sling::Content;
 use Apache::Sling::Group;
+use Apache::Sling::LDAPSynch;
 use Apache::Sling::User;
 
 require Exporter;

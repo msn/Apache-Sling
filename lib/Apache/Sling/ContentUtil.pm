@@ -46,11 +46,11 @@ sub add_eval {
 sub copy_setup {
     my ( $base_url, $remote_src, $remote_dest, $replace ) = @_;
     if ( !defined $base_url ) { croak 'No base url defined!'; }
-    if ( !defined $remote_dest ) {
-        croak 'No content destination to copy to defined!';
-    }
     if ( !defined $remote_src ) {
         croak 'No content source to copy from defined!';
+    }
+    if ( !defined $remote_dest ) {
+        croak 'No content destination to copy to defined!';
     }
     my $post_variables =
       "\$post_variables = [':dest','$remote_dest',':operation','copy'";
@@ -120,11 +120,11 @@ sub exists_eval {
 sub move_setup {
     my ( $base_url, $remote_src, $remote_dest, $replace ) = @_;
     if ( !defined $base_url ) { croak 'No base url defined!'; }
-    if ( !defined $remote_dest ) {
-        croak 'No content destination to move to defined!';
-    }
     if ( !defined $remote_src ) {
         croak 'No content source to move from defined!';
+    }
+    if ( !defined $remote_dest ) {
+        croak 'No content destination to move to defined!';
     }
     my $post_variables =
       "\$post_variables = [':dest','$remote_dest',':operation','move'";
