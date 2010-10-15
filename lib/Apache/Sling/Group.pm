@@ -76,7 +76,7 @@ sub add_from_file {
     my $count             = 0;
     my $number_of_columns = 0;
     my @column_headings;
-    if ( open my ($input), '<', $file ) {
+    if ( defined $file && open my ($input), '<', $file ) {
         while (<$input>) {
             if ( $count++ == 0 ) {
 
@@ -195,7 +195,7 @@ sub member_add_from_file {
     my $count             = 0;
     my $number_of_columns = 0;
     my @column_headings;
-    if ( open my ($input), '<', $file ) {
+    if ( defined $file && open my ($input), '<', $file ) {
         while (<$input>) {
             if ( $count++ == 0 ) {
 
