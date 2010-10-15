@@ -177,6 +177,28 @@ Apache::Sling::Authn - Authenticate to an Apache Sling instance.
 
 Useful utility functions for general Authn functionality.
 
+=head1 METHODS
+
+=head2 new
+
+Create, set up, and return an Authn object.
+
+=head2 set_results
+
+Set a suitable message and response object.
+
+=head2 basic_login
+
+Perform basic authentication for a user.
+
+=head2 login_user
+
+Perform login authentication for a user.
+
+=head2 switch_user
+
+Switch to a different authenticated user.
+
 =head1 USAGE
 
 use Apache::Sling::Authn;

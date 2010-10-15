@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 14;
 
 BEGIN { use_ok( 'Apache::Sling' ); }
 BEGIN { use_ok( 'Apache::Sling::Authn' ); }
@@ -15,6 +15,7 @@ $sling->{'Verbose'} = 1;
 $sling->{'Log'} = 'log.txt';
 
 my $authn = new Apache::Sling::Authn(\$sling);
+isa_ok $authn, 'Apache::Sling::Authn', 'authn';
 ok( $authn->{ 'BaseURL' } eq 'http://localhost:8080', 'Check BaseURL set' );
 ok( $authn->{ 'Type' }    eq 'basic',                 'Check Auth type set' );
 ok( $authn->{ 'Log' }     eq 'log.txt',               'Check Log set' );

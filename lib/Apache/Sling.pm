@@ -652,6 +652,51 @@ abstraction for configuring and running the various Sling operations.
 
 Create, set up, and return a Sling object.
 
+=head2 check_forks
+
+Check number of forks to create complies with maximum number of forks
+allowed.
+
+=head2 content_config
+
+Fetch hash of content configuration.
+
+=head2 content_run
+
+Run content related actions.
+
+=head2 group_config
+
+Fetch hash of group configuration.
+
+=head2 group_run
+
+Run group related actions.
+
+=head2 group_member_config
+
+Fetch hash of group membership configuration.
+
+=head2 group_member_run
+
+Run group membership related actions.
+
+=head2 ldap_synch_config
+
+Fetch hash of ldap synchronization configuration.
+
+=head2 ldap_synch_run
+
+Run ldap synchronization related actions.
+
+=head2 user_config
+
+Fetch hash of user configuration.
+
+=head2 user_run
+
+Run user related actions.
+
 =head1 USAGE
 
 use Apache::Sling;

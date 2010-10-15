@@ -3,7 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 12;
+use Test::More tests => 19;
+use Test::Exception;
 
 BEGIN { use_ok( 'Apache::Sling' ); }
 BEGIN { use_ok( 'Apache::Sling::Authn' ); }
@@ -25,3 +26,11 @@ ok( defined $user->{ 'Response' },                   'Check response defined' );
 $user->set_results( 'Test Message', undef );
 ok( $user->{ 'Message' } eq 'Test Message', 'Message now set' );
 ok( ! defined $user->{ 'Response' },          'Check response no longer defined' );
+
+throws_ok { $user->add() } qr/No user name defined to add!/, 'Check add function croaks without user specified';
+throws_ok { $user->add_from_file() } qr/Problem adding from file!/, 'Check add_from_file function croaks without file specified';
+throws_ok { $user->change_password() } qr/No user name defined to change password for!/, 'Check check_exists function croaks without user specified';
+throws_ok { $user->check_exists() } qr/No user to check existence of defined!/, 'Check check_exists function croaks without user specified';
+throws_ok { $user->del() } qr/No user name defined to delete!/, 'Check del function croaks without user specified';
+throws_ok { $user->update() } qr/No user name defined to update!/, 'Check update function croaks without user specified';
+throws_ok { $user->view() } qr/No user to check existence of defined!/, 'Check view function croaks without user specified';

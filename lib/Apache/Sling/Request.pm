@@ -92,7 +92,7 @@ sub string_to_request {
             $request->header( 'Authorization' => $encoded );
         }
     }
-    if ( $verbose >= 2 ) {
+    if ( defined $verbose && $verbose >= 2 ) {
         Apache::Sling::Print::print_with_lock(
             "**** String representation of compiled request:\n"
               . $request->as_string,

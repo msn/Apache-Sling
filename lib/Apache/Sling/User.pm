@@ -75,7 +75,7 @@ sub add_from_file {
     my $count             = 0;
     my $number_of_columns = 0;
     my @column_headings;
-    if ( open my ($input), '<', $file ) {
+    if ( defined $file && open my ($input), '<', $file ) {
         while (<$input>) {
             if ( $count++ == 0 ) {
 
@@ -132,6 +132,9 @@ sub add_from_file {
             }
         }
         close $input or croak q{Problem closing input};
+    }
+    else {
+        croak 'Problem adding from file!';
     }
     return 1;
 }
@@ -267,6 +270,42 @@ user related functionality for Sling implemented over rest APIs.
 =head2 new
 
 Create, set up, and return a User Agent.
+
+=head2 set_results
+
+Set a suitable message and response for the user object.
+
+=head2 add
+
+Add a new user to the system.
+
+=head2 add_from_file
+
+Add new users to the system based on definitions in a file.
+
+=head2 change_password
+
+Change the password for a user.
+
+=head2 check_exists
+
+Check whether a user exists.
+
+=head2 del
+
+Delete a user.
+
+=head2 sites
+
+Fetch list of sites the user is a member of.
+
+=head2 update
+
+Update a user's credentials.
+
+=head2 view
+
+View details for a user.
 
 =head1 USAGE
 

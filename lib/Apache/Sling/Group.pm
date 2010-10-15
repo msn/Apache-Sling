@@ -133,7 +133,7 @@ sub add_from_file {
 
 #}}}
 
-#{{{sub delete
+#{{{sub del
 sub del {
     my ( $group, $act_on_group ) = @_;
     my $res = Apache::Sling::Request::request(
@@ -396,6 +396,50 @@ group related functionality for Sling implemented over rest APIs.
 =head2 new
 
 Create, set up, and return a Group Object.
+
+=head2 set_results
+
+Set a suitable message and response for the group object.
+
+=head2 add
+
+Add a new group to the system.
+
+=head2 add_from_file
+
+Add new groups to the system based on definitions in a file.
+
+=head2 del
+
+Delete a user.
+
+=head2 check_exists
+
+Check whether a group exists.
+
+=head2 member_add
+
+Add a member to a group.
+
+=head2 member_add_from_file
+
+Add members to groups based on entries in a file.
+
+=head2 member_delete
+
+Delete member from a group.
+
+=head2 member_exists
+
+Check whether a member exists in a group.
+
+=head2 member_view
+
+View members of a group.
+
+=head2 view
+
+View details for a group
 
 =head1 USAGE
 
