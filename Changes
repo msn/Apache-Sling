@@ -1,5 +1,12 @@
 Revision history for Perl extension Apache::Sling.
 
+0.14  Sat Jul 2 07:45:00 2010
+        - Fixing bug with newline, tab handling - thanks to
+          Daniel Burckhardt for the bug report and patch.
+	- Improved handling of filename variable for file upload.
+        - Tweaked required version of external dependency to an
+          earlier supported version.
+
 0.13  Tue Oct 12 10:45:00 2010
         - Pulling functionality from user scripts into Sling.pm.
 	- Fixing bugs with user / group additions from file.

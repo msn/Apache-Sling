@@ -16,7 +16,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 #{{{sub new
 sub new {
@@ -141,6 +141,7 @@ sub move {
 #{{{sub upload_file
 sub upload_file {
     my ( $content, $local_path, $remote_path, $filename ) = @_;
+    $filename = defined $filename ? $filename : q{};
     my $res = Apache::Sling::Request::request(
         \$content,
         Apache::Sling::ContentUtil::upload_file_setup(
