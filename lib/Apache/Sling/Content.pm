@@ -16,7 +16,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 #{{{sub new
 sub new {
@@ -25,7 +25,7 @@ sub new {
     my $response;
     $verbose = ( defined $verbose ? $verbose : 0 );
     my $content = {
-        BaseURL  => ${ $authn }->{'BaseURL'},
+        BaseURL  => ${$authn}->{'BaseURL'},
         Authn    => $authn,
         Message  => q{},
         Response => \$response,
@@ -218,7 +218,7 @@ sub view {
 #{{{sub view_file
 sub view_file {
     my ( $content, $remote_dest ) = @_;
-    if ( ! defined $remote_dest ) {
+    if ( !defined $remote_dest ) {
         croak 'No file to view specified!';
     }
     my $res = Apache::Sling::Request::request( \$content,

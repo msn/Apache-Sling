@@ -17,7 +17,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 #{{{sub new
 
@@ -27,7 +27,7 @@ sub new {
     my $response;
     $verbose = ( defined $verbose ? $verbose : 0 );
     my $user = {
-        BaseURL  => ${ $authn }->{'BaseURL'},
+        BaseURL  => ${$authn}->{'BaseURL'},
         Authn    => $authn,
         Message  => q{},
         Response => \$response,

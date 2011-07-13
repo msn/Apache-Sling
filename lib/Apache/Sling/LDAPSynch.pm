@@ -20,7 +20,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 #{{{sub new
 
@@ -311,7 +311,7 @@ sub parse_attributes {
         }
         if ( @{$ldap_attrs_array} != @{$sling_attrs_array} ) {
             croak
-              q(Number of ldap attributes must match number of sling attributes, )
+q(Number of ldap attributes must match number of sling attributes, )
               . @{$ldap_attrs_array} . ' != '
               . @{$sling_attrs_array};
         }

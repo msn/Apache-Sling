@@ -16,7 +16,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 #{{{sub string_to_request
 
@@ -27,6 +27,7 @@ sub string_to_request {
     if ( !defined $lwp ) {
         croak 'No reference to an lwp user agent supplied!';
     }
+
     # Split based on the space character (\x20) only, such that
     # newlines, tabs etc are maintained in the request variables:
     my ( $action, $target, @req_variables ) = split /\x20/, $string;

@@ -19,34 +19,36 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 #{{{sub new
 sub new {
     my ( $class, $sling ) = @_;
-    my $url = Apache::Sling::URL::url_input_sanitize( ${ $sling }->{'URL'} );
-    my $type =
-      ( defined ${ $sling }->{'Auth'} ? ${ $sling }->{'Auth'} : 'basic' );
+    my $url = Apache::Sling::URL::url_input_sanitize( ${$sling}->{'URL'} );
+    my $type = ( defined ${$sling}->{'Auth'} ? ${$sling}->{'Auth'} : 'basic' );
     my $verbose =
-      ( defined ${ $sling }->{'Verbose'} ? ${ $sling }->{'Verbose'} : 0 );
+      ( defined ${$sling}->{'Verbose'} ? ${$sling}->{'Verbose'} : 0 );
 
     my $lwp_user_agent = LWP::UserAgent->new( keep_alive => 1 );
     push @{ $lwp_user_agent->requests_redirectable }, 'POST';
     my $tmp_cookie_file_name =
       File::Temp::tempnam( File::Temp::tempdir( CLEANUP => 1 ), 'authn' );
     $lwp_user_agent->cookie_jar( { file => $tmp_cookie_file_name } );
+    if ( defined ${$sling}->{'Referer'} ) {
+        $lwp_user_agent->default_header( 'Referer' => ${$sling}->{'Referer'} );
+    }
 
     my $response;
     my $authn = {
         BaseURL  => "$url",
         LWP      => \$lwp_user_agent,
         Type     => $type,
-        Username => ${ $sling }->{'User'},
-        Password => ${ $sling }->{'Pass'},
+        Username => ${$sling}->{'User'},
+        Password => ${$sling}->{'Pass'},
         Message  => q{},
         Response => \$response,
         Verbose  => $verbose,
-        Log      => ${ $sling }->{'Log'}
+        Log      => ${$sling}->{'Log'}
     };
 
 # Authn references itself to be compatibile with Apache::Sling::Request::request
