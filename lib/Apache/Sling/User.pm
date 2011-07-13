@@ -94,7 +94,7 @@ sub add_from_file {
                     {
                         croak
 'Second CSV column must be the user password, column heading must be "password". Found: "'
-                          . $column_headings[0] . "\".\n";
+                          . $column_headings[1] . "\".\n";
                     }
                     $number_of_columns = @column_headings;
                 }
