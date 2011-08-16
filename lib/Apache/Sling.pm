@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use Carp;
 use Apache::Sling::Authn;
+use Apache::Sling::Authz;
 use Apache::Sling::Content;
 use Apache::Sling::Group;
 use Apache::Sling::LDAPSynch;
@@ -65,6 +66,164 @@ sub check_forks {
       ( $sling->{'Threads'} =~ /^[0-9]+$/xms ? $sling->{'Threads'} : 1 );
     $sling->{'Threads'} =
       ( $sling->{'Threads'} < $sling->{'MaxForks'} ? $sling->{'Threads'} : 1 );
+    return 1;
+}
+
+#}}}
+
+#{{{sub authz_config
+
+sub authz_config {
+    my ($sling) = @_;
+    my $delete;
+    my $principal;
+    my $remote_node;
+    my $view;
+
+    # privileges:
+    my $add_child_nodes;
+    my $all;
+    my $life_cycle_manage;
+    my $lock_manage;
+    my $modify_acl;
+    my $modify_props;
+    my $node_type_manage;
+    my $read;
+    my $read_acl;
+    my $remove_childs;
+    my $remove_node;
+    my $retention_manage;
+    my $version_manage;
+    my $write;
+
+    my %authz_config = (
+        'auth'            => \$sling->{'Auth'},
+        'help'            => \$sling->{'Help'},
+        'log'             => \$sling->{'Log'},
+        'man'             => \$sling->{'Man'},
+        'pass'            => \$sling->{'Pass'},
+        'threads'         => \$sling->{'Threads'},
+        'url'             => \$sling->{'URL'},
+        'user'            => \$sling->{'User'},
+        'verbose'         => \$sling->{'Verbose'},
+        'addChildNodes'   => \$add_child_nodes,
+        'all'             => \$all,
+        'delete'          => \$delete,
+        'lifecycleManage' => \$life_cycle_manage,
+        'lockManage'      => \$lock_manage,
+        'modifyACL'       => \$modify_acl,
+        'modifyProps'     => \$modify_props,
+        'nodeTypeManage'  => \$node_type_manage,
+        'principal'       => \$principal,
+        'readACL'         => \$read_acl,
+        'read'            => \$read,
+        'remote'          => \$remote_node,
+        'removeChilds'    => \$remove_childs,
+        'removeNode'      => \$remove_node,
+        'retentionManage' => \$retention_manage,
+        'versionManage'   => \$version_manage,
+        'view'            => \$view,
+        'write'           => \$write
+    );
+
+    return \%authz_config;
+}
+
+#}}}
+
+#{{{sub authz_run
+sub authz_run {
+    my ( $sling, $config ) = @_;
+    if ( !defined $config ) {
+        croak 'No authz config supplied!';
+    }
+    $sling->check_forks;
+    ${ $config->{'remote'} } =
+      Apache::Sling::URL::strip_leading_slash( ${ $config->{'remote'} } );
+
+    my $authn = new Apache::Sling::Authn( \$sling );
+    my $authz =
+      new Apache::Sling::Authz( \$authn, $sling->{'Verbose'}, $sling->{'Log'} );
+    if ( defined $config->{'delete'} ) {
+        $authz->delete( ${ $config->{'remote'} }, ${ $config->{'principal'} } );
+        Apache::Sling::Print::print_result($authz);
+    }
+    my @grant_privileges;
+    my @deny_privileges;
+    if ( defined ${ $config->{'read'} } ) {
+        ${ $config->{'read'} }
+          ? push @grant_privileges, 'read'
+          : push @deny_privileges, 'read';
+    }
+    if ( defined ${ $config->{'modify_props'} } ) {
+        ${ $config->{'modify_props'} }
+          ? push @grant_privileges, 'modifyProperties'
+          : push @deny_privileges, 'modifyProperties';
+    }
+    if ( defined ${ $config->{'add_child_nodes'} } ) {
+        ${ $config->{'add_child_nodes'} }
+          ? push @grant_privileges, 'addChildNodes'
+          : push @deny_privileges, 'addChildNodes';
+    }
+    if ( defined ${ $config->{'remove_node'} } ) {
+        ${ $config->{'remove_node'} }
+          ? push @grant_privileges, 'removeNode'
+          : push @deny_privileges, 'removeNode';
+    }
+    if ( defined ${ $config->{'remove_childs'} } ) {
+        ${ $config->{'remove_childs'} }
+          ? push @grant_privileges, 'removeChildNodes'
+          : push @deny_privileges, 'removeChildNodes';
+    }
+    if ( defined ${ $config->{'write'} } ) {
+        ${ $config->{'write'} }
+          ? push @grant_privileges, 'write'
+          : push @deny_privileges, 'write';
+    }
+    if ( defined ${ $config->{'read_acl'} } ) {
+        ${ $config->{'read_acl'} }
+          ? push @grant_privileges, 'readAccessControl'
+          : push @deny_privileges, 'readAccessControl';
+    }
+    if ( defined ${ $config->{'modify_acl'} } ) {
+        ${ $config->{'modify_acl'} }
+          ? push @grant_privileges, 'modifyAccessControl'
+          : push @deny_privileges, 'modifyAccessControl';
+    }
+
+# Privileges that may become available in due course:
+# if ( defined $lock_manage ) {
+# $lock_manage ? push ( @grant_privileges, 'lockManagement' ) : push ( @deny_privileges, 'lockManagement' );
+# }
+# if ( defined $version_manage ) {
+# $version_manage ? push ( @grant_privileges, 'versionManagement' ) : push ( @deny_privileges, 'versionManagement' );
+# }
+# if ( defined $node_type_manage ) {
+# $node_type_manage ? push ( @grant_privileges, 'nodeTypeManagement' ) : push ( @deny_privileges, 'nodeTypeManagement' );
+# }
+# if ( defined $retention_manage ) {
+# $retention_manage ? push ( @grant_privileges, 'retentionManagement' ) : push ( @deny_privileges, 'retentionManagement' );
+# }
+# if ( defined $life_cycle_manage ) {
+# $life_cycle_manage ? push ( @grant_privileges, 'lifecycleManagement' ) : push ( @deny_privileges, 'lifecycleManagement' );
+# }
+    if ( defined ${ $config->{'all'} } ) {
+        ${ $config->{'all'} }
+          ? push @grant_privileges, 'all'
+          : push @deny_privileges, 'all';
+    }
+    if ( @grant_privileges || @deny_privileges ) {
+        $authz->modify_privileges(
+            ${ $config->{'remote'} }, ${ $config->{'principal'} },
+            \@grant_privileges,       \@deny_privileges
+        );
+        Apache::Sling::Print::print_result($authz);
+    }
+    if ( defined ${ $config->{'view'} } ) {
+        $authz->get_acl( ${ $config->{'remote'} } );
+        Apache::Sling::Print::print_result($authz);
+    }
+
     return 1;
 }
 
@@ -172,8 +331,7 @@ sub content_run {
             $content->check_exists( ${ $config->{'remote'} } );
         }
         elsif ( defined ${ $config->{'add'} } ) {
-            $content->add( ${ $config->{'remote'} },
-                $config->{'property'} );
+            $content->add( ${ $config->{'remote'} }, $config->{'property'} );
         }
         elsif ( defined ${ $config->{'copy'} } ) {
             $content->copy(
@@ -610,8 +768,7 @@ sub user_run {
             );
         }
         elsif ( defined ${ $config->{'update'} } ) {
-            $user->update( ${ $config->{'update'} },
-                $config->{'property'} );
+            $user->update( ${ $config->{'update'} }, $config->{'property'} );
         }
         elsif ( defined ${ $config->{'change-password'} } ) {
             $user->change_password(
