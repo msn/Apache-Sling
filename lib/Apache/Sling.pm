@@ -144,7 +144,7 @@ sub authz_run {
     my $authn = new Apache::Sling::Authn( \$sling );
     my $authz =
       new Apache::Sling::Authz( \$authn, $sling->{'Verbose'}, $sling->{'Log'} );
-    if ( defined $config->{'delete'} ) {
+    if ( defined ${ $config->{'delete'} } ) {
         $authz->delete( ${ $config->{'remote'} }, ${ $config->{'principal'} } );
         Apache::Sling::Print::print_result($authz);
     }
