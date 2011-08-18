@@ -77,7 +77,7 @@ sub get_acl {
     my $res = Apache::Sling::Request::request( \$content,
         Apache::Sling::AuthzUtil::get_acl_setup( $content->{ 'BaseURL' }, $remoteDest ) );
     my $success = Apache::Sling::AuthzUtil::get_acl_eval( $res );
-    my $message = ( $success ? $res->content : "Could not view ACL for \"$remoteDest\"" );
+    my $message = ( $success ? ${$res}->content : "Could not view ACL for \"$remoteDest\"" );
     $content->set_results( "$message", $res );
     return $success;
 }
