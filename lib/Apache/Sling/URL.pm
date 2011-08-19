@@ -172,4 +172,4 @@ Daniel David Parry <perl@ddp.me.uk>
 
 LICENSE: http://dev.perl.org/licenses/artistic.html
 
-COPYRIGHT: (c) 2010 Daniel David Parry <perl@ddp.me.uk>
+COPYRIGHT: (c) 2011 Daniel David Parry <perl@ddp.me.uk>

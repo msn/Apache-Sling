@@ -18,6 +18,7 @@ our $VERSION = '0.15';
 #{{{imports
 use strict;
 use lib qw ( .. );
+
 #}}}
 
 #{{{sub get_acl_setup
@@ -32,11 +33,12 @@ a node in JSON format.
 =cut
 
 sub get_acl_setup {
-    my ( $baseURL, $remoteDest ) = @_;
-    die "No base url defined!" unless defined $baseURL;
-    die "No destination to view ACL for defined!" unless defined $remoteDest;
-    return "get $baseURL/$remoteDest.acl.json";
+    my ( $base_url, $remote_dest ) = @_;
+    die "No base url defined!"                    unless defined $base_url;
+    die "No destination to view ACL for defined!" unless defined $remote_dest;
+    return "get $base_url/$remote_dest.acl.json";
 }
+
 #}}}
 
 #{{{sub get_acl_eval
@@ -52,9 +54,10 @@ successfully, else false.
 =cut
 
 sub get_acl_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/ );
 }
+
 #}}}
 
 #{{{sub delete_setup
@@ -69,13 +72,14 @@ a node in JSON format.
 =cut
 
 sub delete_setup {
-    my ( $baseURL, $remoteDest, $principal ) = @_;
-    die "No base url defined!" unless defined $baseURL;
-    die "No destination to delete ACL for defined!" unless defined $remoteDest;
-    die "No principal to delete ACL for defined!" unless defined $principal;
-    my $postVariables = "\$postVariables = [':applyTo','$principal']";
-    return "post $baseURL/$remoteDest.deleteAce.html $postVariables";
+    my ( $base_url, $remote_dest, $principal ) = @_;
+    die "No base url defined!"                      unless defined $base_url;
+    die "No destination to delete ACL for defined!" unless defined $remote_dest;
+    die "No principal to delete ACL for defined!"   unless defined $principal;
+    my $post_variables = "\$post_variables = [':applyTo','$principal']";
+    return "post $base_url/$remote_dest.deleteAce.html $post_variables";
 }
+
 #}}}
 
 #{{{sub delete_eval
@@ -91,9 +95,10 @@ else false.
 =cut
 
 sub delete_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/ );
 }
+
 #}}}
 
 #{{{sub modify_privilege_setup
@@ -108,46 +113,44 @@ on a node for a specific principal.
 =cut
 
 sub modify_privilege_setup {
-    my ( $baseURL, $remoteDest, $principal, $grant_privileges, $deny_privileges ) = @_;
-    die "No base url defined!" unless defined $baseURL;
-    die "No destination to modify privilege for defined!" unless defined $remoteDest;
-    die "No principal to modify privilege for defined!" unless defined $principal;
+    my ( $base_url, $remote_dest, $principal, $grant_privileges,
+        $deny_privileges )
+      = @_;
+    die "No base url defined!" unless defined $base_url;
+    die "No destination to modify privilege for defined!"
+      unless defined $remote_dest;
+    die "No principal to modify privilege for defined!"
+      unless defined $principal;
     my %privileges = (
-        'read', 1,
-        'modifyProperties', 1,
-        'addChildNodes', 1,
-        'removeNode', 1,
-        'removeChildNodes', 1,
-        'write', 1,
-        'readAccessControl', 1,
-        'modifyAccessControl', 1,
-        'lockManagement', 1,
-        'versionManagement', 1,
-        'nodeTypeManagement', 1,
-        'retentionManagement', 1,
-        'lifecycleManagement', 1,
-        'all', 1
+        'read',                1, 'modifyProperties',    1,
+        'addChildNodes',       1, 'removeNode',          1,
+        'removeChildNodes',    1, 'write',               1,
+        'readAccessControl',   1, 'modifyAccessControl', 1,
+        'lockManagement',      1, 'versionManagement',   1,
+        'nodeTypeManagement',  1, 'retentionManagement', 1,
+        'lifecycleManagement', 1, 'all',                 1
     );
-    my $postVariables = "\$postVariables = ['principalId','$principal',";
-    foreach my $grant ( @{ $grant_privileges } ) {
-        if ( $privileges{ $grant } ) {
-            $postVariables .= "'privilege\@jcr:$grant','granted',";
-	}
-	else {
-	    die "Unsupported privilege: \"$grant\" supplied!\n";
-	}
+    my $post_variables = "\$post_variables = ['principalId','$principal',";
+    foreach my $grant ( @{$grant_privileges} ) {
+        if ( $privileges{$grant} ) {
+            $post_variables .= "'privilege\@jcr:$grant','granted',";
+        }
+        else {
+            die "Unsupported privilege: \"$grant\" supplied!\n";
+        }
     }
-    foreach my $deny ( @{ $deny_privileges} ) {
-        if ( $privileges{ $deny } ) {
-            $postVariables .= "'privilege\@jcr:$deny','denied',";
-	}
-	else {
-	    die "Unsupported privilege: \"$deny\" supplied!\n";
-	}
+    foreach my $deny ( @{$deny_privileges} ) {
+        if ( $privileges{$deny} ) {
+            $post_variables .= "'privilege\@jcr:$deny','denied',";
+        }
+        else {
+            die "Unsupported privilege: \"$deny\" supplied!\n";
+        }
     }
-    $postVariables =~ s/,$/]/;
-    return "post $baseURL/$remoteDest.modifyAce.html $postVariables";
+    $post_variables =~ s/,$/]/;
+    return "post $base_url/$remote_dest.modifyAce.html $post_variables";
 }
+
 #}}}
 
 #{{{sub modify_privilege_eval
@@ -163,9 +166,10 @@ were modified successfully, else false.
 =cut
 
 sub modify_privilege_eval {
-    my ( $res ) = @_;
+    my ($res) = @_;
     return ( $$res->code =~ /^200$/ );
 }
+
 #}}}
 
 1;

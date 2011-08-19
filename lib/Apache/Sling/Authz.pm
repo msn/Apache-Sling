@@ -33,15 +33,18 @@ sub new {
     if ( !defined $authn ) { croak 'no authn provided!'; }
     my $response;
     $verbose = ( defined $verbose ? $verbose : 0 );
-    my $content = { BaseURL => $$authn->{ 'BaseURL' },
-                    Authn => $authn,
-		    Message => "",
-		    Response => \$response,
-		    Verbose => $verbose,
-		    Log => $log };
+    my $content = {
+        BaseURL  => $$authn->{'BaseURL'},
+        Authn    => $authn,
+        Message  => "",
+        Response => \$response,
+        Verbose  => $verbose,
+        Log      => $log
+    };
     bless( $content, $class );
     return $content;
 }
+
 #}}}
 
 #{{{sub set_results
@@ -56,10 +59,11 @@ Populate the message and response with results returned from performing query:
 
 sub set_results {
     my ( $content, $message, $response ) = @_;
-    $content->{ 'Message' } = $message;
-    $content->{ 'Response' } = $response;
+    $content->{'Message'}  = $message;
+    $content->{'Response'} = $response;
     return 1;
 }
+
 #}}}
 
 #{{{sub get_acl
@@ -74,13 +78,21 @@ Return the access control list for the node in JSON format
 
 sub get_acl {
     my ( $content, $remoteDest ) = @_;
-    my $res = Apache::Sling::Request::request( \$content,
-        Apache::Sling::AuthzUtil::get_acl_setup( $content->{ 'BaseURL' }, $remoteDest ) );
-    my $success = Apache::Sling::AuthzUtil::get_acl_eval( $res );
-    my $message = ( $success ? ${$res}->content : "Could not view ACL for \"$remoteDest\"" );
+    my $res = Apache::Sling::Request::request(
+        \$content,
+        Apache::Sling::AuthzUtil::get_acl_setup(
+            $content->{'BaseURL'}, $remoteDest
+        )
+    );
+    my $success = Apache::Sling::AuthzUtil::get_acl_eval($res);
+    my $message =
+      ( $success
+        ? ${$res}->content
+        : "Could not view ACL for \"$remoteDest\"" );
     $content->set_results( "$message", $res );
     return $success;
 }
+
 #}}}
 
 #{{{sub modify_privileges
@@ -94,15 +106,22 @@ Modify the privileges on a specified node for a specified principal.
 =cut
 
 sub modify_privileges {
-    my ( $content, $remoteDest, $principal, $grant_privileges, $deny_privileges ) = @_;
-    my $res = Apache::Sling::Request::request( \$content,
-        Apache::Sling::AuthzUtil::modify_privilege_setup( $content->{ 'BaseURL' }, $remoteDest, $principal, $grant_privileges, $deny_privileges ) );
-    my $success = Apache::Sling::AuthzUtil::modify_privilege_eval( $res );
+    my ( $content, $remoteDest, $principal, $grant_privileges,
+        $deny_privileges ) = @_;
+    my $res = Apache::Sling::Request::request(
+        \$content,
+        Apache::Sling::AuthzUtil::modify_privilege_setup(
+            $content->{'BaseURL'}, $remoteDest, $principal,
+            $grant_privileges,     $deny_privileges
+        )
+    );
+    my $success = Apache::Sling::AuthzUtil::modify_privilege_eval($res);
     my $message = "Privileges on \"$remoteDest\" for \"$principal\" ";
     $message .= ( $success ? "modified." : "were not modified." );
     $content->set_results( "$message", $res );
     return $success;
 }
+
 #}}}
 
 #{{{sub delete
@@ -117,14 +136,19 @@ Delete the access controls for a given principal on a given node:
 
 sub delete {
     my ( $content, $remoteDest, $principal ) = @_;
-    my $res = Apache::Sling::Request::request( \$content,
-        Apache::Sling::AuthzUtil::delete_setup( $content->{ 'BaseURL' }, $remoteDest, $principal ) );
-    my $success = Apache::Sling::AuthzUtil::delete_eval( $res );
+    my $res = Apache::Sling::Request::request(
+        \$content,
+        Apache::Sling::AuthzUtil::delete_setup(
+            $content->{'BaseURL'}, $remoteDest, $principal
+        )
+    );
+    my $success = Apache::Sling::AuthzUtil::delete_eval($res);
     my $message = "Privileges on \"$remoteDest\" for \"$principal\" ";
     $message .= ( $success ? "removed." : "were not removed." );
     $content->set_results( "$message", $res );
     return $success;
 }
+
 #}}}
 
 1;

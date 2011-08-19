@@ -155,23 +155,23 @@ sub authz_run {
           ? push @grant_privileges, 'read'
           : push @deny_privileges, 'read';
     }
-    if ( defined ${ $config->{'modify_props'} } ) {
-        ${ $config->{'modify_props'} }
+    if ( defined ${ $config->{'modifyProps'} } ) {
+        ${ $config->{'modifyProps'} }
           ? push @grant_privileges, 'modifyProperties'
           : push @deny_privileges, 'modifyProperties';
     }
-    if ( defined ${ $config->{'add_child_nodes'} } ) {
-        ${ $config->{'add_child_nodes'} }
+    if ( defined ${ $config->{'addChildNodes'} } ) {
+        ${ $config->{'addChildNodes'} }
           ? push @grant_privileges, 'addChildNodes'
           : push @deny_privileges, 'addChildNodes';
     }
-    if ( defined ${ $config->{'remove_node'} } ) {
-        ${ $config->{'remove_node'} }
+    if ( defined ${ $config->{'removeNode'} } ) {
+        ${ $config->{'removeNode'} }
           ? push @grant_privileges, 'removeNode'
           : push @deny_privileges, 'removeNode';
     }
-    if ( defined ${ $config->{'remove_childs'} } ) {
-        ${ $config->{'remove_childs'} }
+    if ( defined ${ $config->{'removeChilds'} } ) {
+        ${ $config->{'removeChilds'} }
           ? push @grant_privileges, 'removeChildNodes'
           : push @deny_privileges, 'removeChildNodes';
     }
@@ -180,13 +180,13 @@ sub authz_run {
           ? push @grant_privileges, 'write'
           : push @deny_privileges, 'write';
     }
-    if ( defined ${ $config->{'read_acl'} } ) {
-        ${ $config->{'read_acl'} }
+    if ( defined ${ $config->{'readACL'} } ) {
+        ${ $config->{'readACL'} }
           ? push @grant_privileges, 'readAccessControl'
           : push @deny_privileges, 'readAccessControl';
     }
-    if ( defined ${ $config->{'modify_acl'} } ) {
-        ${ $config->{'modify_acl'} }
+    if ( defined ${ $config->{'modifyACL'} } ) {
+        ${ $config->{'modifyACL'} }
           ? push @grant_privileges, 'modifyAccessControl'
           : push @deny_privileges, 'modifyAccessControl';
     }
@@ -901,4 +901,4 @@ Daniel David Parry <perl@ddp.me.uk>
 
 LICENSE: http://dev.perl.org/licenses/artistic.html
 
-COPYRIGHT: (c) 2010 Daniel David Parry <perl@ddp.me.uk>
+COPYRIGHT: (c) 2011 Daniel David Parry <perl@ddp.me.uk>
