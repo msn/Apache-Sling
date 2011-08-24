@@ -136,7 +136,7 @@ sub modify_privilege_setup {
             $post_variables .= "'privilege\@jcr:$grant','granted',";
         }
         else {
-            die "Unsupported privilege: \"$grant\" supplied!\n";
+            die "Unsupported grant privilege: \"$grant\" supplied!\n";
         }
     }
     foreach my $deny ( @{$deny_privileges} ) {
@@ -144,7 +144,7 @@ sub modify_privilege_setup {
             $post_variables .= "'privilege\@jcr:$deny','denied',";
         }
         else {
-            die "Unsupported privilege: \"$deny\" supplied!\n";
+            die "Unsupported deny privilege: \"$deny\" supplied!\n";
         }
     }
     $post_variables =~ s/,$/]/;
