@@ -31,7 +31,7 @@ throws_ok { $group->add() } qr/No group name defined to add!/, 'Check add functi
 throws_ok { $group->del() } qr/No group name defined to delete!/, 'Check del function croaks without group specified';
 throws_ok { $group->check_exists() } qr/No group to check existence of defined!/, 'Check check_exists function croaks without group specified';
 throws_ok { $group->member_add() } qr/No group name defined to add member to!/, 'Check member_add function croaks without group specified';
-throws_ok { $group->member_delete() } qr/No group name defined to delete member to!/, 'Check member_delete function croaks without group specified';
+throws_ok { $group->member_delete() } qr/No group name defined to delete member from!/, 'Check member_delete function croaks without group specified';
 throws_ok { $group->member_exists() } qr/No group to view defined!/, 'Check member_exists function croaks without group specified';
 throws_ok { $group->member_view() } qr/No group to view defined!/, 'Check member_view function croaks without group specified';
 throws_ok { $group->view() } qr/No group to view defined!/, 'Check view function croaks without group specified';

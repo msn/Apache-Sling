@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 24;
+use Test::More tests => 27;
 use Test::Exception;
 BEGIN { use_ok( 'Apache::Sling::GroupUtil' ); }
 BEGIN { use_ok( 'HTTP::Response' ); }
@@ -40,4 +40,7 @@ throws_ok { Apache::Sling::GroupUtil::exists_setup() } qr/No base url to check e
 throws_ok { Apache::Sling::GroupUtil::member_add_setup() } qr/No base url defined to add against!/, 'Check member_add_setup function croaks without base_url specified';
 throws_ok { Apache::Sling::GroupUtil::member_add_setup('http://localhost:8080','group') } qr/No member name defined to add!/, 'Check member_add_setup function croaks without add_member specified';
 throws_ok { Apache::Sling::GroupUtil::member_delete_setup() } qr/No base url defined to delete against!/, 'Check member_delete_setup function croaks without base_url specified';
+throws_ok { Apache::Sling::GroupUtil::member_delete_setup('http://localhost:8080') } qr/No group name defined to delete member from!/, 'Check member_delete_setup function croaks without group specified';
+throws_ok { Apache::Sling::GroupUtil::member_delete_setup('http://localhost:8080','group') } qr/No member name defined to delete!/, 'Check member_delete_setup function croaks without member specified';
+throws_ok { Apache::Sling::GroupUtil::view_setup() } qr/No base url to view with defined!/, 'Check view_setup function croaks without base_url specified';
 throws_ok { Apache::Sling::GroupUtil::view_setup() } qr/No base url to view with defined!/, 'Check view_setup function croaks without base_url specified';

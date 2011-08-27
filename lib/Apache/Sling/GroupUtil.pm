@@ -22,10 +22,11 @@ sub add_setup {
     my ( $base_url, $act_on_group, $properties ) = @_;
     if ( !defined $base_url ) { croak 'No base url defined to add against!'; }
     if ( !defined $act_on_group ) { croak 'No group name defined to add!'; }
+    # property_post_vars is set to q{} if no properties are specified:
     my $property_post_vars =
       Apache::Sling::URL::properties_array_to_string($properties);
     my $post_variables = "\$post_variables = [':name','$act_on_group'";
-    if ( defined $property_post_vars && $property_post_vars ne q{} ) {
+    if ( $property_post_vars ne q{} ) {
         $post_variables .= ",$property_post_vars";
     }
     $post_variables .= "]";
@@ -126,7 +127,7 @@ sub member_delete_setup {
         croak 'No base url defined to delete against!';
     }
     if ( !defined $act_on_group ) {
-        croak 'No group name defined to delete member to!';
+        croak 'No group name defined to delete member from!';
     }
     if ( !defined $delete_member ) {
         croak 'No member name defined to delete!';
