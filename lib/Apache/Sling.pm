@@ -814,6 +814,14 @@ Create, set up, and return a Sling object.
 Check number of forks to create complies with maximum number of forks
 allowed.
 
+=head2 authz_config
+
+Fetch hash of authz configuration.
+
+=head2 authz_run
+
+Run authz related actions.
+
 =head2 content_config
 
 Fetch hash of content configuration.
