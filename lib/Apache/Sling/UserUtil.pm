@@ -29,7 +29,7 @@ sub add_setup {
       Apache::Sling::URL::properties_array_to_string($properties);
     my $post_variables =
 "\$post_variables = [':name','$act_on_user','pwd','$act_on_pass','pwdConfirm','$act_on_pass'";
-    if ( defined $property_post_vars && $property_post_vars ne q{} ) {
+    if ( $property_post_vars ne q{} ) {
         $post_variables .= ",$property_post_vars";
     }
     $post_variables .= ']';
