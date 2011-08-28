@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 29;
+use Test::More tests => 30;
 use Test::Exception;
 BEGIN { use_ok( 'Apache::Sling::UserUtil' ); }
 BEGIN { use_ok( 'HTTP::Response' ); }
@@ -12,6 +12,7 @@ my $res = HTTP::Response->new( '200' );
 my @properties = '';
 ok( Apache::Sling::UserUtil::add_setup( 'http://localhost:8080', 'user', 'pass', \@properties) eq
   "post http://localhost:8080/system/userManager/user.create.html \$post_variables = [':name','user','pwd','pass','pwdConfirm','pass']", 'Check add_setup function' );
+ok( Apache::Sling::UserUtil::update_setup('http://localhost:8080','user',\@properties ) eq "post http://localhost:8080/system/userManager/user/user.update.html \$post_variables = []", 'Check update_setup function without any properties' );
 push @properties, 'a=b';
 ok( Apache::Sling::UserUtil::add_setup( 'http://localhost:8080', 'user', 'pass', \@properties) eq
   "post http://localhost:8080/system/userManager/user.create.html \$post_variables = [':name','user','pwd','pass','pwdConfirm','pass','a','b']", 'Check add_setup function with properties' );
@@ -40,8 +41,7 @@ ok( Apache::Sling::UserUtil::sites_setup( 'http://localhost:8080' ) eq
   "get http://localhost:8080/system/sling/membership", 'Check sites_setup function' );
 throws_ok { Apache::Sling::UserUtil::sites_setup() } qr/No base url to check membership of sites against!/, 'Check sites_setup function croaks without base URL specified';
 ok( Apache::Sling::UserUtil::sites_eval( \$res ), 'Check sites_eval function' );
-ok( Apache::Sling::UserUtil::update_setup( 'http://localhost:8080','user',\@properties ) eq
-  "post http://localhost:8080/system/userManager/user/user.update.html \$post_variables = ['a','b']", 'Check update_setup function' );
+ok( Apache::Sling::UserUtil::update_setup( 'http://localhost:8080','user',\@properties ) eq "post http://localhost:8080/system/userManager/user/user.update.html \$post_variables = ['a','b']", 'Check update_setup function' );
 throws_ok { Apache::Sling::UserUtil::update_setup() } qr/No base url defined to update against!/, 'Check update_setup function croaks without base URL specified';
 ok( Apache::Sling::UserUtil::exists_eval( \$res ), 'Check exists_eval function' );
 ok( Apache::Sling::UserUtil::update_eval( \$res ), 'Check update_eval function' );
