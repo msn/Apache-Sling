@@ -3,7 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More tests => 23;
+use Test::Exception;
 
 my $sling_host = 'http://localhost:8080';
 my $super_user = 'admin';
@@ -30,9 +31,26 @@ my $sling = Apache::Sling->new();
 isa_ok $sling, 'Apache::Sling', 'sling';
 $sling->{'URL'}     = $sling_host;
 $sling->{'User'}    = $super_user;
-$sling->{'Pass'}    = $super_pass;
-$sling->{'Verbose'} = $verbose;
 $sling->{'Log'}     = $log;
+
+# Check creating authn object fails with bad password:
+$sling->{'Pass'}    = 'badpasswordwillnotwork';
+# Check creation with verbosity turned up:
+$sling->{'Verbose'} = 3;
+throws_ok{ my $authn = Apache::Sling::Authn->new( \$sling ) } qr%Basic Auth log in for user "$super_user" at URL "$sling_host" was unsuccessful%, 'Check authn object creation croaks with bad password and high verbosity';
+# reset verbosity level:
+$sling->{'Verbose'} = $verbose;
+throws_ok{ my $authn = Apache::Sling::Authn->new( \$sling ) } qr%Basic Auth log in for user "$super_user" at URL "$sling_host" was unsuccessful%, 'Check authn object creation croaks with bad password and default verbosity';
+
+# Set the password to something that should work!
+$sling->{'Pass'}    = $super_pass;
+
+# Check creating authn object fails with unsupported auth type:
+$sling->{'Auth'}    = 'badauthtypewillnotwork';
+throws_ok{ my $authn = Apache::Sling::Authn->new( \$sling ) } qr/Unsupported auth type: "badauthtypewillnotwork"/, 'Check authn object creation croaks with unsupported auth type';
+
+# Set the auth type to something that should work!
+$sling->{'Auth'}    = undef;
 
 # authn object:
 my $authn = Apache::Sling::Authn->new( \$sling );
@@ -55,8 +73,11 @@ ok( $user->add( $test_user2, $test_pass, \@test_properties ),
 ok( $user->check_exists( $test_user2 ),
     "Authn Test: User \"$test_user2\" exists." );
 
+throws_ok{ $authn->switch_user( $test_user1, $test_pass, "badauthtypewillnotwork", 1 ) } qr/Unsupported auth type: "badauthtypewillnotwork"/, 'Check switch_user croaks with unsupported auth type';
 ok( $authn->switch_user( $test_user1, $test_pass, "basic", 1 ),
     "Authn Test: Successfully switched to user: \"$test_user1\" with basic auth" );
+ok( $authn->switch_user( $test_user1, $test_pass, "basic", 1 ),
+    "Authn Test: Successfully stayed as user: \"$test_user1\"" );
 ok( $authn->switch_user( $test_user2, $test_pass, "basic", 1 ),
     "Authn Test: Successfully switched to user: \"$test_user2\" with basic auth" );
 ok( $authn->switch_user( $super_user, $super_pass, "basic", 1 ),
