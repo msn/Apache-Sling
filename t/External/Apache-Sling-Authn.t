@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 23;
+use Test::More tests => 26;
 use Test::Exception;
 
 my $sling_host = 'http://localhost:8080';
@@ -53,7 +53,11 @@ throws_ok{ my $authn = Apache::Sling::Authn->new( \$sling ) } qr/Unsupported aut
 $sling->{'Auth'}    = undef;
 
 # authn object:
+$sling->{'Verbose'} = 3;
 my $authn = Apache::Sling::Authn->new( \$sling );
+isa_ok $authn, 'Apache::Sling::Authn', 'authentication';
+$sling->{'Verbose'} = $verbose;
+$authn = Apache::Sling::Authn->new( \$sling );
 isa_ok $authn, 'Apache::Sling::Authn', 'authentication';
 # user object:
 my $user = Apache::Sling::User->new( \$authn, $verbose, $log );
@@ -74,14 +78,18 @@ ok( $user->check_exists( $test_user2 ),
     "Authn Test: User \"$test_user2\" exists." );
 
 throws_ok{ $authn->switch_user( $test_user1, $test_pass, "badauthtypewillnotwork", 1 ) } qr/Unsupported auth type: "badauthtypewillnotwork"/, 'Check switch_user croaks with unsupported auth type';
+throws_ok{ $authn->switch_user( "baduser", "badpassword", "basic", 1 ) } qr/Basic Auth log in for user "baduser" at URL "$sling_host" was unsuccessful/, 'Check switch_user croaks with bad credentials';
+throws_ok{ $authn->switch_user( $super_user, "badpassword", "basic", 1 ) } qr/Basic Auth log in for user "$super_user" at URL "$sling_host" was unsuccessful/, 'Check switch_user croaks with bad password';
 ok( $authn->switch_user( $test_user1, $test_pass, "basic", 1 ),
     "Authn Test: Successfully switched to user: \"$test_user1\" with basic auth" );
 ok( $authn->switch_user( $test_user1, $test_pass, "basic", 1 ),
     "Authn Test: Successfully stayed as user: \"$test_user1\"" );
 ok( $authn->switch_user( $test_user2, $test_pass, "basic", 1 ),
     "Authn Test: Successfully switched to user: \"$test_user2\" with basic auth" );
+$authn->{'Verbose'} = 3;
 ok( $authn->switch_user( $super_user, $super_pass, "basic", 1 ),
     "Authn Test: Successfully switched back to user: \"$super_user\" with basic auth" );
+$authn->{'Verbose'} = $verbose;
 
 ok( $user->del( $test_user1 ),
     "Authn Test: User \"$test_user1\" deleted successfully." );
