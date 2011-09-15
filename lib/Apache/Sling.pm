@@ -9,6 +9,7 @@ use Apache::Sling::Authn;
 use Apache::Sling::Authz;
 use Apache::Sling::Content;
 use Apache::Sling::Group;
+use Apache::Sling::JsonQueryServlet;
 use Apache::Sling::LDAPSynch;
 use Apache::Sling::User;
 
@@ -538,6 +539,56 @@ sub group_member_run {
         }
         Apache::Sling::Print::print_result($group);
     }
+    return 1;
+}
+
+#}}}
+
+#{{{sub json_query_servlet_config
+
+sub json_query_servlet_config {
+    my ($sling) = @_;
+    my $all_nodes;
+
+    my %json_query_servlet_config = (
+        'auth'          => \$sling->{'Auth'},
+        'help'          => \$sling->{'Help'},
+        'log'           => \$sling->{'Log'},
+        'man'           => \$sling->{'Man'},
+        'pass'          => \$sling->{'Pass'},
+        'threads'       => \$sling->{'Threads'},
+        'url'           => \$sling->{'URL'},
+        'user'          => \$sling->{'User'},
+        'verbose'       => \$sling->{'Verbose'},
+        'all_nodes'     => \$all_nodes
+    );
+
+    return \%json_query_servlet_config;
+}
+
+#}}}
+
+#{{{sub json_query_servlet_run
+sub json_query_servlet_run {
+    my ( $sling, $config ) = @_;
+    if ( !defined $config ) {
+        croak 'No json query servlet config supplied!';
+    }
+    $sling->check_forks;
+    ${ $config->{'remote'} } =
+      Apache::Sling::URL::strip_leading_slash( ${ $config->{'remote'} } );
+    ${ $config->{'remote-source'} } = Apache::Sling::URL::strip_leading_slash(
+        ${ $config->{'remote-source'} } );
+
+    my $authn = new Apache::Sling::Authn( \$sling );
+    my $json_query_servlet =
+      new Apache::Sling::JsonQueryServlet( \$authn, $sling->{'Verbose'},
+        $sling->{'Log'} );
+    if (   defined ${ $config->{'all_nodes'} } )
+    {
+        $json_query_servlet->all_nodes();
+    }
+    Apache::Sling::Print::print_result($json_query_servlet);
     return 1;
 }
 
