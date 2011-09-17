@@ -19,7 +19,7 @@ our $VERSION = '0.16';
 #{{{sub all_nodes_setup
 
 sub all_nodes_setup {
-    my ( $base_url, $remote_dest ) = @_;
+    my ( $base_url ) = @_;
     if ( !defined $base_url ) { croak 'No base url defined!'; }
     return "get $base_url/content.query.json?queryType=xpath&statement=//*";
 }

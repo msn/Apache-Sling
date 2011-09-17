@@ -7,6 +7,8 @@ lib/Apache/Sling/Content.pm
 lib/Apache/Sling/ContentUtil.pm
 lib/Apache/Sling/Group.pm
 lib/Apache/Sling/GroupUtil.pm
+lib/Apache/Sling/JsonQueryServlet.pm
+lib/Apache/Sling/JsonQueryServletUtil.pm
 lib/Apache/Sling/LDAPSynch.pm
 lib/Apache/Sling.pm
 lib/Apache/Sling/Print.pm
@@ -32,6 +34,7 @@ t/Local/Apache-Sling-Content.t
 t/Local/Apache-Sling-ContentUtil.t
 t/Local/Apache-Sling-Group.t
 t/Local/Apache-Sling-GroupUtil.t
+t/Local/Apache-Sling-JsonQueryServletUtil.t
 t/Local/Apache-Sling-LDAPSynch.t
 t/Local/Apache-Sling-Print.t
 t/Local/Apache-Sling-Request.t
