@@ -179,7 +179,7 @@ sub member_add {
         )
     );
     my $success = Apache::Sling::GroupUtil::member_add_eval($res);
-    my $message = "Member: \"$add_member\" ";
+    my $message = "\"$add_member\" ";
     $message .= ( $success ? 'added' : 'was not added' );
     $message .= " to group \"$act_on_group\"!";
     $group->set_results( "$message", $res );
@@ -264,7 +264,7 @@ sub member_delete {
         )
     );
     my $success = Apache::Sling::GroupUtil::member_delete_eval($res);
-    my $message = "Member: \"$delete_member\" ";
+    my $message = "\"$delete_member\" ";
     $message .= ( $success ? 'deleted' : 'was not deleted' );
     $message .= " from group \"$act_on_group\"!";
     $group->set_results( "$message", $res );
@@ -301,12 +301,12 @@ sub member_exists {
             $message =
                 "\"$exists_member\" is "
               . ( $is_member ? q{} : 'not ' )
-              . "a member of group \"$act_on_group\"";
+              . "in group \"$act_on_group\"";
         }
         else {
 
             # members field not defined in JSON:
-            $message = "Problem viewing group members: \"$act_on_group\"";
+            $message = "Problem viewing group JSON: \"$act_on_group\"";
         }
     }
     else {
@@ -334,7 +334,7 @@ sub member_view {
         if ( defined $group_info->{'members'} ) {
             my $number_members = @{ $group_info->{'members'} };
             my $members =
-              "Group \"$act_on_group\" has $number_members member(s):";
+              "$number_members result(s) for group \"$act_on_group\":";
             foreach my $member ( @{ $group_info->{'members'} } ) {
                 $members .= "\n$member";
             }
@@ -344,7 +344,7 @@ sub member_view {
         else {
 
             # members field not defined in JSON:
-            $message = "Problem viewing group members: \"$act_on_group\"";
+            $message = "Problem viewing group JSON: \"$act_on_group\"";
         }
     }
     else {

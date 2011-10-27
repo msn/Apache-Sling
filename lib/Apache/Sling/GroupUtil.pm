@@ -99,9 +99,9 @@ sub member_add_setup {
     my ( $base_url, $act_on_group, $add_member ) = @_;
     if ( !defined $base_url ) { croak 'No base url defined to add against!'; }
     if ( !defined $act_on_group ) {
-        croak 'No group name defined to add member to!';
+        croak 'No group name defined to add to!';
     }
-    if ( !defined $add_member ) { croak 'No member name defined to add!'; }
+    if ( !defined $add_member ) { croak 'Group addition detail missing!'; }
     my $post_variables =
       "\$post_variables = [':member','/system/userManager/user/$add_member']";
     return
@@ -127,10 +127,10 @@ sub member_delete_setup {
         croak 'No base url defined to delete against!';
     }
     if ( !defined $act_on_group ) {
-        croak 'No group name defined to delete member from!';
+        croak 'No group name defined to delete from!';
     }
     if ( !defined $delete_member ) {
-        croak 'No member name defined to delete!';
+        croak 'Group deletion detail missing!';
     }
     my $post_variables =
 "\$post_variables = [':member\@Delete','/system/userManager/user/$delete_member']";
