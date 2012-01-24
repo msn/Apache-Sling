@@ -1,5 +1,11 @@
 Revision history for Perl extension Apache::Sling.
 
+0.17  Tue Jan 24 23:40:00 2012
+        - Adding JSON query Servlet functionality.
+        - Making add eval return success for 200 or 201 code.
+        - Making the use of the phrase member less prevalent in
+          the message output.
+
 0.16  Sat Sep 3 14:00:00 2011
         - Adding authz functionality.
 

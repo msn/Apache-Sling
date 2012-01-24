@@ -14,7 +14,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 #{{{sub add_setup
 
@@ -39,10 +39,13 @@ sub add_setup {
 #}}}
 
 #{{{sub add_eval
+# Return true if the return code is 200 or 201
+# to support Sakai Nakamura using the more correct
+# 201 "Created" return code:
 
 sub add_eval {
     my ($res) = @_;
-    return ( ${$res}->code eq '200' );
+    return ( ${$res}->code =~ /^20(0|1)$/ );
 }
 
 #}}}
