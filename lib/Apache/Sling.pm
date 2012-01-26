@@ -19,7 +19,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 #{{{sub new
 
@@ -713,10 +713,8 @@ sub user_config {
     my $exists;
     my $first_name;
     my $last_name;
-    my $me;
     my $new_password;
     my @property;
-    my $sites;
     my $update;
     my $view;
 
@@ -738,11 +736,9 @@ sub user_config {
         'exists'          => \$exists,
         'first-name'      => \$first_name,
         'last-name'       => \$last_name,
-        'me'              => \$me,
         'new-password'    => \$new_password,
         'password'        => \$password,
         'property'        => \@property,
-        'sites'           => \$sites,
         'update'          => \$update,
         'view'            => \$view
     );
@@ -804,12 +800,6 @@ sub user_run {
             $sling->{'Log'} );
         if ( defined ${ $config->{'exists'} } ) {
             $user->check_exists( ${ $config->{'exists'} } );
-        }
-        elsif ( defined ${ $config->{'me'} } ) {
-            $user->me();
-        }
-        elsif ( defined ${ $config->{'sites'} } ) {
-            $user->sites();
         }
         elsif ( defined ${ $config->{'add'} } ) {
             $user->add(

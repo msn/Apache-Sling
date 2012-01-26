@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 30;
+use Test::More tests => 27;
 use Test::Exception;
 BEGIN { use_ok( 'Apache::Sling::UserUtil' ); }
 BEGIN { use_ok( 'HTTP::Response' ); }
@@ -37,10 +37,6 @@ ok( Apache::Sling::UserUtil::exists_setup( 'http://localhost:8080', 'user' ) eq
   "get http://localhost:8080/system/userManager/user/user.tidy.json", 'Check exists_setup function' );
 throws_ok { Apache::Sling::UserUtil::exists_setup() } qr/No base url to check existence against!/, 'Check exists_setup function croaks without base URL specified';
 ok( Apache::Sling::UserUtil::exists_eval( \$res ), 'Check exists_eval function' );
-ok( Apache::Sling::UserUtil::sites_setup( 'http://localhost:8080' ) eq
-  "get http://localhost:8080/system/sling/membership", 'Check sites_setup function' );
-throws_ok { Apache::Sling::UserUtil::sites_setup() } qr/No base url to check membership of sites against!/, 'Check sites_setup function croaks without base URL specified';
-ok( Apache::Sling::UserUtil::sites_eval( \$res ), 'Check sites_eval function' );
 ok( Apache::Sling::UserUtil::update_setup( 'http://localhost:8080','user',\@properties ) eq "post http://localhost:8080/system/userManager/user/user.update.html \$post_variables = ['a','b']", 'Check update_setup function' );
 throws_ok { Apache::Sling::UserUtil::update_setup() } qr/No base url defined to update against!/, 'Check update_setup function croaks without base URL specified';
 ok( Apache::Sling::UserUtil::exists_eval( \$res ), 'Check exists_eval function' );

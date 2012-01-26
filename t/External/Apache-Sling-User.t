@@ -3,7 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 27;
+use Test::More tests => 32;
+use Test::Exception;
 
 my $sling_host = 'http://localhost:8080';
 my $super_user = 'admin';
@@ -20,6 +21,8 @@ BEGIN { use_ok( 'Apache::Sling::Group' ); }
 my $test_user = "user_test_user_$$";
 # test user pass:
 my $test_pass = "pass";
+# test user new pass:
+my $test_pass_new = "passnew";
 # test properties:
 my @test_properties;
 
@@ -34,6 +37,10 @@ $sling->{'User'}    = $super_user;
 $sling->{'Pass'}    = $super_pass;
 $sling->{'Verbose'} = $verbose;
 $sling->{'Log'}     = $log;
+
+# Check error is thrown without auth:
+throws_ok{ my $user = Apache::Sling::User->new(); } qr%no authn provided!%, 'Check user creation croaks with authn missing';
+
 # authn object:
 my $authn = Apache::Sling::Authn->new( \$sling );
 isa_ok $authn, 'Apache::Sling::Authn', 'authentication';
@@ -100,6 +107,22 @@ ok( $user->update( $test_user, \@test_properties ),
 # switch back to admin user:
 ok( $authn->switch_user( $super_user, $super_pass ),
     "User Test: Successfully switched to user: \"$super_user\" with basic auth" );
+
+# Change user's password:
+ok( $user->change_password( $test_user, $test_pass, $test_pass_new, $test_pass_new ),
+    "User Test: Successfully changed password from \"$test_pass\" to \"$test_pass_new\" for user: \"$test_user\"");
+
+# Switch to test_user with new pass:
+ok( $authn->switch_user( $test_user, $test_pass_new ),
+    "User Test: Successfully switched to user: \"$test_user\" with basic auth and new pass" );
+
+# switch back to admin user:
+ok( $authn->switch_user( $super_user, $super_pass ),
+    "User Test: Successfully switched to user: \"$super_user\" with basic auth" );
+
+# Testing view for user:
+ok( $user->view( $test_user ),
+    "User Test: User \"$test_user\" viewed successfully." );
 
 # Check user deletion:
 ok( $user->del( $test_user ),

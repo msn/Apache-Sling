@@ -16,7 +16,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 #{{{sub new
 sub new {
@@ -85,6 +85,10 @@ query related functionality for Sling implemented over rest APIs.
 =head2 new
 
 Create, set up, and return a JSON Query Servlet object
+
+=head2 set_results
+
+Set a suitable message and response for the json query object.
 
 =head2 all_nodes
 

@@ -14,7 +14,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 #{{{sub add_setup
 
@@ -133,27 +133,6 @@ sub exists_eval {
 
 #}}}
 
-#{{{sub sites_setup
-
-sub sites_setup {
-    my ($base_url) = @_;
-    if ( !defined $base_url ) {
-        croak 'No base url to check membership of sites against!';
-    }
-    return "get $base_url/system/sling/membership";
-}
-
-#}}}
-
-#{{{sub sites_eval
-
-sub sites_eval {
-    my ($res) = @_;
-    return ( ${$res}->code eq '200' );
-}
-
-#}}}
-
 #{{{sub update_setup
 
 sub update_setup {
@@ -235,17 +214,6 @@ username exists in the system.
 
 Inspects the result returned from issuing the request generated in exists_setup
 returning true if the result indicates the username does exist in the system,
-else false.
-
-=head2 sites_setup
-
-Returns a textual representation of the request needed to return the list of
-sites the current user is a member of.
-
-=head2 sites_eval
-
-Inspects the result returned from issuing the request generated in sites_setup
-returning true if the result indicates information was returned successfully,
 else false.
 
 =head2 update_setup

@@ -1,5 +1,10 @@
 Revision history for Perl extension Apache::Sling.
 
+0.18  Thu Jan 26 11:25:00 2012
+        - Adding JSON query Servlet tests.
+        - Removing sakai specific me and sites functionality from code.
+        - Improving user test coverage.
+
 0.17  Tue Jan 24 23:40:00 2012
         - Adding JSON query Servlet functionality.
         - Making add eval return success for 200 or 201 code.

@@ -14,7 +14,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 #{{{sub all_nodes_setup
 
@@ -70,7 +70,7 @@ result of performing the request.
 Returns a textual representation of the request needed to return a JSON
 representation of all nodes in the system.
 
-=head2 upload_file_eval
+=head2 all_nodes_eval
 
 Check result of all_nodes call.
 

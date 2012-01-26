@@ -17,7 +17,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 #{{{sub new
 
@@ -196,24 +196,6 @@ sub del {
 
 #}}}
 
-#{{{sub sites
-sub sites {
-    my ($user) = @_;
-    my $res =
-      Apache::Sling::Request::request( \$user,
-        Apache::Sling::UserUtil::sites_setup( $user->{'BaseURL'} ) );
-    my $success = Apache::Sling::UserUtil::sites_eval($res);
-    my $message = (
-        $success
-        ? ${$res}->content
-        : 'Problem fetching details for current user'
-    );
-    $user->set_results( "$message", $res );
-    return $success;
-}
-
-#}}}
-
 #{{{sub update
 sub update {
     my ( $user, $act_on_user, $properties ) = @_;
@@ -294,10 +276,6 @@ Check whether a user exists.
 =head2 del
 
 Delete a user.
-
-=head2 sites
-
-Fetch list of sites the user is a member of.
 
 =head2 update
 
