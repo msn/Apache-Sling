@@ -887,6 +887,14 @@ Fetch hash of group membership configuration.
 
 Run group membership related actions.
 
+=head2 json_query_servlet_config
+
+Fetch hash of json query servlet configuration.
+
+=head2 json_query_servlet_run
+
+Run json query server related actions.
+
 =head2 ldap_synch_config
 
 Fetch hash of ldap synchronization configuration.

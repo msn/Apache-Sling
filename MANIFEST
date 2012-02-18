@@ -26,6 +26,7 @@ t/External/Apache-Sling-Authz.t
 t/External/Apache-Sling-Content.t
 t/External/Apache-Sling-Group.t
 t/External/Apache-Sling-JsonQueryServlet.t
+t/External/Apache-Sling.t
 t/External/Apache-Sling-User.t
 t/Local/Apache-Sling-Authn.t
 t/Local/Apache-Sling-AuthnUtil.t
