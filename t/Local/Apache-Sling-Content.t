@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 23;
 use Test::Exception;
 BEGIN { use_ok( 'Apache::Sling' ); }
 BEGIN { use_ok( 'Apache::Sling::Authn' ); }
@@ -31,6 +31,9 @@ throws_ok { $content->del() } qr/No content destination to delete defined!/, 'Ch
 throws_ok { $content->check_exists() } qr/No position or ID to perform exists for specified!/, 'Check check_exists function croaks without remote_dest specified';
 throws_ok { $content->move() } qr/No content source to move from defined!/, 'Check move function croaks without remote_src specified';
 throws_ok { $content->upload_file() } qr/No local file to upload defined!/, 'Check upload_file function croaks without file specified';
-throws_ok { $content->upload_from_file() } qr/Problem opening file: ''/, 'Check upload_from_file function croaks without file specified';
 throws_ok { $content->view() } qr/No position or ID to perform exists for specified!/, 'Check view function croaks without remote_dest specified';
 throws_ok { $content->view_file() } qr/No file to view specified!/, 'Check view_file function croaks without remote_dest specified';
+my $file = "\n";
+throws_ok { $content->upload_from_file() } qr/File to upload from not defined/, 'Check upload_from_file function croaks without file specified';
+throws_ok { $content->upload_from_file(\$file) } qr/Problem parsing content to add/, 'Check upload_from_file function croaks with blank file';
+throws_ok { $content->upload_from_file('/tmp/__non__--__tnetsixe__') } qr{Problem opening file: '/tmp/__non__--__tnetsixe__'}, 'Check upload_from_file function croaks with non-existent file specified';

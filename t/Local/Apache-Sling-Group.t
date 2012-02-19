@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 27;
 use Test::Exception;
 
 BEGIN { use_ok( 'Apache::Sling' ); }
@@ -15,6 +15,7 @@ my $sling = Apache::Sling->new();
 isa_ok $sling, 'Apache::Sling', 'sling';
 
 my $authn = new Apache::Sling::Authn(\$sling);
+throws_ok { my $group = new Apache::Sling::Group() } qr/no authn provided!/, 'Check creating group croaks without authn provided';
 my $group = new Apache::Sling::Group(\$authn,'1','log.txt');
 
 ok( $group->{ 'BaseURL' } eq 'http://localhost:8080', 'Check BaseURL set' );
@@ -35,5 +36,12 @@ throws_ok { $group->member_delete() } qr/No group name defined to delete from!/,
 throws_ok { $group->member_exists() } qr/No group to view defined!/, 'Check member_exists function croaks without group specified';
 throws_ok { $group->member_view() } qr/No group to view defined!/, 'Check member_view function croaks without group specified';
 throws_ok { $group->view() } qr/No group to view defined!/, 'Check view function croaks without group specified';
-ok( $group->add_from_file(), 'Check add_from_file function' );
-ok( $group->member_add_from_file(), 'Check member_add_from_file function' );
+
+my $file = "\n";
+throws_ok { $group->add_from_file() } qr/File to upload from not defined/, 'Check add_from_file function croaks without file';
+throws_ok { $group->add_from_file(\$file) } qr/First CSV column must be the group ID, column heading must be "group". Found: ""./, 'Check add_from_file function croaks with blank file';
+throws_ok { $group->add_from_file('/tmp/__non__--__tnetsixe__') } qr{Problem opening file: '/tmp/__non__--__tnetsixe__'}, 'Check add_from_file function croaks with non-existent file specified';
+
+throws_ok { $group->member_add_from_file() } qr/File to upload from not defined/, 'Check member_add_from_file function croaks without file';
+throws_ok { $group->member_add_from_file(\$file) } qr/First CSV column must be the group ID, column heading must be "group". Found: ""./, 'Check member_add_from_file function croaks with blank file';
+throws_ok { $group->member_add_from_file('/tmp/__non__--__tnetsixe__') } qr{Problem opening file: '/tmp/__non__--__tnetsixe__'}, 'Check member_add_from_file function croaks with non-existent file specified';

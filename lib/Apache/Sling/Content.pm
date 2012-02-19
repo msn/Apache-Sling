@@ -164,8 +164,13 @@ sub upload_file {
 #{{{sub upload_from_file
 sub upload_from_file {
     my ( $content, $file, $fork_id, $number_of_forks ) = @_;
+    $fork_id = defined $fork_id ? $fork_id : 0;
+    $number_of_forks = defined $number_of_forks ? $number_of_forks : 1;
     my $count = 0;
-    if ( defined $file && open my ($input), '<', $file ) {
+    if ( !defined $file ) {
+        croak 'File to upload from not defined';
+    }
+    if ( open my ($input), '<', $file ) {
         while (<$input>) {
             if ( $fork_id == ( $count++ % $number_of_forks ) ) {
                 chomp;
@@ -186,7 +191,6 @@ sub upload_from_file {
         close $input or croak 'Problem closing input!';
     }
     else {
-        $file = ( defined $file ? $file : '' );
         croak "Problem opening file: '$file'";
     }
     return 1;

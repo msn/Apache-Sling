@@ -71,11 +71,16 @@ sub add {
 #{{{sub add_from_file
 sub add_from_file {
     my ( $user, $file, $fork_id, $number_of_forks ) = @_;
+    $fork_id = defined $fork_id ? $fork_id : 0;
+    $number_of_forks = defined $number_of_forks ? $number_of_forks : 1;
     my $csv               = Text::CSV->new();
     my $count             = 0;
     my $number_of_columns = 0;
     my @column_headings;
-    if ( defined $file && open my ($input), '<', $file ) {
+    if ( !defined $file ) {
+        croak 'File to upload from not defined';
+    }
+    if ( open my ($input), '<', $file ) {
         while (<$input>) {
             if ( $count++ == 0 ) {
 
@@ -134,7 +139,7 @@ sub add_from_file {
         close $input or croak q{Problem closing input};
     }
     else {
-        croak 'Problem adding from file!';
+        croak "Problem opening file: '$file'";
     }
     return 1;
 }
