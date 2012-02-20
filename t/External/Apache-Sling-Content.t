@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 37;
+use Test::More tests => 43;
 use Test::Exception;
 
 my $sling_host = 'http://localhost:8080';
@@ -118,7 +118,16 @@ isa_ok $content, 'Apache::Sling::Content', 'content';
 ( $tmp_content_handle, $tmp_content_name ) = File::Temp::tempfile();
 print {$tmp_content_handle} "Test file\n";
 ok( $content->upload_file($tmp_content_name,$test_content1), 'Check upload_file function' );
-my $upload = "$tmp_content_name,$test_content1\n";
+ok( $content->view($test_content1), 'Check view function' );
+# TODO: Look at why viewing the content is returning a 403:
+ok( ! $content->view_file($test_content1), 'Check view file function' );
+throws_ok{ $content->view_file()} qr{No file to view specified!}, 'Check view_file function croaks with a missing remote path';
+my $test_path = "content_test_path_$$/";
+ok( $content->upload_file($tmp_content_name,$test_path,$test_content1), 'Check upload_file function with filename specified' );
+
+my $upload = "$tmp_content_name\n";
+throws_ok{ $content->upload_from_file(\$upload)} qr{Problem parsing content to add}, 'Check upload_file function croaks with a missing remote path';
+$upload = "$tmp_content_name,$test_content1\n";
 ok( $content->upload_from_file(\$upload,0,1), 'Check upload_from_file function' );
 my ( $tmp_content2_handle, $tmp_content2_name ) = File::Temp::tempfile();
 $upload .= "$tmp_content2_name,$test_content2\n";
@@ -130,3 +139,5 @@ ok( $content->del( $test_content1 ),
     "Content Test: Content \"$test_content1\" deleted successfully." );
 ok( $content->del( $test_content2 ),
     "Content Test: Content \"$test_content2\" deleted successfully." );
+ok( $content->del( $test_path ),
+    "Content Test: Content \"$test_path\" deleted successfully." );

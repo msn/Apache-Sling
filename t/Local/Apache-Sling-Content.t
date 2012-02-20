@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 23;
+use Test::More tests => 24;
 use Test::Exception;
 BEGIN { use_ok( 'Apache::Sling' ); }
 BEGIN { use_ok( 'Apache::Sling::Authn' ); }
@@ -14,6 +14,7 @@ my $sling = Apache::Sling->new();
 isa_ok $sling, 'Apache::Sling', 'sling';
 
 my $authn   = new Apache::Sling::Authn(\$sling);
+throws_ok { my $content = new Apache::Sling::Content() } qr/no authn provided!/, 'Check creating content croaks without authn provided';
 my $content = new Apache::Sling::Content(\$authn,'1','log.txt');
 ok( $content->{ 'BaseURL' } eq 'http://localhost:8080', 'Check BaseURL set' );
 ok( $content->{ 'Log' }     eq 'log.txt',               'Check Log set' );

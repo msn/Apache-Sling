@@ -174,18 +174,12 @@ sub upload_from_file {
         while (<$input>) {
             if ( $fork_id == ( $count++ % $number_of_forks ) ) {
                 chomp;
-                $_ =~ /^(.*?),(.*?)$/msx
+                $_ =~ /^(\S.*?),(\S.*?)$/msx
                   or croak 'Problem parsing content to add';
-                if ( defined $1 && defined $2 ) {
-                    my $local_path  = $1;
-                    my $remote_path = $2;
-                    $content->upload_file( $local_path, $remote_path, q{} );
-                    Apache::Sling::Print::print_result($content);
-                }
-                else {
-                    print "ERROR: Problem parsing content to add: \"$_\"\n"
-                      or croak 'Problem printing!';
-                }
+                my $local_path  = $1;
+                my $remote_path = $2;
+                $content->upload_file( $local_path, $remote_path, q{} );
+                Apache::Sling::Print::print_result($content);
             }
         }
         close $input or croak 'Problem closing input!';
