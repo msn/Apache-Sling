@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 32;
+use Test::More tests => 48;
 use Test::Exception;
 
 my $sling_host = 'http://localhost:8080';
@@ -62,11 +62,15 @@ ok( $user->add( $test_user, $test_pass, \@test_properties ),
     "User Test: User \"$test_user\" added successfully." );
 ok( $user->check_exists( $test_user ),
     "User Test: User \"$test_user\" exists." );
+ok( ! $user->add( $test_user, $test_pass, \@test_properties ),
+    "User Test: Already existing User \"$test_user\" not added successfully again." );
 
 # Check can update properties:
 @test_properties = ( "user_test_editor=$super_user" );
 ok( $user->update( $test_user, \@test_properties ),
     "User Test: User \"$test_user\" updated successfully." );
+ok( ! $user->update( "non-existent-$test_user", \@test_properties ),
+    "User Test: non-existent user properties not updated successfully." );
 
 # Check can update properties after addition pf user to group:
 # http://jira.sakaiproject.org/browse/KERN-270
@@ -111,6 +115,8 @@ ok( $authn->switch_user( $super_user, $super_pass ),
 # Change user's password:
 ok( $user->change_password( $test_user, $test_pass, $test_pass_new, $test_pass_new ),
     "User Test: Successfully changed password from \"$test_pass\" to \"$test_pass_new\" for user: \"$test_user\"");
+ok( ! $user->change_password( "non-existent-$test_user", $test_pass, $test_pass_new, $test_pass_new ),
+    "User Test: non-existent user password change not successful");
 
 # Switch to test_user with new pass:
 ok( $authn->switch_user( $test_user, $test_pass_new ),
@@ -123,9 +129,43 @@ ok( $authn->switch_user( $super_user, $super_pass ),
 # Testing view for user:
 ok( $user->view( $test_user ),
     "User Test: User \"$test_user\" viewed successfully." );
+ok( ! $user->view( "non-existent-$test_user" ),
+    "User Test: non-existent user not viewed successfully." );
+
+# Testing user addition from file
+# test user name:
+my $test_upload_user1 = "user_test_upload_user_1_$$";
+my $test_upload_user2 = "user_test_upload_user_2_$$";
+my $test_upload_user3 = "user_test_upload_user_3_$$";
+my $test_upload_user4 = "user_test_upload_user_4_$$";
+
+my $upload = "user,password\n$test_upload_user1,$test_pass";
+ok( $user->add_from_file(\$upload,0,1), 'Check add_from_file function' );
+$upload = "user,password\n$test_upload_user2,$test_pass\n$test_upload_user3,$test_pass\n$test_upload_user4,$test_pass";
+ok( $user->add_from_file(\$upload,0,3), 'Check add_from_file function with three forks' );
+$upload = "user,bad_heading\n$test_upload_user1,$test_pass";
+throws_ok{ $user->add_from_file(\$upload,0,1); } qr%Second CSV column must be the user password, column heading must be "password". Found: "bad_heading".%, 'Check add_from_file function with bad second heading';
+$upload = "user,password\n$test_upload_user1,$test_pass,bad_extra_column";
+throws_ok{ $user->add_from_file(\$upload,0,1); } qr%Found "3" columns. There should have been "2".%, 'Check add_from_file function with heading / data count mismatch';
+$upload = "user,password,property\n$test_upload_user2,$test_pass,test";
+ok( $user->add_from_file(\$upload,0,1), 'Check add_from_file function with extra property specified' );
 
 # Check user deletion:
+ok( ! $user->del( "non-existent-$test_user" ),
+    "User Test: non-existent user not deleted successfully." );
 ok( $user->del( $test_user ),
     "User Test: User \"$test_user\" deleted successfully." );
+ok( $user->del( $test_upload_user1 ),
+    "User Test: User \"$test_upload_user1\" deleted successfully." );
+ok( $user->del( $test_upload_user2 ),
+    "User Test: User \"$test_upload_user2\" deleted successfully." );
+ok( $user->del( $test_upload_user4 ),
+    "User Test: User \"$test_upload_user4\" deleted successfully." );
 ok( ! $user->check_exists( $test_user ),
     "User Test: User \"$test_user\" should no longer exist." );
+ok( ! $user->check_exists( $test_upload_user1 ),
+    "User Test: User \"$test_upload_user1\" should no longer exist." );
+ok( ! $user->check_exists( $test_upload_user2 ),
+    "User Test: User \"$test_upload_user2\" should no longer exist." );
+ok( ! $user->check_exists( $test_upload_user4 ),
+    "User Test: User \"$test_upload_user4\" should no longer exist." );

@@ -303,27 +303,20 @@ sub member_exists {
     if ($success) {
         my $group_info = from_json( ${$res}->content );
         my $is_member  = 0;
-        if ( defined $group_info->{'members'} ) {
-            foreach my $member ( @{ $group_info->{'members'} } ) {
-                if (   $member eq "/system/userManager/user/$exists_member"
-                    || $member eq "/system/userManager/group/$exists_member"
-                    || $member eq "$exists_member" )
-                {
-                    $is_member = 1;
-                    last;
-                }
+        foreach my $member ( @{ $group_info->{'members'} } ) {
+            if (   $member eq "/system/userManager/user/$exists_member"
+                || $member eq "/system/userManager/group/$exists_member"
+                || $member eq "$exists_member" )
+            {
+                $is_member = 1;
+                last;
             }
-            $success = $is_member;
-            $message =
-                "\"$exists_member\" is "
-              . ( $is_member ? q{} : 'not ' )
-              . "in group \"$act_on_group\"";
         }
-        else {
-
-            # members field not defined in JSON:
-            $message = "Problem viewing group JSON: \"$act_on_group\"";
-        }
+        $success = $is_member;
+        $message =
+            "\"$exists_member\" is "
+          . ( $is_member ? q{} : 'not ' )
+          . "in group \"$act_on_group\"";
     }
     else {
         $message = "Problem viewing group: \"$act_on_group\"";
@@ -347,21 +340,14 @@ sub member_view {
     my $message;
     if ($success) {
         my $group_info = from_json( ${$res}->content );
-        if ( defined $group_info->{'members'} ) {
-            my $number_members = @{ $group_info->{'members'} };
-            my $members =
-              "$number_members result(s) for group \"$act_on_group\":";
-            foreach my $member ( @{ $group_info->{'members'} } ) {
-                $members .= "\n$member";
-            }
-            $message = "$members";
-            $success = $number_members;
+        my $number_members = @{ $group_info->{'members'} };
+        my $members =
+          "$number_members result(s) for group \"$act_on_group\":";
+        foreach my $member ( @{ $group_info->{'members'} } ) {
+            $members .= "\n$member";
         }
-        else {
-
-            # members field not defined in JSON:
-            $message = "Problem viewing group JSON: \"$act_on_group\"";
-        }
+        $message = "$members";
+        $success = $number_members;
     }
     else {
 
