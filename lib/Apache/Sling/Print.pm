@@ -89,11 +89,24 @@ sub print_result {
 
 #}}}
 
+#{{{sub date_string
+
+sub date_string {
+    my ( $day_of_week, $month, $year_offset, $day_of_month, $hour, $minute, $sec ) = @_;
+    my @months    = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+    my @week_days = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
+    if ( $sec    =~ /^[0-9]$/msx ) { $sec    = "0$sec"; }
+    if ( $minute =~ /^[0-9]$/msx ) { $minute = "0$minute"; }
+    my $year = 1900 + $year_offset;
+    return
+"$week_days[$day_of_week] $months[$month] $day_of_month $hour:$minute:$sec";
+}
+
+#}}}
+
 #{{{sub date_time
 
 sub date_time {
-    my @months    = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
-    my @week_days = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
     (
         my $sec,
         my $minute,
@@ -105,11 +118,7 @@ sub date_time {
         my $day_of_year,
         my $daylight_savings
     ) = localtime;
-    if ( $sec    =~ /^[0-9]$/msx ) { $sec    = "0$sec"; }
-    if ( $minute =~ /^[0-9]$/msx ) { $minute = "0$minute"; }
-    my $year = 1900 + $year_offset;
-    return
-"$week_days[$day_of_week] $months[$month] $day_of_month $hour:$minute:$sec";
+    return date_string($day_of_week, $month, $year_offset, $day_of_month, $hour, $minute, $sec );
 }
 
 #}}}
