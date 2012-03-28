@@ -16,7 +16,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 #{{{sub new
 
@@ -85,10 +85,11 @@ sub get_acl {
         )
     );
     my $success = Apache::Sling::AuthzUtil::get_acl_eval($res);
-    my $message =
-      ( $success
+    my $message = (
+        $success
         ? ${$res}->content
-        : "Could not view ACL for \"$remoteDest\"" );
+        : "Could not view ACL for \"$remoteDest\""
+    );
     $content->set_results( "$message", $res );
     return $success;
 }

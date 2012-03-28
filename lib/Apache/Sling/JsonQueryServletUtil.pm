@@ -14,12 +14,12 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 #{{{sub all_nodes_setup
 
 sub all_nodes_setup {
-    my ( $base_url ) = @_;
+    my ($base_url) = @_;
     if ( !defined $base_url ) { croak 'No base url defined!'; }
     return "get $base_url/content.query.json?queryType=xpath&statement=//*";
 }

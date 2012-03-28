@@ -16,7 +16,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 #{{{sub new
 sub new {
@@ -50,8 +50,9 @@ sub set_results {
 
 #{{{sub all_nodes
 sub all_nodes {
-    my ( $json_query_servlet ) = @_;
-    my $res = Apache::Sling::Request::request( \$json_query_servlet,
+    my ($json_query_servlet) = @_;
+    my $res = Apache::Sling::Request::request(
+        \$json_query_servlet,
         Apache::Sling::JsonQueryServletUtil::all_nodes_setup(
             $json_query_servlet->{'BaseURL'}
         )

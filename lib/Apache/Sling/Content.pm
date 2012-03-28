@@ -16,7 +16,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 #{{{sub new
 sub new {
@@ -164,7 +164,7 @@ sub upload_file {
 #{{{sub upload_from_file
 sub upload_from_file {
     my ( $content, $file, $fork_id, $number_of_forks ) = @_;
-    $fork_id = defined $fork_id ? $fork_id : 0;
+    $fork_id         = defined $fork_id         ? $fork_id         : 0;
     $number_of_forks = defined $number_of_forks ? $number_of_forks : 1;
     my $count = 0;
     if ( !defined $file ) {

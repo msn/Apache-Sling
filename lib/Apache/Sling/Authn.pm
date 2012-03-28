@@ -19,7 +19,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 #{{{sub new
 sub new {
@@ -134,7 +134,7 @@ sub switch_user {
     {
         my $old_username = $authn->{'Username'};
         my $old_password = $authn->{'Password'};
-        my $old_type = $authn->{'Type'};
+        my $old_type     = $authn->{'Type'};
         $authn->{'Username'} = $new_username;
         $authn->{'Password'} = $new_password;
         if ( defined $type ) {
@@ -145,10 +145,11 @@ sub switch_user {
             if ($check_basic) {
                 my $success = $authn->basic_login();
                 if ( !$success ) {
+
                     # Reset credentials:
-                    $authn->{'Username'} = $old_username ;
-                    $authn->{'Password'} = $old_password ;
-                    $authn->{'Type'} = $old_type ;
+                    $authn->{'Username'} = $old_username;
+                    $authn->{'Password'} = $old_password;
+                    $authn->{'Type'}     = $old_type;
                     croak
                       "Basic Auth log in for user \"$new_username\" at URL \""
                       . $authn->{'BaseURL'}
@@ -160,10 +161,11 @@ sub switch_user {
             }
         }
         else {
+
             # Reset credentials:
-            $authn->{'Username'} = $old_username ;
-            $authn->{'Password'} = $old_password ;
-            $authn->{'Type'} = $old_type ;
+            $authn->{'Username'} = $old_username;
+            $authn->{'Password'} = $old_password;
+            $authn->{'Type'}     = $old_type;
             croak "Unsupported auth type: \"$type\"\n";
         }
     }

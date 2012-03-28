@@ -15,7 +15,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 #{{{sub print_with_lock
 
@@ -92,7 +92,9 @@ sub print_result {
 #{{{sub date_string
 
 sub date_string {
-    my ( $day_of_week, $month, $year_offset, $day_of_month, $hour, $minute, $sec ) = @_;
+    my ( $day_of_week, $month, $year_offset, $day_of_month, $hour, $minute,
+        $sec )
+      = @_;
     my @months    = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
     my @week_days = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
     if ( $sec    =~ /^[0-9]$/msx ) { $sec    = "0$sec"; }
@@ -118,7 +120,8 @@ sub date_time {
         my $day_of_year,
         my $daylight_savings
     ) = localtime;
-    return date_string($day_of_week, $month, $year_offset, $day_of_month, $hour, $minute, $sec );
+    return date_string( $day_of_week, $month, $year_offset, $day_of_month,
+        $hour, $minute, $sec );
 }
 
 #}}}

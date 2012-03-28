@@ -18,7 +18,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 #{{{sub new
 
@@ -72,7 +72,7 @@ sub add {
 #{{{sub add_from_file
 sub add_from_file {
     my ( $group, $file, $fork_id, $number_of_forks ) = @_;
-    $fork_id = defined $fork_id ? $fork_id : 0;
+    $fork_id         = defined $fork_id         ? $fork_id         : 0;
     $number_of_forks = defined $number_of_forks ? $number_of_forks : 1;
     my $csv               = Text::CSV->new();
     my $count             = 0;
@@ -199,7 +199,7 @@ sub member_add {
 #{{{sub member_add_from_file
 sub member_add_from_file {
     my ( $group, $file, $fork_id, $number_of_forks ) = @_;
-    $fork_id = defined $fork_id ? $fork_id : 0;
+    $fork_id         = defined $fork_id         ? $fork_id         : 0;
     $number_of_forks = defined $number_of_forks ? $number_of_forks : 1;
     my $csv               = Text::CSV->new();
     my $count             = 0;
@@ -339,10 +339,9 @@ sub member_view {
     my $success = Apache::Sling::GroupUtil::view_eval($res);
     my $message;
     if ($success) {
-        my $group_info = from_json( ${$res}->content );
+        my $group_info     = from_json( ${$res}->content );
         my $number_members = @{ $group_info->{'members'} };
-        my $members =
-          "$number_members result(s) for group \"$act_on_group\":";
+        my $members = "$number_members result(s) for group \"$act_on_group\":";
         foreach my $member ( @{ $group_info->{'members'} } ) {
             $members .= "\n$member";
         }

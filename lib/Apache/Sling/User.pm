@@ -17,7 +17,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 #{{{sub new
 
@@ -71,7 +71,7 @@ sub add {
 #{{{sub add_from_file
 sub add_from_file {
     my ( $user, $file, $fork_id, $number_of_forks ) = @_;
-    $fork_id = defined $fork_id ? $fork_id : 0;
+    $fork_id         = defined $fork_id         ? $fork_id         : 0;
     $number_of_forks = defined $number_of_forks ? $number_of_forks : 1;
     my $csv               = Text::CSV->new();
     my $count             = 0;

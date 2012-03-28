@@ -14,7 +14,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 #{{{sub add_setup
 
@@ -22,6 +22,7 @@ sub add_setup {
     my ( $base_url, $act_on_group, $properties ) = @_;
     if ( !defined $base_url ) { croak 'No base url defined to add against!'; }
     if ( !defined $act_on_group ) { croak 'No group name defined to add!'; }
+
     # property_post_vars is set to q{} if no properties are specified:
     my $property_post_vars =
       Apache::Sling::URL::properties_array_to_string($properties);
