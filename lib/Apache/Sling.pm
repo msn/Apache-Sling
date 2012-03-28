@@ -146,7 +146,7 @@ sub authz_run {
     my $authz =
       new Apache::Sling::Authz( \$authn, $sling->{'Verbose'}, $sling->{'Log'} );
     if ( defined ${ $config->{'delete'} } ) {
-        $authz->delete( ${ $config->{'remote'} }, ${ $config->{'principal'} } );
+        $authz->del( ${ $config->{'remote'} }, ${ $config->{'principal'} } );
         Apache::Sling::Print::print_result($authz);
     }
     my @grant_privileges;
