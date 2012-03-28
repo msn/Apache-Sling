@@ -34,8 +34,8 @@ a node in JSON format.
 
 sub get_acl_setup {
     my ( $base_url, $remote_dest ) = @_;
-    die "No base url defined!"                    unless defined $base_url;
-    die "No destination to view ACL for defined!" unless defined $remote_dest;
+    croak "No base url defined!"                    unless defined $base_url;
+    croak "No destination to view ACL for defined!" unless defined $remote_dest;
     return "get $base_url/$remote_dest.acl.json";
 }
 
@@ -55,7 +55,7 @@ successfully, else false.
 
 sub get_acl_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/ );
+    return ( $$res->code =~ /^200$/x );
 }
 
 #}}}
@@ -73,9 +73,9 @@ a node in JSON format.
 
 sub delete_setup {
     my ( $base_url, $remote_dest, $principal ) = @_;
-    die "No base url defined!"                      unless defined $base_url;
-    die "No destination to delete ACL for defined!" unless defined $remote_dest;
-    die "No principal to delete ACL for defined!"   unless defined $principal;
+    croak "No base url defined!"                      unless defined $base_url;
+    croak "No destination to delete ACL for defined!" unless defined $remote_dest;
+    croak "No principal to delete ACL for defined!"   unless defined $principal;
     my $post_variables = "\$post_variables = [':applyTo','$principal']";
     return "post $base_url/$remote_dest.deleteAce.html $post_variables";
 }
@@ -96,7 +96,7 @@ else false.
 
 sub delete_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/ );
+    return ( $$res->code =~ /^200$/x );
 }
 
 #}}}
@@ -116,10 +116,10 @@ sub modify_privilege_setup {
     my ( $base_url, $remote_dest, $principal, $grant_privileges,
         $deny_privileges )
       = @_;
-    die "No base url defined!" unless defined $base_url;
-    die "No destination to modify privilege for defined!"
+    croak "No base url defined!" unless defined $base_url;
+    croak "No destination to modify privilege for defined!"
       unless defined $remote_dest;
-    die "No principal to modify privilege for defined!"
+    croak "No principal to modify privilege for defined!"
       unless defined $principal;
     my %privileges = (
         'read',                1, 'modifyProperties',    1,
@@ -136,7 +136,7 @@ sub modify_privilege_setup {
             $post_variables .= "'privilege\@jcr:$grant','granted',";
         }
         else {
-            die "Unsupported grant privilege: \"$grant\" supplied!\n";
+            croak "Unsupported grant privilege: \"$grant\" supplied!\n";
         }
     }
     foreach my $deny ( @{$deny_privileges} ) {
@@ -144,10 +144,10 @@ sub modify_privilege_setup {
             $post_variables .= "'privilege\@jcr:$deny','denied',";
         }
         else {
-            die "Unsupported deny privilege: \"$deny\" supplied!\n";
+            croak "Unsupported deny privilege: \"$deny\" supplied!\n";
         }
     }
-    $post_variables =~ s/,$/]/;
+    $post_variables =~ s/,$/]/x;
     return "post $base_url/$remote_dest.modifyAce.html $post_variables";
 }
 
@@ -167,7 +167,7 @@ were modified successfully, else false.
 
 sub modify_privilege_eval {
     my ($res) = @_;
-    return ( $$res->code =~ /^200$/ );
+    return ( $$res->code =~ /^200$/x );
 }
 
 #}}}

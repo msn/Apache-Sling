@@ -125,17 +125,17 @@ sub modify_privileges {
 
 #}}}
 
-#{{{sub delete
+#{{{sub del
 
 =pod
 
-=head2 delete
+=head2 del
 
 Delete the access controls for a given principal on a given node:
 
 =cut
 
-sub delete {
+sub del {
     my ( $content, $remoteDest, $principal ) = @_;
     my $res = Apache::Sling::Request::request(
         \$content,

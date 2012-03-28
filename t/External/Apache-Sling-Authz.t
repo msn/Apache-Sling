@@ -75,10 +75,10 @@ push @grant_privileges, 'read';
 ok( $authz->modify_privileges( $test_content1, $test_user, \@grant_privileges, \@deny_privileges ),
     "Authz Test: Content \"$test_content1\" ACL privileges successfully modified." );
 
-ok( ! $authz->delete( 'bad_content_does_not_exist', $test_user ),
+ok( ! $authz->del( 'bad_content_does_not_exist', $test_user ),
     "Authz Test: Content \"bad_content_does_not_exist\" ACL privileges not removed for principal: \"$test_user\"." );
 
-ok( $authz->delete( $test_content1, $test_user ),
+ok( $authz->del( $test_content1, $test_user ),
     "Authz Test: Content \"$test_content1\" ACL privileges successfully removed for principal: \"$test_user\"." );
 
 ok( $user->del( $test_user ),

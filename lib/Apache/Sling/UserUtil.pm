@@ -45,7 +45,7 @@ sub add_setup {
 
 sub add_eval {
     my ($res) = @_;
-    return ( ${$res}->code =~ /^20(0|1)$/ );
+    return ( ${$res}->code =~ /^20(0|1)$/x );
 }
 
 #}}}
