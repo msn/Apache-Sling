@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 44;
+use Test::More tests => 47;
 use Test::Exception;
 
 my $sling_host = 'http://localhost:8080';
@@ -114,6 +114,9 @@ ok( $content->view("$test_path/$tmp_content_basename"), 'Check view function' );
 ok( $content->view_file("$test_path/$tmp_content_basename"), 'Check view file function' );
 ok( ! $content->view_file("$test_path/this_file_does_not_exist"), 'Check view file function with non-existent file' );
 throws_ok{ $content->view_file()} qr{No file to view specified!}, 'Check view_file function croaks with a missing remote path';
+ok( $content->view_full_json("$test_path/$tmp_content_basename"), 'Check view_full_json function' );
+ok( ! $content->view_full_json("$test_path/this_file_does_not_exist"), 'Check view_full_json function with non-existent file' );
+throws_ok{ $content->view_full_json()} qr{No file to view specified!}, 'Check view_full_json function croaks with a missing remote path';
 ok( $content->upload_file($tmp_content_name,$test_path,$test_content1), 'Check upload_file function with filename specified' );
 ok( $content->view("$test_path/$test_content1"), 'Check view function on named file' );
 ok( $content->view_file("$test_path/$test_content1"), 'Check view file function on named file' );

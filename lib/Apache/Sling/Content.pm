@@ -233,6 +233,30 @@ sub view_file {
 
 #}}}
 
+#{{{sub view_full_json
+sub view_full_json {
+    my ( $content, $remote_dest ) = @_;
+    if ( !defined $remote_dest ) {
+        croak 'No file to view specified!';
+    }
+    my $res = Apache::Sling::Request::request(
+        \$content,
+        Apache::Sling::ContentUtil::full_json_setup(
+            $content->{'BaseURL'}, $remote_dest
+        )
+    );
+    my $success = Apache::Sling::ContentUtil::full_json_eval($res);
+    my $message = (
+        $success
+        ? ${$res}->content
+        : "Problem viewing json: \"$remote_dest\""
+    );
+    $content->set_results( "$message", $res );
+    return $success;
+}
+
+#}}}
+
 1;
 
 __END__
@@ -290,6 +314,10 @@ View content details.
 =head2 view_file
 
 View content.
+
+=head2 view_full_json
+
+View JSON representation of content.
 
 =head1 USAGE
 
