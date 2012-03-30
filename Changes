@@ -1,5 +1,8 @@
 Revision history for Perl extension Apache::Sling.
 
+0.20  Fri Mar 30 06:05:00 2012
+        - Adding support for .infinity.json.
+
 0.19  Wed Mar 28 20:38:00 2012
         - Improving test coverage.
         - A small amount of code tidying.
