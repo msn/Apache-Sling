@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 use Test::Exception;
 
 my $sling_host = 'http://localhost:8080';
@@ -31,6 +31,7 @@ throws_ok{ my $jsonqueryobject = Apache::Sling::JsonQueryServlet->new(); } qr%no
 # authn object:
 my $authn = Apache::Sling::Authn->new( \$sling );
 isa_ok $authn, 'Apache::Sling::Authn', 'authentication';
+ok( $authn->login_user(), "log in successful" );
 # json query object:
 my $jsonqueryobject = Apache::Sling::JsonQueryServlet->new( \$authn, $verbose, $log );
 isa_ok $jsonqueryobject, 'Apache::Sling::JsonQueryServlet', 'jsonqueryservlet';

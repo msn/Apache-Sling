@@ -25,7 +25,6 @@ our $VERSION = '0.20';
 sub new {
     my ( $class, $sling ) = @_;
     my $url = Apache::Sling::URL::url_input_sanitize( ${$sling}->{'URL'} );
-    my $type = ( defined ${$sling}->{'Auth'} ? ${$sling}->{'Auth'} : 'basic' );
     my $verbose =
       ( defined ${$sling}->{'Verbose'} ? ${$sling}->{'Verbose'} : 0 );
 
@@ -42,7 +41,7 @@ sub new {
     my $authn = {
         BaseURL  => "$url",
         LWP      => \$lwp_user_agent,
-        Type     => $type,
+        Type     => ${$sling}->{'Auth'},
         Username => ${$sling}->{'User'},
         Password => ${$sling}->{'Pass'},
         Message  => q{},
@@ -54,7 +53,6 @@ sub new {
 # Authn references itself to be compatibile with Apache::Sling::Request::request
     $authn->{'Authn'} = \$authn;
     bless $authn, $class;
-    $authn->login_user;
     return $authn;
 }
 
@@ -88,6 +86,7 @@ sub basic_login {
 #{{{sub login_user
 sub login_user {
     my ($authn) = @_;
+    $authn->{'Type'} = ( defined $authn->{'Type'} ? $authn->{'Type'} : 'basic' );
 
     # Apply basic authentication to the user agent if url, username and
     # password are supplied:

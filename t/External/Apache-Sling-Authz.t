@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 22;
 use Test::Exception;
 
 my $sling_host = 'http://localhost:8080';
@@ -38,6 +38,7 @@ $sling->{'Log'}     = $log;
 # authn object:
 my $authn = Apache::Sling::Authn->new( \$sling );
 isa_ok $authn, 'Apache::Sling::Authn', 'authentication';
+ok( $authn->login_user(), "log in successful" );
 # content object:
 my $content = Apache::Sling::Content->new( \$authn, $verbose, $log );
 isa_ok $content, 'Apache::Sling::Content', 'content';

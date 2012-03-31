@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 48;
+use Test::More tests => 49;
 use Test::Exception;
 
 my $sling_host = 'http://localhost:8080';
@@ -44,6 +44,7 @@ throws_ok{ my $user = Apache::Sling::User->new(); } qr%no authn provided!%, 'Che
 # authn object:
 my $authn = Apache::Sling::Authn->new( \$sling );
 isa_ok $authn, 'Apache::Sling::Authn', 'authentication';
+ok( $authn->login_user(), "log in successful" );
 # user object:
 my $user = Apache::Sling::User->new( \$authn, $verbose, $log );
 isa_ok $user, 'Apache::Sling::User', 'user';

@@ -143,6 +143,7 @@ sub authz_run {
       Apache::Sling::URL::strip_leading_slash( ${ $config->{'remote'} } );
 
     my $authn = new Apache::Sling::Authn( \$sling );
+    $authn->login_user();
     my $authz =
       new Apache::Sling::Authz( \$authn, $sling->{'Verbose'}, $sling->{'Log'} );
     if ( defined ${ $config->{'delete'} } ) {
@@ -301,6 +302,7 @@ sub content_run {
             elsif ( $pid == 0 ) {                # child
                     # Create a separate authorization per fork:
                 my $authn = new Apache::Sling::Authn( \$sling );
+                $authn->login_user();
                 my $content =
                   new Apache::Sling::Content( \$authn, $sling->{'Verbose'},
                     $sling->{'Log'} );
@@ -316,6 +318,7 @@ sub content_run {
     }
     else {
         my $authn = new Apache::Sling::Authn( \$sling );
+        $authn->login_user();
         my $content =
           new Apache::Sling::Content( \$authn, $sling->{'Verbose'},
             $sling->{'Log'} );
@@ -414,6 +417,7 @@ sub group_run {
             elsif ( $pid == 0 ) {                # child
                     # Create a separate authorization per fork:
                 my $authn = new Apache::Sling::Authn( \$sling );
+                $authn->login_user();
                 my $group =
                   new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
                     $sling->{'Log'} );
@@ -429,6 +433,7 @@ sub group_run {
     }
     else {
         my $authn = new Apache::Sling::Authn( \$sling );
+        $authn->login_user();
         my $group =
           new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
             $sling->{'Log'} );
@@ -504,6 +509,7 @@ sub group_member_run {
             elsif ( $pid == 0 ) {                # child
                     # Create a separate authorization per fork:
                 my $authn = new Apache::Sling::Authn( \$sling );
+                $authn->login_user();
                 my $group =
                   new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
                     $sling->{'Log'} );
@@ -519,6 +525,7 @@ sub group_member_run {
     }
     else {
         my $authn = new Apache::Sling::Authn( \$sling );
+        $authn->login_user();
         my $group =
           new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
             $sling->{'Log'} );
@@ -581,6 +588,7 @@ sub json_query_servlet_run {
         ${ $config->{'remote-source'} } );
 
     my $authn = new Apache::Sling::Authn( \$sling );
+    $authn->login_user();
     my $json_query_servlet =
       new Apache::Sling::JsonQueryServlet( \$authn, $sling->{'Verbose'},
         $sling->{'Log'} );
@@ -652,6 +660,7 @@ sub ldap_synch_run {
     $sling->check_forks;
 
     my $authn      = new Apache::Sling::Authn( \$sling );
+    $authn->login_user();
     my $ldap_synch = new Apache::Sling::LDAPSynch(
         ${ $config->{'ldap-host'} },
         ${ $config->{'ldap-base'} },
@@ -779,6 +788,7 @@ sub user_run {
             elsif ( $pid == 0 ) {                # child
                     # Create a separate authorization per fork:
                 my $authn = new Apache::Sling::Authn( \$sling );
+                $authn->login_user();
                 my $user =
                   new Apache::Sling::User( \$authn, $sling->{'Verbose'},
                     $sling->{'Log'} );
@@ -794,6 +804,7 @@ sub user_run {
     }
     else {
         my $authn = new Apache::Sling::Authn( \$sling );
+        $authn->login_user();
         my $user =
           new Apache::Sling::User( \$authn, $sling->{'Verbose'},
             $sling->{'Log'} );
