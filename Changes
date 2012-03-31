@@ -1,5 +1,8 @@
 Revision history for Perl extension Apache::Sling.
 
+0.21  Sat Mar 31 06:45:00 2012
+        - Refactoring user login to support subclassing auth.
+
 0.20  Fri Mar 30 06:05:00 2012
         - Adding support for .infinity.json.
 
