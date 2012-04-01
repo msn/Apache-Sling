@@ -292,7 +292,10 @@ sub content_run {
       Apache::Sling::URL::strip_leading_slash( ${ $config->{'remote'} } );
     ${ $config->{'remote-source'} } = Apache::Sling::URL::strip_leading_slash(
         ${ $config->{'remote-source'} } );
-    my $authn = defined $sling->{'Authn'} ? ${ $sling->{'Authn'} } : new Apache::Sling::Authn( \$sling );
+    my $authn =
+      defined $sling->{'Authn'}
+      ? ${ $sling->{'Authn'} }
+      : new Apache::Sling::Authn( \$sling );
 
     if ( defined ${ $config->{'additions'} } ) {
         my $message =
@@ -408,7 +411,10 @@ sub group_run {
         croak 'No group config supplied!';
     }
     $sling->check_forks;
-    my $authn = defined $sling->{'Authn'} ? ${ $sling->{'Authn'} } : new Apache::Sling::Authn( \$sling );
+    my $authn =
+      defined $sling->{'Authn'}
+      ? ${ $sling->{'Authn'} }
+      : new Apache::Sling::Authn( \$sling );
 
     if ( defined ${ $config->{'additions'} } ) {
         my $message =
@@ -501,7 +507,10 @@ sub group_member_run {
         croak 'No group_member config supplied!';
     }
     $sling->check_forks;
-    my $authn = defined $sling->{'Authn'} ? ${ $sling->{'Authn'} } : new Apache::Sling::Authn( \$sling );
+    my $authn =
+      defined $sling->{'Authn'}
+      ? ${ $sling->{'Authn'} }
+      : new Apache::Sling::Authn( \$sling );
 
     if ( defined ${ $config->{'additions'} } ) {
         my $message =
@@ -664,7 +673,7 @@ sub ldap_synch_run {
     }
     $sling->check_forks;
 
-    my $authn      = new Apache::Sling::Authn( \$sling );
+    my $authn = new Apache::Sling::Authn( \$sling );
     $authn->login_user();
     my $ldap_synch = new Apache::Sling::LDAPSynch(
         ${ $config->{'ldap-host'} },
@@ -768,7 +777,10 @@ sub user_run {
         croak 'No user config supplied!';
     }
     $sling->check_forks;
-    my $authn = defined $sling->{'Authn'} ? ${ $sling->{'Authn'} } : new Apache::Sling::Authn( \$sling );
+    my $authn =
+      defined $sling->{'Authn'}
+      ? ${ $sling->{'Authn'} }
+      : new Apache::Sling::Authn( \$sling );
 
     # Handle the three special case commonly used properties:
     if ( defined ${ $config->{'email'} } ) {

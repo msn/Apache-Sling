@@ -27,7 +27,7 @@ sub new {
     my $verbose =
       ( defined ${$sling}->{'Verbose'} ? ${$sling}->{'Verbose'} : 0 );
 
-    my $lwp_user_agent = $class->user_agent( $sling );
+    my $lwp_user_agent = $class->user_agent($sling);
 
     my $response;
     my $authn = {
@@ -42,10 +42,11 @@ sub new {
         Log      => ${$sling}->{'Log'}
     };
 
-# Authn references itself to be compatible with Apache::Sling::Request::request
+ # Authn references itself to be compatible with Apache::Sling::Request::request
     $authn->{'Authn'} = \$authn;
-# Add a reference to the authn object to the sling object to make it easier to
-# pass a subclassed authn object through:
+
+  # Add a reference to the authn object to the sling object to make it easier to
+  # pass a subclassed authn object through:
     ${$sling}->{'Authn'} = \$authn;
     bless $authn, $class;
     return $authn;
@@ -81,7 +82,8 @@ sub basic_login {
 #{{{sub login_user
 sub login_user {
     my ($authn) = @_;
-    $authn->{'Type'} = ( defined $authn->{'Type'} ? $authn->{'Type'} : 'basic' );
+    $authn->{'Type'} =
+      ( defined $authn->{'Type'} ? $authn->{'Type'} : 'basic' );
 
     # Apply basic authentication to the user agent if url, username and
     # password are supplied:
