@@ -1,5 +1,8 @@
 Revision history for Perl extension Apache::Sling.
 
+0.22  Sun Apr 1 21:15:00 2012
+        - Make it possible to subclass authn successfully.
+
 0.21  Sat Mar 31 06:45:00 2012
         - Refactoring user login to support subclassing auth.
 
