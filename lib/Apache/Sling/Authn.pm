@@ -6,7 +6,6 @@ use 5.008001;
 use strict;
 use warnings;
 use Carp;
-use File::Temp;
 use LWP::UserAgent ();
 use Apache::Sling::AuthnUtil;
 use Apache::Sling::Print;
@@ -28,19 +27,12 @@ sub new {
     my $verbose =
       ( defined ${$sling}->{'Verbose'} ? ${$sling}->{'Verbose'} : 0 );
 
-    my $lwp_user_agent = LWP::UserAgent->new( keep_alive => 1 );
-    push @{ $lwp_user_agent->requests_redirectable }, 'POST';
-    my $tmp_cookie_file_name =
-      File::Temp::tempnam( File::Temp::tempdir( CLEANUP => 1 ), 'authn' );
-    $lwp_user_agent->cookie_jar( { file => $tmp_cookie_file_name } );
-    if ( defined ${$sling}->{'Referer'} ) {
-        $lwp_user_agent->default_header( 'Referer' => ${$sling}->{'Referer'} );
-    }
+    my $lwp_user_agent = $class->user_agent( $sling );
 
     my $response;
     my $authn = {
         BaseURL  => "$url",
-        LWP      => \$lwp_user_agent,
+        LWP      => $lwp_user_agent,
         Type     => ${$sling}->{'Auth'},
         Username => ${$sling}->{'User'},
         Password => ${$sling}->{'Pass'},
@@ -50,8 +42,11 @@ sub new {
         Log      => ${$sling}->{'Log'}
     };
 
-# Authn references itself to be compatibile with Apache::Sling::Request::request
+# Authn references itself to be compatible with Apache::Sling::Request::request
     $authn->{'Authn'} = \$authn;
+# Add a reference to the authn object to the sling object to make it easier to
+# pass a subclassed authn object through:
+    ${$sling}->{'Authn'} = \$authn;
     bless $authn, $class;
     return $authn;
 }
@@ -175,6 +170,21 @@ sub switch_user {
         Apache::Sling::Print::print_result($authn);
     }
     return 1;
+}
+
+#}}}
+
+#{{{sub user_agent
+sub user_agent {
+    my ( $class, $sling ) = @_;
+    my $lwp_user_agent = LWP::UserAgent->new( keep_alive => 1 );
+    push @{ $lwp_user_agent->requests_redirectable }, 'POST';
+    my $tmp_cookie_file_name;
+    $lwp_user_agent->cookie_jar( { file => \$tmp_cookie_file_name } );
+    if ( defined ${$sling}->{'Referer'} ) {
+        $lwp_user_agent->default_header( 'Referer' => ${$sling}->{'Referer'} );
+    }
+    return \$lwp_user_agent;
 }
 
 #}}}
