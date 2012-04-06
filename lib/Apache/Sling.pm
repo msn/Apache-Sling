@@ -308,7 +308,7 @@ sub content_run {
             elsif ( $pid == 0 ) {                # child
                     # Create a new separate user agent per fork in order to
                     # ensure cookie stores are separate, then log the user in:
-                $authn->{'LWP'} = $authn->user_agent();
+                $authn->{'LWP'} = $authn->user_agent($sling->{'Referer'});
                 $authn->login_user();
                 my $content =
                   new Apache::Sling::Content( \$authn, $sling->{'Verbose'},
@@ -427,7 +427,7 @@ sub group_run {
             elsif ( $pid == 0 ) {                # child
                     # Create a new separate user agent per fork in order to
                     # ensure cookie stores are separate, then log the user in:
-                $authn->{'LWP'} = $authn->user_agent();
+                $authn->{'LWP'} = $authn->user_agent($sling->{'Referer'});
                 $authn->login_user();
                 my $group =
                   new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
@@ -523,7 +523,7 @@ sub group_member_run {
             elsif ( $pid == 0 ) {                # child
                     # Create a new separate user agent per fork in order to
                     # ensure cookie stores are separate, then log the user in:
-                $authn->{'LWP'} = $authn->user_agent();
+                $authn->{'LWP'} = $authn->user_agent($sling->{'Referer'});
                 $authn->login_user();
                 my $group =
                   new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
@@ -806,7 +806,7 @@ sub user_run {
             elsif ( $pid == 0 ) {                # child
                     # Create a new separate user agent per fork in order to
                     # ensure cookie stores are separate, then log the user in:
-                $authn->{'LWP'} = $authn->user_agent();
+                $authn->{'LWP'} = $authn->user_agent($sling->{'Referer'});
                 $authn->login_user();
                 my $user =
                   new Apache::Sling::User( \$authn, $sling->{'Verbose'},

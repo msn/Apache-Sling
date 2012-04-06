@@ -27,7 +27,7 @@ sub new {
     my $verbose =
       ( defined ${$sling}->{'Verbose'} ? ${$sling}->{'Verbose'} : 0 );
 
-    my $lwp_user_agent = $class->user_agent($sling);
+    my $lwp_user_agent = $class->user_agent(${$sling}->{'Referer'});
 
     my $response;
     my $authn = {
@@ -178,13 +178,13 @@ sub switch_user {
 
 #{{{sub user_agent
 sub user_agent {
-    my ( $class, $sling ) = @_;
+    my ( $class, $referer ) = @_;
     my $lwp_user_agent = LWP::UserAgent->new( keep_alive => 1 );
     push @{ $lwp_user_agent->requests_redirectable }, 'POST';
     my $tmp_cookie_file_name;
     $lwp_user_agent->cookie_jar( { file => \$tmp_cookie_file_name } );
-    if ( defined ${$sling}->{'Referer'} ) {
-        $lwp_user_agent->default_header( 'Referer' => ${$sling}->{'Referer'} );
+    if ( defined $referer ) {
+        $lwp_user_agent->default_header( 'Referer' => $referer );
     }
     return \$lwp_user_agent;
 }
