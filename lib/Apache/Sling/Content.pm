@@ -66,6 +66,54 @@ sub add {
 
 #}}}
 
+#{{{sub config
+
+sub config {
+    my ($sling) = @_;
+    my $add;
+    my $additions;
+    my $copy;
+    my $delete;
+    my $exists;
+    my $filename;
+    my $local;
+    my $move;
+    my @property;
+    my $remote;
+    my $remote_source;
+    my $replace;
+    my $view;
+
+    my %content_config = (
+        'auth'          => \$sling->{'Auth'},
+        'help'          => \$sling->{'Help'},
+        'log'           => \$sling->{'Log'},
+        'man'           => \$sling->{'Man'},
+        'pass'          => \$sling->{'Pass'},
+        'threads'       => \$sling->{'Threads'},
+        'url'           => \$sling->{'URL'},
+        'user'          => \$sling->{'User'},
+        'verbose'       => \$sling->{'Verbose'},
+        'add'           => \$add,
+        'additions'     => \$additions,
+        'copy'          => \$copy,
+        'delete'        => \$delete,
+        'exists'        => \$exists,
+        'filename'      => \$filename,
+        'local'         => \$local,
+        'move'          => \$move,
+        'property'      => \@property,
+        'remote'        => \$remote,
+        'remote-source' => \$remote_source,
+        'replace'       => \$replace,
+        'view'          => \$view
+    );
+
+    return \%content_config;
+}
+
+#}}}
+
 #{{{sub copy
 sub copy {
     my ( $content, $remote_src, $remote_dest, $replace ) = @_;
@@ -134,6 +182,95 @@ sub move {
     $message .= ( $success ? 'completed!' : 'did not complete successfully!' );
     $content->set_results( "$message", $res );
     return $success;
+}
+
+#}}}
+
+#{{{sub run
+sub run {
+    my ( $sling, $config ) = @_;
+    if ( !defined $config ) {
+        croak 'No content config supplied!';
+    }
+    $sling->check_forks;
+    ${ $config->{'remote'} } =
+      Apache::Sling::URL::strip_leading_slash( ${ $config->{'remote'} } );
+    ${ $config->{'remote-source'} } = Apache::Sling::URL::strip_leading_slash(
+        ${ $config->{'remote-source'} } );
+    my $authn =
+      defined $sling->{'Authn'}
+      ? ${ $sling->{'Authn'} }
+      : new Apache::Sling::Authn( \$sling );
+
+    if ( defined ${ $config->{'additions'} } ) {
+        my $message =
+          "Adding content from file \"" . ${ $config->{'additions'} } . "\":\n";
+        Apache::Sling::Print::print_with_lock( "$message", $sling->{'Log'} );
+        my @childs = ();
+        for my $i ( 0 .. $sling->{'Threads'} ) {
+            my $pid = fork;
+            if ($pid) { push @childs, $pid; }    # parent
+            elsif ( $pid == 0 ) {                # child
+                    # Create a new separate user agent per fork in order to
+                    # ensure cookie stores are separate, then log the user in:
+                $authn->{'LWP'} = $authn->user_agent($sling->{'Referer'});
+                $authn->login_user();
+                my $content =
+                  new Apache::Sling::Content( \$authn, $sling->{'Verbose'},
+                    $sling->{'Log'} );
+                $content->upload_from_file( ${ $config->{'additions'} },
+                    $i, $sling->{'Threads'} );
+                exit 0;
+            }
+            else {
+                croak "Could not fork $i!";
+            }
+        }
+        foreach (@childs) { waitpid $_, 0; }
+    }
+    else {
+        $authn->login_user();
+        my $content =
+          new Apache::Sling::Content( \$authn, $sling->{'Verbose'},
+            $sling->{'Log'} );
+        if (   defined ${ $config->{'local'} }
+            && defined ${ $config->{'remote'} } )
+        {
+            $content->upload_file(
+                ${ $config->{'local'} },
+                ${ $config->{'remote'} },
+                ${ $config->{'filename'} }
+            );
+        }
+        elsif ( defined ${ $config->{'exists'} } ) {
+            $content->check_exists( ${ $config->{'remote'} } );
+        }
+        elsif ( defined ${ $config->{'add'} } ) {
+            $content->add( ${ $config->{'remote'} }, $config->{'property'} );
+        }
+        elsif ( defined ${ $config->{'copy'} } ) {
+            $content->copy(
+                ${ $config->{'remote-source'} },
+                ${ $config->{'remote'} },
+                ${ $config->{'replace'} }
+            );
+        }
+        elsif ( defined ${ $config->{'delete'} } ) {
+            $content->del( ${ $config->{'remote'} } );
+        }
+        elsif ( defined ${ $config->{'move'} } ) {
+            $content->move(
+                ${ $config->{'remote-source'} },
+                ${ $config->{'remote'} },
+                ${ $config->{'replace'} }
+            );
+        }
+        elsif ( defined ${ $config->{'view'} } ) {
+            $content->view( ${ $config->{'remote'} } );
+        }
+        Apache::Sling::Print::print_result($content);
+    }
+    return 1;
 }
 
 #}}}
@@ -287,6 +424,10 @@ Add new content to the system.
 
 Copy content in the system.
 
+=head2 config
+
+Fetch hash of content configuration.
+
 =head2 check_exists
 
 Check whether content exists.
@@ -298,6 +439,10 @@ Delete content.
 =head2 move
 
 Move location of content in the system.
+
+=head2 run
+
+Run content related actions.
 
 =head2 upload_file
 
