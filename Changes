@@ -1,5 +1,8 @@
 Revision history for Perl extension Apache::Sling.
 
+0.23  Fri Apr 6 06:20:00 2012
+        - Fix bug in referer passthrough from subclasses.
+
 0.22  Sun Apr 1 21:15:00 2012
         - Make it possible to subclass authn successfully.
 
