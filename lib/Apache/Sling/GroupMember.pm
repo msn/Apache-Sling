@@ -1,13 +1,15 @@
 #!/usr/bin/perl -w
 
-package Apache::Sling::Group;
+package Apache::Sling::GroupMember;
 
 use 5.008001;
 use strict;
 use warnings;
 use Carp;
+use Getopt::Long qw(:config bundling);
 use JSON;
 use Text::CSV;
+use Apache::Sling;
 use Apache::Sling::GroupUtil;
 use Apache::Sling::GroupMemberUtil;
 use Apache::Sling::Print;
@@ -17,7 +19,7 @@ require Exporter;
 
 use base qw(Exporter);
 
-our @EXPORT_OK = ();
+our @EXPORT_OK = qw(command_line);
 
 our $VERSION = '0.23';
 
@@ -145,6 +147,29 @@ sub add_from_file {
 
 #}}}
 
+#{{{ sub command_line
+sub command_line {
+    my @ARGV = @_;
+
+    #options parsing
+    my $sling  = Apache::Sling->new;
+    my $config = config($sling);
+
+    GetOptions(
+    $config,      'auth=s',     'help|?',      'log|L=s',
+    'man|M',      'pass|p=s',   'threads|t=s', 'url|U=s',
+    'user|u=s',   'verbose|v+', 'add|a=s',     'additions|A=s',
+    'delete|d=s', 'exists|e=s', 'group|g=s',   'view|V'
+    ) or help();
+
+    if ( $sling->{'Help'} ) { help(); }
+    if ( $sling->{'Man'} )  { man(); }
+
+    return run( $sling, $config );
+}
+
+#}}}
+
 #{{{sub config
 
 sub config {
@@ -232,6 +257,77 @@ sub exists {
     }
     $group->set_results( "$message", $res );
     return $success;
+}
+
+#}}}
+
+#{{{ sub help
+sub help {
+
+    print <<"EOF";
+Usage: perl $0 [-OPTIONS [-MORE_OPTIONS]] [--] [PROGRAM_ARG1 ...]
+The following options are accepted:
+
+ --additions or -A (file)       - file containing list of members to be added to groups.
+ --add or -a (member)           - add specified member.
+ --auth (type)                  - Specify auth type. If ommitted, default is used.
+ --delete or -d (member)        - delete specified group member.
+ --exists or -e (member)        - check whether specified member exists in group.
+ --group or -g (actOnGroup)     - group to perform membership actions on.
+ --help or -?                   - view the script synopsis and options.
+ --log or -L (log)              - Log script output to specified log file.
+ --man or -M                    - view the full script documentation.
+ --pass or -p (password)        - Password of user performing actions.
+ --threads or -t (threads)      - Used with -A, defines number of parallel
+                                  processes to have running through file.
+ --url or -U (URL)              - URL for system being tested against.
+ --user or -u (username)        - Name of user to perform any actions as.
+ --verbose or -v or -vv or -vvv - Increase verbosity of output.
+ --view or -V                   - view members of specified group.
+
+Options may be merged together. -- stops processing of options.
+Space is not required between options and their arguments.
+For full details run: perl $0 --man
+EOF
+
+    return 1;
+}
+
+#}}}
+
+#{{{ sub man
+sub man {
+
+    print <<'EOF';
+group membership perl script. Provides a means of managing membership of groups
+in sling from the command line.
+
+EOF
+
+    help();
+
+    print <<"EOF";
+Example Usage
+
+* Authenticate and add a member testuser to the group with id g-test:
+
+ perl $0 -U http://localhost:8080 -g g-test -u admin -p admin -a testuser
+
+* Authenticate and view members of group with id g-test:
+
+ perl $0 -U http://localhost:8080 -g g-test -u admin -p admin -V
+
+* Authenticate and check whether testuser is a member of group with id g-test:
+
+ perl $0 -U http://localhost:8080 -g g-test -u admin -p admin -e testuser 
+
+* Authenticate and remove testuser from being a member of group with id g-test with very verbose output:
+
+ perl $0 -U http://localhost:8080 -g g-test -u admin -p admin -d testuser -vv
+
+EOF
+
+    return 1;
 }
 
 #}}}
