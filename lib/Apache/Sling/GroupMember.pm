@@ -204,27 +204,8 @@ sub config {
 
 #}}}
 
-#{{{sub delete
-sub delete {
-    my ( $group, $act_on_group, $delete_member ) = @_;
-    my $res = Apache::Sling::Request::request(
-        \$group,
-        Apache::Sling::GroupMemberUtil::delete_setup(
-            $group->{'BaseURL'}, $act_on_group, $delete_member
-        )
-    );
-    my $success = Apache::Sling::GroupMemberUtil::delete_eval($res);
-    my $message = "\"$delete_member\" ";
-    $message .= ( $success ? 'deleted' : 'was not deleted' );
-    $message .= " from group \"$act_on_group\"!";
-    $group->set_results( "$message", $res );
-    return $success;
-}
-
-#}}}
-
-#{{{sub exists
-sub exists {
+#{{{sub check_exists
+sub check_exists {
     my ( $group, $act_on_group, $exists_member ) = @_;
     my $res = Apache::Sling::Request::request(
         \$group,
@@ -255,6 +236,25 @@ sub exists {
     else {
         $message = "Problem viewing group: \"$act_on_group\"";
     }
+    $group->set_results( "$message", $res );
+    return $success;
+}
+
+#}}}
+
+#{{{sub delete
+sub delete {
+    my ( $group, $act_on_group, $delete_member ) = @_;
+    my $res = Apache::Sling::Request::request(
+        \$group,
+        Apache::Sling::GroupMemberUtil::delete_setup(
+            $group->{'BaseURL'}, $act_on_group, $delete_member
+        )
+    );
+    my $success = Apache::Sling::GroupMemberUtil::delete_eval($res);
+    my $message = "\"$delete_member\" ";
+    $message .= ( $success ? 'deleted' : 'was not deleted' );
+    $message .= " from group \"$act_on_group\"!";
     $group->set_results( "$message", $res );
     return $success;
 }
@@ -357,10 +357,10 @@ sub run {
                     # ensure cookie stores are separate, then log the user in:
                 $authn->{'LWP'} = $authn->user_agent($sling->{'Referer'});
                 $authn->login_user();
-                my $group =
-                  new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
+                my $group_member =
+                  new Apache::Sling::GroupMember( \$authn, $sling->{'Verbose'},
                     $sling->{'Log'} );
-                $group->member_add_from_file( ${ $config->{'additions'} },
+                $group_member->add_from_file( ${ $config->{'additions'} },
                     $i, $sling->{'Threads'} );
                 exit 0;
             }
@@ -372,25 +372,25 @@ sub run {
     }
     else {
         $authn->login_user();
-        my $group =
-          new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
+        my $group_member =
+          new Apache::Sling::GroupMember( \$authn, $sling->{'Verbose'},
             $sling->{'Log'} );
         if ( defined ${ $config->{'exists'} } ) {
-            $group->member_exists( ${ $config->{'group'} },
+            $group_member->check_exists( ${ $config->{'group'} },
                 ${ $config->{'exists'} } );
         }
         elsif ( defined ${ $config->{'add'} } ) {
-            $group->member_add( ${ $config->{'group'} },
+            $group_member->add( ${ $config->{'group'} },
                 ${ $config->{'add'} } );
         }
         elsif ( defined ${ $config->{'delete'} } ) {
-            $group->member_delete( ${ $config->{'group'} },
+            $group_member->delete( ${ $config->{'group'} },
                 ${ $config->{'delete'} } );
         }
         elsif ( defined ${ $config->{'view'} } ) {
-            $group->member_view( ${ $config->{'group'} } );
+            $group_member->view( ${ $config->{'group'} } );
         }
-        Apache::Sling::Print::print_result($group);
+        Apache::Sling::Print::print_result($group_member);
     }
     return 1;
 }

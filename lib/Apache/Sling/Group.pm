@@ -6,8 +6,10 @@ use 5.008001;
 use strict;
 use warnings;
 use Carp;
+use Getopt::Long qw(:config bundling);
 use JSON;
 use Text::CSV;
+use Apache::Sling;
 use Apache::Sling::GroupUtil;
 use Apache::Sling::Print;
 use Apache::Sling::Request;
@@ -16,7 +18,7 @@ require Exporter;
 
 use base qw(Exporter);
 
-our @EXPORT_OK = ();
+our @EXPORT_OK = qw(command_line);
 
 our $VERSION = '0.23';
 
@@ -159,6 +161,29 @@ sub check_exists {
 
 #}}}
 
+#{{{ sub command_line
+sub command_line {
+    my @ARGV = @_;
+
+    #options parsing
+    my $sling  = Apache::Sling->new;
+    my $config = config($sling);
+
+    GetOptions(
+    $config,      'auth=s',     'help|?',       'log|L=s',
+    'man|M',      'pass|p=s',   'threads|t=s',  'url|U=s',
+    'user|u=s',   'verbose|v+', 'add|a=s',      'additions|A=s',
+    'delete|d=s', 'exists|e=s', 'property|P=s', 'view|V=s'
+    ) or help();
+
+    if ( $sling->{'Help'} ) { help(); }
+    if ( $sling->{'Man'} )  { man(); }
+
+    return run( $sling, $config );
+}
+
+#}}}
+
 #{{{sub config
 
 sub config {
@@ -207,6 +232,82 @@ sub del {
     $message .= ( $success ? 'deleted!' : 'was not deleted!' );
     $group->set_results( "$message", $res );
     return $success;
+}
+
+#}}}
+
+#{{{ sub help
+sub help {
+
+    print <<"EOF";
+Usage: perl $0 [-OPTIONS [-MORE_OPTIONS]] [--] [PROGRAM_ARG1 ...]
+The following options are accepted:
+
+ --additions or -A (file)          - file containing list of groups to be added.
+ --add or -a (actOnGroup)          - add specified group.
+ --auth (type)                     - Specify auth type. If ommitted, default is used.
+ --delete or -d (actOnGroup)       - delete specified group.
+ --exists or -e (actOnGroup)       - check whether specified group exists.
+ --help or -?                      - view the script synopsis and options.
+ --log or -L (log)                 - Log script output to specified log file.
+ --man or -M                       - view the full script documentation.
+ --pass or -p (password)           - Password of user performing actions.
+ --property or -P (property=value) - Specify property to set on group.
+ --threads or -t (threads)         - Used with -A, defines number of parallel
+                                     processes to have running through file.
+ --url or -U (URL)                 - URL for system being tested against.
+ --user or -u (username)           - Name of user to perform any actions as.
+ --verbose or -v or -vv or -vvv    - Increase verbosity of output.
+ --view or -V (actOnGroup)         - view details for specified group in json format.
+
+Options may be merged together. -- stops processing of options.
+Space is not required between options and their arguments.
+For full details run: perl $0 --man
+EOF
+
+    return 1;
+}
+
+#}}}
+
+#{{{ sub man
+sub man {
+
+    print <<'EOF';
+group perl script. Provides a means of managing groups in sling from the
+command line. The script also acts as a reference implementation for the Group
+perl library.
+
+EOF
+
+    help();
+
+    print <<"EOF";
+Example Usage
+
+* Authenticate and add a group with id g-test:
+
+ perl group.pl -U http://localhost:8080 -u admin -p admin -a g-test
+
+* Authenticate and check whether group with id g-test exists:
+
+ perl group.pl -U http://localhost:8080 -u admin -p admin -a g-test
+
+* Authenticate and view details for group with id g-test:
+
+ perl group.pl -U http://localhost:8080 -u admin -p admin -V g-test
+
+* Authenticate and delete group with id g-test:
+
+ perl group.pl -U http://localhost:8080 -u admin -p admin -d g-test
+
+* Authenticate and add a group with id g-test and property p1=v1:
+
+ perl group.pl -U http://localhost:8080 -u admin -p admin -a g-test -P p1=v1
+
+EOF
+
+    return 1;
 }
 
 #}}}
