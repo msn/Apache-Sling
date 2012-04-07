@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 27;
+use Test::More tests => 30;
 use Test::Exception;
 
 BEGIN { use_ok( 'Apache::Sling' ); }
@@ -45,3 +45,8 @@ throws_ok { $group->add_from_file('/tmp/__non__--__tnetsixe__') } qr{Problem ope
 throws_ok { $group->member_add_from_file() } qr/File to upload from not defined/, 'Check member_add_from_file function croaks without file';
 throws_ok { $group->member_add_from_file(\$file) } qr/First CSV column must be the group ID, column heading must be "group". Found: ""./, 'Check member_add_from_file function croaks with blank file';
 throws_ok { $group->member_add_from_file('/tmp/__non__--__tnetsixe__') } qr{Problem opening file: '/tmp/__non__--__tnetsixe__'}, 'Check member_add_from_file function croaks with non-existent file specified';
+
+
+ok( my $group_config = Apache::Sling::Group::config($sling), 'check config function' );
+ok( Apache::Sling::Group::run($sling,$group_config), 'check run function' );
+throws_ok { Apache::Sling::Group::run() } qr/No group config supplied!/, 'check run function croaks with no config supplied';

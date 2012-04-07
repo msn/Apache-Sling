@@ -5,6 +5,8 @@ lib/Apache/Sling/Authz.pm
 lib/Apache/Sling/AuthzUtil.pm
 lib/Apache/Sling/Content.pm
 lib/Apache/Sling/ContentUtil.pm
+lib/Apache/Sling/GroupMember.pm
+lib/Apache/Sling/GroupMemberUtil.pm
 lib/Apache/Sling/Group.pm
 lib/Apache/Sling/GroupUtil.pm
 lib/Apache/Sling/JsonQueryServlet.pm

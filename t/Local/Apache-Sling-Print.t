@@ -3,10 +3,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 13;
+use Test::More tests => 14;
 use Test::Exception;
 use File::Temp;
 BEGIN { use_ok( 'Apache::Sling' ); }
+BEGIN { use_ok( 'Apache::Sling::Content' ); }
 BEGIN { use_ok( 'Apache::Sling::Print' ); }
 
 ok( Apache::Sling::Print::print_lock('Check print_lock function'), 'Check print_lock function' );

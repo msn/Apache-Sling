@@ -7,6 +7,8 @@ use strict;
 use warnings;
 use Carp;
 use Text::CSV;
+use Getopt::Long qw(:config bundling);
+use Apache::Sling;
 use Apache::Sling::Print;
 use Apache::Sling::Request;
 use Apache::Sling::UserUtil;
@@ -15,7 +17,7 @@ require Exporter;
 
 use base qw(Exporter);
 
-our @EXPORT_OK = ();
+our @EXPORT_OK = qw(command_line);
 
 our $VERSION = '0.23';
 
@@ -183,6 +185,37 @@ sub check_exists {
 
 #}}}
 
+#{{{ sub command_line
+sub command_line {
+    my @ARGV = @_;
+
+    #options parsing
+    my $sling  = Apache::Sling->new;
+    my $config = config($sling);
+
+    GetOptions(
+    $config,               'auth=s',
+    'help|?',              'log|L=s',
+    'man|M',               'pass|p=s',
+    'threads|t=s',         'url|U=s',
+    'user|u=s',            'verbose|v+',
+    'add|a=s',             'additions|A=s',
+    'change-password|c=s', 'delete|d=s',
+    'email|E=s',           'first-name|f=s',
+    'exists|e=s',          'last-name|l=s',
+    'new-password|n=s',    'password|w=s',
+    'property|P=s',        'update=s',
+    'view|V=s'
+    ) or help();
+
+    if ( $sling->{'Help'} ) { help(); }
+    if ( $sling->{'Man'} )  { man(); }
+
+    return run( $sling, $config );
+}
+
+#}}}
+
 #{{{sub config
 
 sub config {
@@ -245,6 +278,89 @@ sub del {
     $message .= ( $success ? 'deleted!' : 'was not deleted!' );
     $user->set_results( "$message", $res );
     return $success;
+}
+
+#}}}
+
+#{{{ sub help
+sub help {
+
+    print <<"EOF";
+Usage: perl $0 [-OPTIONS [-MORE_OPTIONS]] [--] [PROGRAM_ARG1 ...]
+The following options are accepted:
+
+ --add or -a (actOnUser)             - add specified user name.
+ --additions or -A (file)            - file containing list of users to be added.
+ --auth (type)                       - Specify auth type. If ommitted, default is used.
+ --change-password or -c (actOnUser) - change password of specified user name.
+ --delete or -d (actOnUser)          - delete specified user name.
+ --email or -E (email)               - specify email address property for user.
+ --exists or -e (actOnUser)          - check whether specified user exists.
+ --first-name or -f (firstName)      - specify first name property for user.
+ --help or -?                        - view the script synopsis and options.
+ --last-name or -l (lastName)        - specify last name property for user.
+ --log or -L (log)                   - Log script output to specified log file.
+ --man or -M                         - view the full script documentation.
+ --me or -m                          - me returns json representing authenticated user.
+ --new-password or -n (newPassword)  - Used with -c, new password to set.
+ --password or -w (actOnPass)        - Password of user being actioned.
+ --pass or -p (password)             - Password of user performing actions.
+ --property or -P (property=value)   - Specify property to set on user.
+ --threads or -t (threads)           - Used with -A, defines number of parallel
+                                       processes to have running through file.
+ --update (actOnUser)                - update specified user name, used with -P.
+ --url or -U (URL)                   - URL for system being tested against.
+ --user or -u (username)             - Name of user to perform any actions as.
+ --verbose or -v or -vv or -vvv      - Increase verbosity of output.
+ --view or -V (actOnUser)            - view details for specified user in json format.
+
+Options may be merged together. -- stops processing of options.
+Space is not required between options and their arguments.
+For full details run: perl $0 --man
+EOF
+
+    return 1;
+}
+
+#}}}
+
+#{{{ sub man
+sub man {
+
+    print <<'EOF';
+user perl script. Provides a means of managing users in sling from the command
+line. The script also acts as a reference implementation for the User perl
+library.
+
+EOF
+
+    help();
+
+    print <<"EOF";
+Example Usage
+
+* Add user "testuser" with password "test"
+
+ perl $0 -U http://localhost:8080 -a testuser -w test
+
+* View information about authenticated user "testuser"
+
+ perl $0 -U http://localhost:8080 --me -u testuser -p test
+
+* Authenticate as admin and check whether user "testuser" exists
+
+ perl $0 -U http://localhost:8080 -e testuser -u admin -p admin
+
+* Authenticate and update "testuser" to set property p1=v1
+
+ perl $0 -U http://localhost:8080 --update testuser -P "p1=v1" -u admin -p admin
+
+* Authenticate and delete "testuser"
+
+ perl $0 -U http://localhost:8080 -d testuser -u admin -p admin
+EOF
+
+    return 1;
 }
 
 #}}}
