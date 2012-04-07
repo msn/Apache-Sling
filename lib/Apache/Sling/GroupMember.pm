@@ -9,6 +9,7 @@ use Carp;
 use JSON;
 use Text::CSV;
 use Apache::Sling::GroupUtil;
+use Apache::Sling::GroupMemberUtil;
 use Apache::Sling::Print;
 use Apache::Sling::Request;
 
@@ -53,16 +54,17 @@ sub set_results {
 
 #{{{sub add
 sub add {
-    my ( $group, $act_on_group, $properties ) = @_;
+    my ( $group, $act_on_group, $add_member ) = @_;
     my $res = Apache::Sling::Request::request(
         \$group,
-        Apache::Sling::GroupUtil::add_setup(
-            $group->{'BaseURL'}, $act_on_group, $properties
+        Apache::Sling::GroupMemberUtil::add_setup(
+            $group->{'BaseURL'}, $act_on_group, $add_member
         )
     );
-    my $success = Apache::Sling::GroupUtil::add_eval($res);
-    my $message = "Group: \"$act_on_group\" ";
-    $message .= ( $success ? 'added!' : 'was not added!' );
+    my $success = Apache::Sling::GroupMemberUtil::add_eval($res);
+    my $message = "\"$add_member\" ";
+    $message .= ( $success ? 'added' : 'was not added' );
+    $message .= " to group \"$act_on_group\"!";
     $group->set_results( "$message", $res );
     return $success;
 }
@@ -96,6 +98,14 @@ sub add_from_file {
                           . 'Found: "'
                           . $column_headings[0] . "\".\n";
                     }
+
+                    # Second field must be user:
+                    if ( $column_headings[1] !~ /^[Uu][Ss][Ee][Rr]$/msx ) {
+                        croak 'Second CSV column must be the user ID, '
+                          . 'column heading must be "user". '
+                          . 'Found: "'
+                          . $column_headings[1] . "\".\n";
+                    }
                     $number_of_columns = @column_headings;
                 }
                 else {
@@ -104,7 +114,6 @@ sub add_from_file {
                 }
             }
             elsif ( $fork_id == ( $count++ % $number_of_forks ) ) {
-                my @properties;
                 if ( $csv->parse($_) ) {
                     my @columns      = $csv->fields();
                     my $columns_size = @columns;
@@ -115,14 +124,9 @@ sub add_from_file {
 "Found \"$columns_size\" columns. There should have been \"$number_of_columns\".\n"
                           . "Row contents was: $_";
                     }
-                    my $id = $columns[0];
-                    for ( my $i = 1 ; $i < $number_of_columns ; $i++ ) {
-                        my $heading = $column_headings[$i];
-                        my $data    = $columns[$i];
-                        my $value   = "$heading=$data";
-                        push @properties, $value;
-                    }
-                    $group->add( $id, \@properties );
+                    my $act_on_group = $columns[0];
+                    my $add_member   = $columns[1];
+                    $group->add( $act_on_group, $add_member );
                     Apache::Sling::Print::print_result($group);
                 }
                 else {
@@ -141,36 +145,57 @@ sub add_from_file {
 
 #}}}
 
-#{{{sub del
-sub del {
-    my ( $group, $act_on_group ) = @_;
+#{{{sub delete
+sub delete {
+    my ( $group, $act_on_group, $delete_member ) = @_;
     my $res = Apache::Sling::Request::request(
         \$group,
-        Apache::Sling::GroupUtil::delete_setup(
-            $group->{'BaseURL'}, $act_on_group
+        Apache::Sling::GroupMemberUtil::delete_setup(
+            $group->{'BaseURL'}, $act_on_group, $delete_member
         )
     );
-    my $success = Apache::Sling::GroupUtil::delete_eval($res);
-    my $message = "Group: \"$act_on_group\" ";
-    $message .= ( $success ? 'deleted!' : 'was not deleted!' );
+    my $success = Apache::Sling::GroupMemberUtil::delete_eval($res);
+    my $message = "\"$delete_member\" ";
+    $message .= ( $success ? 'deleted' : 'was not deleted' );
+    $message .= " from group \"$act_on_group\"!";
     $group->set_results( "$message", $res );
     return $success;
 }
 
 #}}}
 
-#{{{sub check_exists
-sub check_exists {
-    my ( $group, $act_on_group ) = @_;
+#{{{sub exists
+sub exists {
+    my ( $group, $act_on_group, $exists_member ) = @_;
     my $res = Apache::Sling::Request::request(
         \$group,
-        Apache::Sling::GroupUtil::exists_setup(
+        Apache::Sling::GroupUtil::view_setup(
             $group->{'BaseURL'}, $act_on_group
         )
     );
-    my $success = Apache::Sling::GroupUtil::exists_eval($res);
-    my $message = "Group \"$act_on_group\" ";
-    $message .= ( $success ? 'exists!' : 'does not exist!' );
+    my $success = Apache::Sling::GroupUtil::view_eval($res);
+    my $message;
+    if ($success) {
+        my $group_info = from_json( ${$res}->content );
+        my $is_member  = 0;
+        foreach my $member ( @{ $group_info->{'members'} } ) {
+            if (   $member eq "/system/userManager/user/$exists_member"
+                || $member eq "/system/userManager/group/$exists_member"
+                || $member eq "$exists_member" )
+            {
+                $is_member = 1;
+                last;
+            }
+        }
+        $success = $is_member;
+        $message =
+            "\"$exists_member\" is "
+          . ( $is_member ? q{} : 'not ' )
+          . "in group \"$act_on_group\"";
+    }
+    else {
+        $message = "Problem viewing group: \"$act_on_group\"";
+    }
     $group->set_results( "$message", $res );
     return $success;
 }
@@ -187,11 +212,22 @@ sub view {
         )
     );
     my $success = Apache::Sling::GroupUtil::view_eval($res);
-    my $message = (
-        $success
-        ? ${$res}->content
-        : "Problem viewing group: \"$act_on_group\""
-    );
+    my $message;
+    if ($success) {
+        my $group_info     = from_json( ${$res}->content );
+        my $number_members = @{ $group_info->{'members'} };
+        my $members = "$number_members result(s) for group \"$act_on_group\":";
+        foreach my $member ( @{ $group_info->{'members'} } ) {
+            $members .= "\n$member";
+        }
+        $message = "$members";
+        $success = $number_members;
+    }
+    else {
+
+        # HTTP request did not complete successfully!
+        $message = "Problem viewing group: \"$act_on_group\"";
+    }
     $group->set_results( "$message", $res );
     return $success;
 }
@@ -222,23 +258,23 @@ Set a suitable message and response for the group object.
 
 =head2 add
 
-Add a new group to the system.
+Add a member to a group.
 
 =head2 add_from_file
 
-Add new groups to the system based on definitions in a file.
+Add members to groups based on entries in a file.
 
-=head2 del
+=head2 delete
 
-Delete a user.
+Delete member from a group.
 
-=head2 check_exists
+=head2 exists
 
-Check whether a group exists.
+Check whether a member exists in a group.
 
 =head2 view
 
-View details for a group
+View members of a group.
 
 =head1 USAGE
 

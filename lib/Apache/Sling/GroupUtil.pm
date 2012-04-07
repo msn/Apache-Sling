@@ -94,62 +94,6 @@ sub exists_eval {
 
 #}}}
 
-#{{{sub member_add_setup
-
-sub member_add_setup {
-    my ( $base_url, $act_on_group, $add_member ) = @_;
-    if ( !defined $base_url ) { croak 'No base url defined to add against!'; }
-    if ( !defined $act_on_group ) {
-        croak 'No group name defined to add to!';
-    }
-    if ( !defined $add_member ) { croak 'Group addition detail missing!'; }
-    my $post_variables =
-      "\$post_variables = [':member','/system/userManager/user/$add_member']";
-    return
-"post $base_url/system/userManager/group/$act_on_group.update.html $post_variables";
-}
-
-#}}}
-
-#{{{sub member_add_eval
-
-sub member_add_eval {
-    my ($res) = @_;
-    return ( ${$res}->code eq '200' );
-}
-
-#}}}
-
-#{{{sub member_delete_setup
-
-sub member_delete_setup {
-    my ( $base_url, $act_on_group, $delete_member ) = @_;
-    if ( !defined $base_url ) {
-        croak 'No base url defined to delete against!';
-    }
-    if ( !defined $act_on_group ) {
-        croak 'No group name defined to delete from!';
-    }
-    if ( !defined $delete_member ) {
-        croak 'Group deletion detail missing!';
-    }
-    my $post_variables =
-"\$post_variables = [':member\@Delete','/system/userManager/user/$delete_member']";
-    return
-"post $base_url/system/userManager/group/$act_on_group.update.html $post_variables";
-}
-
-#}}}
-
-#{{{sub member_delete_eval
-
-sub member_delete_eval {
-    my ($res) = @_;
-    return ( ${$res}->code eq '200' && ${$res}->content ne q{} );
-}
-
-#}}}
-
 #{{{sub view_setup
 
 sub view_setup {
@@ -213,24 +157,6 @@ group exists in the system.
 Inspects the result returned from issuing the request generated in exists_setup
 returning true if the result indicates the group does exist in the system, else
 false.
-
-=head2 member_add_setup
-
-Returns a textual representation of the request needed to add add a member to a
-group in the system.
-
-=head2 member_add_eval
-
-Check result of adding a member to a group in the system.
-
-=head2 member_delete_setup
-
-Returns a textual representation of the request needed to delete a member from
-a group in the system.
-
-=head2 member_delete_eval
-
-Check result of deleting a member from a group in the system.
 
 =head2 view_setup
 
