@@ -6,6 +6,8 @@ use 5.008001;
 use strict;
 use warnings;
 use Carp;
+use Getopt::Long qw(:config bundling);
+use Apache::Sling;
 use Apache::Sling::ContentUtil;
 use Apache::Sling::Print;
 use Apache::Sling::Request;
@@ -14,7 +16,7 @@ require Exporter;
 
 use base qw(Exporter);
 
-our @EXPORT_OK = ();
+our @EXPORT_OK = qw(command_line);
 
 our $VERSION = '0.23';
 
@@ -62,6 +64,37 @@ sub add {
     $message .= ( $success ? 'succeeded!' : 'failed!' );
     $content->set_results( "$message", $res );
     return $success;
+}
+
+#}}}
+
+#{{{ sub command_line
+sub command_line {
+    my @ARGV = @_;
+
+    #options parsing
+    my $sling  = Apache::Sling->new;
+    my $config = config($sling);
+
+    GetOptions(
+    $config,             'auth=s',
+    'help|?',            'log|L=s',
+    'man|M',             'pass|p=s',
+    'threads|t=s',       'url|U=s',
+    'user|u=s',          'verbose|v+',
+    'add|a',             'additions|A=s',
+    'copy|c',            'delete|d',
+    'exists|e',          'filename|n=s',
+    'local|l=s',         'move|m',
+    'property|P=s',      'remote|r=s',
+    'remote-source|S=s', 'replace|R',
+    'view|V'
+    ) or help();
+
+    if ( $sling->{'Help'} ) { help(); }
+    if ( $sling->{'Man'} )  { man(); }
+
+    return run( $sling, $config );
 }
 
 #}}}
@@ -132,6 +165,24 @@ sub copy {
 
 #}}}
 
+#{{{sub check_exists
+sub check_exists {
+    my ( $content, $remote_dest ) = @_;
+    my $res = Apache::Sling::Request::request(
+        \$content,
+        Apache::Sling::ContentUtil::exists_setup(
+            $content->{'BaseURL'}, $remote_dest
+        )
+    );
+    my $success = Apache::Sling::ContentUtil::exists_eval($res);
+    my $message = "Content \"$remote_dest\" ";
+    $message .= ( $success ? 'exists!' : 'does not exist!' );
+    $content->set_results( "$message", $res );
+    return $success;
+}
+
+#}}}
+
 #{{{sub del
 sub del {
     my ( $content, $remote_dest ) = @_;
@@ -150,20 +201,95 @@ sub del {
 
 #}}}
 
-#{{{sub check_exists
-sub check_exists {
-    my ( $content, $remote_dest ) = @_;
-    my $res = Apache::Sling::Request::request(
-        \$content,
-        Apache::Sling::ContentUtil::exists_setup(
-            $content->{'BaseURL'}, $remote_dest
-        )
-    );
-    my $success = Apache::Sling::ContentUtil::exists_eval($res);
-    my $message = "Content \"$remote_dest\" ";
-    $message .= ( $success ? 'exists!' : 'does not exist!' );
-    $content->set_results( "$message", $res );
-    return $success;
+#{{{ sub help
+sub help {
+
+    print <<"EOF";
+Usage: perl $0 [-OPTIONS [-MORE_OPTIONS]] [--] [PROGRAM_ARG1 ...]
+The following options are accepted:
+
+ --additions or -A (file)          - File containing list of content to be uploaded.
+ --add or -a                       - Add content.
+ --auth (type)                     - Specify auth type. If ommitted, default is used.
+ --copy or -c                      - Copy content.
+ --delete or -d                    - Delete content.
+ --filename or -n (filename)       - Specify file name to use for content upload.
+ --help or -?                      - view the script synopsis and options.
+ --local or -l (localPath)         - Local path to content to upload.
+ --log or -L (log)                 - Log script output to specified log file.
+ --man or -M                       - view the full script documentation.
+ --move or -m                      - Move content.
+ --pass or -p (password)           - Password of user performing content manipulations.
+ --property or -P (property)       - Specify property to set on node.
+ --remote or -r (remoteNode)       - specify remote destination under JCR root to act on.
+ --remote-source or -S (remoteSrc) - specify remote source node under JCR root to act on.
+ --replace or -R                   - when copying or moving, overwrite remote destination if it exists.
+ --threads or -t (threads)         - Used with -A, defines number of parallel
+                                     processes to have running through file.
+ --url or -U (URL)                 - URL for system being tested against.
+ --user or -u (username)           - Name of user to perform content manipulations as.
+ --verbose or -v or -vv or -vvv    - Increase verbosity of output.
+ --view or -V (actOnGroup)         - view details for specified group in json format.
+
+Options may be merged together. -- stops processing of options.
+Space is not required between options and their arguments.
+For full details run: perl $0 --man
+EOF
+
+    return 1;
+}
+
+#}}}
+
+#{{{ sub man
+sub man {
+
+    print <<'EOF';
+content perl script. Provides a means of uploading content into sling from the
+command line. The script also acts as a reference implementation for the
+Content perl library.
+
+EOF
+
+    help();
+
+    print <<"EOF";
+Example Usage
+
+* Authenticate and add a node at /test:
+
+ perl $0 -U http://localhost:8080 -a -r /test -u admin -p admin
+
+* Authenticate and add a node at /test with property p1 set to v1:
+
+ perl $0 -U http://localhost:8080 -a -r /test -P p1=v1 -u admin -p admin
+
+* Authenticate and add a node at /test with property p1 set to v1, and p2 set to v2:
+
+ perl $0 -U http://localhost:8080 -a -r /test -P p1=v1 -P p2=v2 -u admin -p admin
+
+* View json for node at /test:
+
+ perl $0 -U http://localhost:8080 -V -r /test
+
+* Check whether node at /test exists:
+
+ perl $0 -U http://localhost:8080 -V -r /test
+
+* Authenticate and copy content at /test to /test2
+
+ perl $0 -U http://localhost:8080 -c -S /test -r /test2 -u admin -p admin
+
+* Authenticate and move content at /test to /test2, replacing test2 if it already exists
+
+ perl $0 -U http://localhost:8080 -m -S /test -r /test2 -R -u admin -p admin
+
+* Authenticate and delete content at /test
+
+ perl $0 -U http://localhost:8080 -d -r /test -u admin -p admin
+EOF
+
+    return 1;
 }
 
 #}}}
@@ -200,7 +326,7 @@ sub run {
     my $authn =
       defined $sling->{'Authn'}
       ? ${ $sling->{'Authn'} }
-      : new Apache::Sling::Authn( \$sling );
+      : Apache::Sling::Authn->new( \$sling );
 
     if ( defined ${ $config->{'additions'} } ) {
         my $message =
@@ -216,7 +342,7 @@ sub run {
                 $authn->{'LWP'} = $authn->user_agent($sling->{'Referer'});
                 $authn->login_user();
                 my $content =
-                  new Apache::Sling::Content( \$authn, $sling->{'Verbose'},
+                  Apache::Sling::Content->new( \$authn, $sling->{'Verbose'},
                     $sling->{'Log'} );
                 $content->upload_from_file( ${ $config->{'additions'} },
                     $i, $sling->{'Threads'} );
@@ -231,7 +357,7 @@ sub run {
     else {
         $authn->login_user();
         my $content =
-          new Apache::Sling::Content( \$authn, $sling->{'Verbose'},
+          Apache::Sling::Content->new( \$authn, $sling->{'Verbose'},
             $sling->{'Log'} );
         if (   defined ${ $config->{'local'} }
             && defined ${ $config->{'remote'} } )

@@ -91,12 +91,12 @@ sub command_line {
         'removeChilds!',    'removeNode!',
         'retentionManage!', 'versionManage!',
         'view|V',           'write!'
-    ) or pod2usage(2);
+    ) or help();
 
     if ( $sling->{'Help'} ) { help(); }
     if ( $sling->{'Man'} )  { man(); }
 
-    run($sling, $config);
+    return run( $sling, $config );
 }
 
 #}}}
@@ -221,56 +221,37 @@ sub get_acl {
 #{{{ sub help
 sub help {
 
-    print
-"Usage: perl $0 [-OPTIONS [-MORE_OPTIONS]] [--] [PROGRAM_ARG1 ...]\n";
-    print "The following options are accepted:\n\n";
+    print <<"EOF";
+Usage: perl $0 [-OPTIONS [-MORE_OPTIONS]] [--] [PROGRAM_ARG1 ...]
+The following options are accepted:
 
-    print
-" --auth (type)                  - Specify auth type. If ommitted, default is used.\n";
-    print
-" --delete or -d                 - delete access control list for node for principal.\n";
-    print
-" --help or -?                   - view the script synopsis and options.\n";
-    print
-" --log or -L (log)              - Log script output to specified log file.\n";
-    print
-      " --man or -M                    - view the full script documentation.\n";
-    print
-" --(no-)addChildNodes           - Grant or deny the addChildNodes privilege\n";
-    print
-      " --(no-)all                     - Grant or deny all above privileges\n";
-    print
-" --(no-)modifyACL               - Grant or deny the modifyACL privilege\n";
-    print
-" --(no-)modifyProps             - Grant or deny the modifyProperties privilege\n";
-    print
-      " --(no-)readACL                 - Grant or deny the readACL privilege\n";
-    print
-      " --(no-)read                    - Grant or deny the read privilege\n";
-    print
-" --(no-)removeChilds            - Grant or deny the removeChildNodes privilege\n";
-    print
-" --(no-)removeNode              - Grant or deny the removeNode privilege\n";
-    print
-      " --(no-)write                   - Grant or deny the write privileges:\n";
-    print
-"                                  modifyProperties,addChildNodes,removeNode,removeChildNodes\n";
-    print
-" --pass or -p (password)        - Password of user performing content manipulations.\n";
-    print
-" --principal or -P (principal)  - Principal to grant, deny, or delete privilege for.\n";
-    print
-" --remote or -r (remoteNode)    - specify remote node under JCR root to act on.\n";
-    print
-" --url or -U (URL)              - URL for system being tested against.\n";
-    print
-" --user or -u (username)        - Name of user to perform content manipulations as.\n";
-    print " --verbose or -v or -vv or -vvv - Increase verbosity of output.\n";
-    print
-" --view or -V                   - view access control list for node.\n\n";
-    print "Options may be merged together. -- stops processing of options.\n";
-    print "Space is not required between options and their arguments.\n";
-    print "For full details run: perl $0 --man\n";
+ --auth (type)                  - Specify auth type. If ommitted, default is used.
+ --delete or -d                 - delete access control list for node for principal.
+ --help or -?                   - view the script synopsis and options.
+ --log or -L (log)              - Log script output to specified log file.
+ --man or -M                    - view the full script documentation.
+ --(no-)addChildNodes           - Grant or deny the addChildNodes privilege
+ --(no-)all                     - Grant or deny all above privileges
+ --(no-)modifyACL               - Grant or deny the modifyACL privilege
+ --(no-)modifyProps             - Grant or deny the modifyProperties privilege
+ --(no-)readACL                 - Grant or deny the readACL privilege
+ --(no-)read                    - Grant or deny the read privilege
+ --(no-)removeChilds            - Grant or deny the removeChildNodes privilege
+ --(no-)removeNode              - Grant or deny the removeNode privilege
+ --(no-)write                   - Grant or deny the write privileges:
+                                  modifyProperties,addChildNodes,removeNode,removeChildNodes
+ --pass or -p (password)        - Password of user performing content manipulations.
+ --principal or -P (principal)  - Principal to grant, deny, or delete privilege for.
+ --remote or -r (remoteNode)    - specify remote node under JCR root to act on.
+ --url or -U (URL)              - URL for system being tested against.
+ --user or -u (username)        - Name of user to perform content manipulations as.
+ --verbose or -v or -vv or -vvv - Increase verbosity of output.
+ --view or -V                   - view access control list for node.
+
+Options may be merged together. -- stops processing of options.
+Space is not required between options and their arguments.
+For full details run: perl $0 --man
+EOF
 
     return 1;
 }
@@ -280,59 +261,48 @@ sub help {
 #{{{ sub man
 sub man {
 
-    print
-"authz perl script. Provides a means of manipulating access control on content\n";
-    print
-"in sling from the command line. This script can be used to get, set, update and\n";
-    print
-"delete content permissions. It also acts as a reference implementation for the\n";
-    print "Authz perl library.\n\n";
+    print <<'EOF';
+authz perl script. Provides a means of manipulating access control on content
+in sling from the command line. This script can be used to get, set, update and
+delete content permissions. It also acts as a reference implementation for the
+Authz perl library.
+
+EOF
 
     help();
 
-    print "\n* Authenticate and view the ACL for the /data node:\n\n";
+    print <<"EOF";
+* Authenticate and view the ACL for the /data node:
 
-    print " perl $0 -U http://localhost:8080 -r /data -V -u admin -p admin\n\n";
+perl $0 -U http://localhost:8080 -r /data -V -u admin -p admin
 
-    print
-"* Authenticate and grant the read privilege to the owner principal, view the result:\n\n";
+* Authenticate and grant the read privilege to the owner principal, view the result:
 
-    print
-" perl $0 -U http://localhost:8080 -r /testdata -P owner --read -u admin -p admin -V\n\n";
+perl $0 -U http://localhost:8080 -r /testdata -P owner --read -u admin -p admin -V
 
-    print
-"* Authenticate and grant the modifyProps privilege to the everyone principal, * view the result:\n\n";
+* Authenticate and grant the modifyProps privilege to the everyone principal, * view the result:
 
-    print
-" perl $0 -U http://localhost:8080 -r /testdata -P everyone --modifyProps -u admin -p admin -V\n\n";
+perl $0 -U http://localhost:8080 -r /testdata -P everyone --modifyProps -u admin -p admin -V
 
-    print
-"* Authenticate and deny the addChildNodes privilege to the testuser principal, * view the result:\n\n";
+* Authenticate and deny the addChildNodes privilege to the testuser principal, * view the result:
 
-    print
-" perl $0 -U http://localhost:8080 -r /testdata -P testuser --no-addChildNodes -u admin -p admin -V\n\n";
+perl $0 -U http://localhost:8080 -r /testdata -P testuser --no-addChildNodes -u admin -p admin -V
 
-    print
-"* Authenticate with form based authentication and grant the read and write privileges to the g-testgroup principal, log the results, including the resulting JSON, to authz.log:\n\n";
+* Authenticate with form based authentication and grant the read and write privileges to the g-testgroup principal, log the results, including the resulting JSON, to authz.log:
 
-    print
-" perl $0 -U http://localhost:8080 -r /testdata -P g-testgroup --read --write -u admin -p admin --auth form -V -L authz.log\n\n";
+perl $0 -U http://localhost:8080 -r /testdata -P g-testgroup --read --write -u admin -p admin --auth form -V -L authz.log
 
-    print "JSR-283 privileges:\n\n";
+JSR-283 privileges:
 
-    print
-      "The following privileges are not yet supported, but may be soon:\n\n";
+The following privileges are not yet supported, but may be soon:
 
-    print
-      " --(no-)lockManage      - Grant or deny the lockManagement privilege\n";
-    print
-" --(no-)versionManage   - Grant or deny the versionManagement privilege\n";
-    print
-" --(no-)nodeTypeManage  - Grant or deny the nodeTypeManagement privilege\n";
-    print
-" --(no-)retentionManage - Grant or deny the retentionManagement privilege\n";
-    print
-" --(no-)lifecycleManage - Grant or deny the lifeCycleManagement privilege\n";
+ --(no-)lockManage      - Grant or deny the lockManagement privilege
+ --(no-)versionManage   - Grant or deny the versionManagement privilege
+ --(no-)nodeTypeManage  - Grant or deny the nodeTypeManagement privilege
+ --(no-)retentionManage - Grant or deny the retentionManagement privilege
+ --(no-)lifecycleManage - Grant or deny the lifeCycleManagement privilege
+EOF
+
     return 1;
 }
 
@@ -377,10 +347,10 @@ sub run {
     ${ $config->{'remote'} } =
       Apache::Sling::URL::strip_leading_slash( ${ $config->{'remote'} } );
 
-    my $authn = new Apache::Sling::Authn( \$sling );
+    my $authn = Apache::Sling::Authn->new( \$sling );
     $authn->login_user();
     my $authz =
-      new Apache::Sling::Authz( \$authn, $sling->{'Verbose'}, $sling->{'Log'} );
+      Apache::Sling::Authz->new( \$authn, $sling->{'Verbose'}, $sling->{'Log'} );
     if ( defined ${ $config->{'delete'} } ) {
         $authz->del( ${ $config->{'remote'} }, ${ $config->{'principal'} } );
         Apache::Sling::Print::print_result($authz);
