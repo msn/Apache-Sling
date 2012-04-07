@@ -6,6 +6,8 @@ use 5.008001;
 use strict;
 use warnings;
 use Carp;
+use Getopt::Long qw(:config bundling);
+use Apache::Sling;
 use Apache::Sling::Authn;
 use Apache::Sling::Content;
 use Apache::Sling::User;
@@ -18,7 +20,7 @@ require Exporter;
 
 use base qw(Exporter);
 
-our @EXPORT_OK = ();
+our @EXPORT_OK = qw(command_line);
 
 our $VERSION = '0.23';
 
@@ -508,6 +510,111 @@ sub synch_listed_since {
     croak q(Function not yet fully supported!);
 
     # return 1;
+}
+
+#}}}
+
+#{{{ sub command_line
+sub command_line {
+    my @ARGV = @_;
+
+    #options parsing
+    my $sling  = Apache::Sling->new;
+    my $config = config($sling);
+
+    GetOptions(
+    $config,                  'auth=s',
+    'help|?',                 'log|L=s',
+    'man|M',                  'pass|p=s',
+    'threads|t=s',            'url|U=s',
+    'user|u=s',               'verbose|v+',
+    'download-user-list|d=s', 'ldap-attributes|a=s',
+    'ldap-base|b=s',          'ldap-dn|d=s',
+    'ldap-filter|f=s',        'ldap-host|h=s',
+    'ldap-pass|P=s',          'attributes|A=s',
+    'synch-full|s',           'synch-full-since|S=s',
+    'synch-listed|l',         'synch-listed-since|L=s',
+    'upload-user-list|U=s'
+    ) or help();
+
+    if ( $sling->{'Help'} ) { help(); }
+    if ( $sling->{'Man'} )  { man(); }
+
+    return run( $sling, $config );
+}
+
+#}}}
+
+#{{{ sub help
+sub help {
+
+    print <<"EOF";
+Usage: perl $0 [-OPTIONS [-MORE_OPTIONS]] [--] [PROGRAM_ARG1 ...]
+The following options are accepted:
+
+ --attributes or -a (attribs)          - Comma separated list of attributes.
+ --auth (type)                         - Specify auth type. If ommitted, default is used.
+ --download-user-list or -d (userList) - Download user list to file userList
+ --flag-disabled or -f                 - property to denote user should be disabled.
+ --help or -?                          - View the script synopsis and options.
+ --ldap-attributes or -A (attribs)     - Specify ldap attributes to be updated.
+ --ldap-base or -B (ldapBase)          - Specify ldap base to synchronize users from.
+ --ldap-dn or -D (ldapDN)              - Specify ldap DN for authentication.
+ --ldap-filter or -F (filter)          - Specify ldap attribute to search for users with.
+ --ldap-host or -H (host)              - Specify ldap host to synchronize from.
+ --ldap-pass or -P (pass)              - Specify ldap pass for authentication.
+ --log or -L (log)                     - Log script output to specified log file.
+ --man or -M                           - View the full script documentation.
+ --pass or -p (password)               - Password of user performing actions.
+ --synch-full or -s                    - Perform a full synchronization from ldap to sling.
+ --synch-full-since or -S (since)      - Perform a full synchronization from ldap to sling using changes since specified time.
+ --synch-listed or -l                  - Perform a sychronization of listed users from ldap to sling.
+ --synch-listed-since or -L (since)    - Perform a sychronization of listed users from ldap to sling using changes since specified time.
+ --upload-user-list or -U (userList)   - Upload user list specified by file userList.
+ --url or -U (URL)                     - URL for system being tested against.
+ --user or -u (username)               - Name of user to perform any actions as.
+ --verbose or -v or -vv or -vvv        - Increase verbosity of output.
+
+Options may be merged together. -- stops processing of options.
+Space is not required between options and their arguments.
+For full details run: perl $0 --man
+EOF
+
+    return 1;
+}
+
+#}}}
+
+#{{{ sub man
+sub man {
+
+    print <<'EOF';
+LDAP synchronization perl script. Provides a means of synchronizing user
+information from an LDAP server into a running sling instance from the command
+line. The script also acts as a reference implementation for the LDAPSynch perl
+library.
+
+EOF
+
+    help();
+
+    print <<"EOF";
+Example Usage
+
+* Upload a restricted list of users (one id per line of specified file) to use in synchronizations:
+
+ perl $0 --upload-user-list user_list.txt --sling-host http://localhost:8080 --sling-user admin --sling-pass admin
+
+* Download a previously specified list of users to be synchronized to a specified file:
+
+ perl $0 --download-user-list user_list.txt --sling-host http://localhost:8080 --sling-user admin --sling-pass admin
+
+* Authenticate and perform a full synchronization:
+
+ perl $0 -s -h ldap://ldap.org -b "ou=people,o=ldap,dc=org" -H http://localhost:8080 -u admin -P admin -a "displayname,mail,sn" -A "name,email,surname"
+EOF
+
+    return 1;
 }
 
 #}}}
