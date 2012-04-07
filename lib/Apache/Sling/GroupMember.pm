@@ -145,6 +145,40 @@ sub add_from_file {
 
 #}}}
 
+#{{{sub config
+
+sub config {
+    my ($sling) = @_;
+    my $additions;
+    my $add;
+    my $delete;
+    my $exists;
+    my $group;
+    my $view;
+
+    my %group_member_config = (
+        'auth'      => \$sling->{'Auth'},
+        'help'      => \$sling->{'Help'},
+        'log'       => \$sling->{'Log'},
+        'man'       => \$sling->{'Man'},
+        'pass'      => \$sling->{'Pass'},
+        'threads'   => \$sling->{'Threads'},
+        'url'       => \$sling->{'URL'},
+        'user'      => \$sling->{'User'},
+        'verbose'   => \$sling->{'Verbose'},
+        'add'       => \$add,
+        'additions' => \$additions,
+        'delete'    => \$delete,
+        'exists'    => \$exists,
+        'group'     => \$group,
+        'view'      => \$view
+    );
+
+    return \%group_member_config;
+}
+
+#}}}
+
 #{{{sub delete
 sub delete {
     my ( $group, $act_on_group, $delete_member ) = @_;
@@ -198,6 +232,71 @@ sub exists {
     }
     $group->set_results( "$message", $res );
     return $success;
+}
+
+#}}}
+
+#{{{sub run
+sub run {
+    my ( $sling, $config ) = @_;
+    if ( !defined $config ) {
+        croak 'No group_member config supplied!';
+    }
+    $sling->check_forks;
+    my $authn =
+      defined $sling->{'Authn'}
+      ? ${ $sling->{'Authn'} }
+      : new Apache::Sling::Authn( \$sling );
+
+    if ( defined ${ $config->{'additions'} } ) {
+        my $message =
+          "Adding groups from file \"" . ${ $config->{'additions'} } . "\":\n";
+        Apache::Sling::Print::print_with_lock( "$message", $sling->{'Log'} );
+        my @childs = ();
+        for my $i ( 0 .. $sling->{'Threads'} ) {
+            my $pid = fork;
+            if ($pid) { push @childs, $pid; }    # parent
+            elsif ( $pid == 0 ) {                # child
+                    # Create a new separate user agent per fork in order to
+                    # ensure cookie stores are separate, then log the user in:
+                $authn->{'LWP'} = $authn->user_agent($sling->{'Referer'});
+                $authn->login_user();
+                my $group =
+                  new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
+                    $sling->{'Log'} );
+                $group->member_add_from_file( ${ $config->{'additions'} },
+                    $i, $sling->{'Threads'} );
+                exit 0;
+            }
+            else {
+                croak "Could not fork $i!";
+            }
+        }
+        foreach (@childs) { waitpid $_, 0; }
+    }
+    else {
+        $authn->login_user();
+        my $group =
+          new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
+            $sling->{'Log'} );
+        if ( defined ${ $config->{'exists'} } ) {
+            $group->member_exists( ${ $config->{'group'} },
+                ${ $config->{'exists'} } );
+        }
+        elsif ( defined ${ $config->{'add'} } ) {
+            $group->member_add( ${ $config->{'group'} },
+                ${ $config->{'add'} } );
+        }
+        elsif ( defined ${ $config->{'delete'} } ) {
+            $group->member_delete( ${ $config->{'group'} },
+                ${ $config->{'delete'} } );
+        }
+        elsif ( defined ${ $config->{'view'} } ) {
+            $group->member_view( ${ $config->{'group'} } );
+        }
+        Apache::Sling::Print::print_result($group);
+    }
+    return 1;
 }
 
 #}}}
@@ -264,6 +363,10 @@ Add a member to a group.
 
 Add members to groups based on entries in a file.
 
+=head2 config
+
+Fetch hash of group membership configuration.
+
 =head2 delete
 
 Delete member from a group.
@@ -271,6 +374,10 @@ Delete member from a group.
 =head2 exists
 
 Check whether a member exists in a group.
+
+=head2 run
+
+Run group membership related actions.
 
 =head2 view
 

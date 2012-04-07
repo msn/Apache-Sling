@@ -141,6 +141,58 @@ sub add_from_file {
 
 #}}}
 
+#{{{sub check_exists
+sub check_exists {
+    my ( $group, $act_on_group ) = @_;
+    my $res = Apache::Sling::Request::request(
+        \$group,
+        Apache::Sling::GroupUtil::exists_setup(
+            $group->{'BaseURL'}, $act_on_group
+        )
+    );
+    my $success = Apache::Sling::GroupUtil::exists_eval($res);
+    my $message = "Group \"$act_on_group\" ";
+    $message .= ( $success ? 'exists!' : 'does not exist!' );
+    $group->set_results( "$message", $res );
+    return $success;
+}
+
+#}}}
+
+#{{{sub config
+
+sub config {
+    my ($sling) = @_;
+    my $additions;
+    my $add;
+    my $delete;
+    my $exists;
+    my @property;
+    my $view;
+
+    my %group_config = (
+        'auth'      => \$sling->{'Auth'},
+        'help'      => \$sling->{'Help'},
+        'log'       => \$sling->{'Log'},
+        'man'       => \$sling->{'Man'},
+        'pass'      => \$sling->{'Pass'},
+        'threads'   => \$sling->{'Threads'},
+        'url'       => \$sling->{'URL'},
+        'user'      => \$sling->{'User'},
+        'verbose'   => \$sling->{'Verbose'},
+        'add'       => \$add,
+        'additions' => \$additions,
+        'delete'    => \$delete,
+        'exists'    => \$exists,
+        'property'  => \@property,
+        'view'      => \$view
+    );
+
+    return \%group_config;
+}
+
+#}}}
+
 #{{{sub del
 sub del {
     my ( $group, $act_on_group ) = @_;
@@ -159,20 +211,64 @@ sub del {
 
 #}}}
 
-#{{{sub check_exists
-sub check_exists {
-    my ( $group, $act_on_group ) = @_;
-    my $res = Apache::Sling::Request::request(
-        \$group,
-        Apache::Sling::GroupUtil::exists_setup(
-            $group->{'BaseURL'}, $act_on_group
-        )
-    );
-    my $success = Apache::Sling::GroupUtil::exists_eval($res);
-    my $message = "Group \"$act_on_group\" ";
-    $message .= ( $success ? 'exists!' : 'does not exist!' );
-    $group->set_results( "$message", $res );
-    return $success;
+#{{{sub run
+sub run {
+    my ( $sling, $config ) = @_;
+    if ( !defined $config ) {
+        croak 'No group config supplied!';
+    }
+    $sling->check_forks;
+    my $authn =
+      defined $sling->{'Authn'}
+      ? ${ $sling->{'Authn'} }
+      : new Apache::Sling::Authn( \$sling );
+
+    if ( defined ${ $config->{'additions'} } ) {
+        my $message =
+          "Adding groups from file \"" . ${ $config->{'additions'} } . "\":\n";
+        Apache::Sling::Print::print_with_lock( "$message", $sling->{'Log'} );
+        my @childs = ();
+        for my $i ( 0 .. $sling->{'Threads'} ) {
+            my $pid = fork;
+            if ($pid) { push @childs, $pid; }    # parent
+            elsif ( $pid == 0 ) {                # child
+                    # Create a new separate user agent per fork in order to
+                    # ensure cookie stores are separate, then log the user in:
+                $authn->{'LWP'} = $authn->user_agent($sling->{'Referer'});
+                $authn->login_user();
+                my $group =
+                  new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
+                    $sling->{'Log'} );
+                $group->add_from_file( ${ $config->{'additions'} },
+                    $i, $sling->{'Threads'} );
+                exit 0;
+            }
+            else {
+                croak "Could not fork $i!";
+            }
+        }
+        foreach (@childs) { waitpid $_, 0; }
+    }
+    else {
+        $authn->login_user();
+        my $group =
+          new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
+            $sling->{'Log'} );
+        if ( defined ${ $config->{'exists'} } ) {
+            $group->check_exists( ${ $config->{'exists'} } );
+        }
+        elsif ( defined ${ $config->{'add'} } ) {
+            $group->add( ${ $config->{'add'} }, $config->{'property'} );
+        }
+        elsif ( defined ${ $config->{'delete'} } ) {
+            $group->del( ${ $config->{'delete'} } );
+        }
+        elsif ( defined ${ $config->{'view'} } ) {
+            $group->view( ${ $config->{'view'} } );
+        }
+        Apache::Sling::Print::print_result($group);
+    }
+    return 1;
 }
 
 #}}}
@@ -228,6 +324,10 @@ Add a new group to the system.
 
 Add new groups to the system based on definitions in a file.
 
+=head2 config
+
+Fetch hash of group configuration.
+
 =head2 del
 
 Delete a user.
@@ -235,6 +335,10 @@ Delete a user.
 =head2 check_exists
 
 Check whether a group exists.
+
+=head2 run
+
+Run group related actions.
 
 =head2 view
 

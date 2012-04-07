@@ -183,6 +183,54 @@ sub check_exists {
 
 #}}}
 
+#{{{sub config
+
+sub config {
+    my ($sling) = @_;
+    my $password;
+    my $additions;
+    my $add;
+    my $change_password;
+    my $delete;
+    my $email;
+    my $exists;
+    my $first_name;
+    my $last_name;
+    my $new_password;
+    my @property;
+    my $update;
+    my $view;
+
+    my %user_config = (
+        'auth'            => \$sling->{'Auth'},
+        'help'            => \$sling->{'Help'},
+        'log'             => \$sling->{'Log'},
+        'man'             => \$sling->{'Man'},
+        'pass'            => \$sling->{'Pass'},
+        'threads'         => \$sling->{'Threads'},
+        'url'             => \$sling->{'URL'},
+        'user'            => \$sling->{'User'},
+        'verbose'         => \$sling->{'Verbose'},
+        'add'             => \$add,
+        'additions'       => \$additions,
+        'change-password' => \$change_password,
+        'delete'          => \$delete,
+        'email'           => \$email,
+        'exists'          => \$exists,
+        'first-name'      => \$first_name,
+        'last-name'       => \$last_name,
+        'new-password'    => \$new_password,
+        'password'        => \$password,
+        'property'        => \@property,
+        'update'          => \$update,
+        'view'            => \$view
+    );
+
+    return \%user_config;
+}
+
+#}}}
+
 #{{{sub del
 sub del {
     my ( $user, $act_on_user ) = @_;
@@ -197,6 +245,96 @@ sub del {
     $message .= ( $success ? 'deleted!' : 'was not deleted!' );
     $user->set_results( "$message", $res );
     return $success;
+}
+
+#}}}
+
+#{{{sub run
+sub run {
+    my ( $sling, $config ) = @_;
+    if ( !defined $config ) {
+        croak 'No user config supplied!';
+    }
+    $sling->check_forks;
+    my $authn =
+      defined $sling->{'Authn'}
+      ? ${ $sling->{'Authn'} }
+      : new Apache::Sling::Authn( \$sling );
+
+    # Handle the three special case commonly used properties:
+    if ( defined ${ $config->{'email'} } ) {
+        push @{ $config->{'property'} }, "email=" . ${ $config->{'email'} };
+    }
+    if ( defined ${ $config->{'first-name'} } ) {
+        push @{ $config->{'property'} },
+          "firstName=" . ${ $config->{'first-name'} };
+    }
+    if ( defined ${ $config->{'last-name'} } ) {
+        push @{ $config->{'property'} },
+          "lastName=" . ${ $config->{'last-name'} };
+    }
+
+    if ( defined ${ $config->{'additions'} } ) {
+        my $message =
+          "Adding users from file \"" . ${ $config->{'additions'} } . "\":\n";
+        Apache::Sling::Print::print_with_lock( "$message", $sling->{'Log'} );
+        my @childs = ();
+        for my $i ( 0 .. $sling->{'Threads'} ) {
+            my $pid = fork;
+            if ($pid) { push @childs, $pid; }    # parent
+            elsif ( $pid == 0 ) {                # child
+                    # Create a new separate user agent per fork in order to
+                    # ensure cookie stores are separate, then log the user in:
+                $authn->{'LWP'} = $authn->user_agent($sling->{'Referer'});
+                $authn->login_user();
+                my $user =
+                  new Apache::Sling::User( \$authn, $sling->{'Verbose'},
+                    $sling->{'Log'} );
+                $user->add_from_file( ${ $config->{'additions'} },
+                    $i, $sling->{'Threads'} );
+                exit 0;
+            }
+            else {
+                croak "Could not fork $i!";
+            }
+        }
+        foreach (@childs) { waitpid $_, 0; }
+    }
+    else {
+        $authn->login_user();
+        my $user =
+          new Apache::Sling::User( \$authn, $sling->{'Verbose'},
+            $sling->{'Log'} );
+        if ( defined ${ $config->{'exists'} } ) {
+            $user->check_exists( ${ $config->{'exists'} } );
+        }
+        elsif ( defined ${ $config->{'add'} } ) {
+            $user->add(
+                ${ $config->{'add'} },
+                ${ $config->{'password'} },
+                $config->{'property'}
+            );
+        }
+        elsif ( defined ${ $config->{'update'} } ) {
+            $user->update( ${ $config->{'update'} }, $config->{'property'} );
+        }
+        elsif ( defined ${ $config->{'change-password'} } ) {
+            $user->change_password(
+                ${ $config->{'change-password'} },
+                ${ $config->{'password'} },
+                ${ $config->{'new-password'} },
+                ${ $config->{'new-password'} }
+            );
+        }
+        elsif ( defined ${ $config->{'delete'} } ) {
+            $user->del( ${ $config->{'delete'} } );
+        }
+        elsif ( defined ${ $config->{'view'} } ) {
+            $user->view( ${ $config->{'view'} } );
+        }
+        Apache::Sling::Print::print_result($user);
+    }
+    return 1;
 }
 
 #}}}
@@ -278,9 +416,17 @@ Change the password for a user.
 
 Check whether a user exists.
 
+=head2 config
+
+Fetch hash of user configuration.
+
 =head2 del
 
 Delete a user.
+
+=head2 run
+
+Run user related actions.
 
 =head2 update
 
