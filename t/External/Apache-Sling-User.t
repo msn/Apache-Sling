@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 49;
+use Test::More tests => 51;
 use Test::Exception;
 
 my $sling_host = 'http://localhost:8080';
@@ -16,6 +16,7 @@ BEGIN { use_ok( 'Apache::Sling' ); }
 BEGIN { use_ok( 'Apache::Sling::Authn' ); }
 BEGIN { use_ok( 'Apache::Sling::User' ); }
 BEGIN { use_ok( 'Apache::Sling::Group' ); }
+BEGIN { use_ok( 'Apache::Sling::GroupMember' ); }
 
 # test user name:
 my $test_user = "user_test_user_$$";
@@ -51,6 +52,9 @@ isa_ok $user, 'Apache::Sling::User', 'user';
 # group object:
 my $group = Apache::Sling::Group->new( \$authn, $verbose, $log );
 isa_ok $group, 'Apache::Sling::Group', 'group';
+# group member object:
+my $group_member = Apache::Sling::GroupMember->new( \$authn, $verbose, $log );
+isa_ok $group_member, 'Apache::Sling::GroupMember', 'group_member';
 
 # Run tests:
 ok( defined $user,
@@ -81,18 +85,18 @@ ok( $group->add( $test_group, \@test_properties ),
 ok( $group->check_exists( $test_group ),
     "User Test: Group \"$test_group\" exists." );
 # Add member to group:
-ok( $group->member_add( $test_group, $test_user ),
+ok( $group_member->add( $test_group, $test_user ),
     "User Test: Member \"$test_user\" added to \"$test_group\"." );
-ok( $group->member_exists( $test_group, $test_user ),
+ok( $group_member->check_exists( $test_group, $test_user ),
     "User Test: Member \"$test_user\" exists in \"$test_group\"." );
 # Check can still update properties:
 @test_properties = ( "user_test_edit_after_group_join=true" );
 ok( $user->update( $test_user, \@test_properties ),
     "User Test: User \"$test_user\" updated successfully." );
 # Delete test user from group:
-ok( $group->member_delete( $test_group, $test_user ),
+ok( $group_member->delete( $test_group, $test_user ),
     "User Test: Member \"$test_user\" deleted from \"$test_group\"." );
-ok( ! $group->member_exists( $test_group, $test_user ),
+ok( ! $group_member->check_exists( $test_group, $test_user ),
     "User Test: Member \"$test_user\" should no longer exist in \"$test_group\"." );
 # Cleanup Group:
 ok( $group->del( $test_group ),
