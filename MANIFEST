@@ -23,9 +23,11 @@ Makefile.PL
 MANIFEST
 META.yml
 README
+scripts/sling.pl
 t/External/Apache-Sling-Authn.t
 t/External/Apache-Sling-Authz.t
 t/External/Apache-Sling-Content.t
+t/External/Apache-Sling-GroupMember.t
 t/External/Apache-Sling-Group.t
 t/External/Apache-Sling-JsonQueryServlet.t
 t/External/Apache-Sling.t
