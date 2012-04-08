@@ -13,7 +13,10 @@ use Apache::Sling::JsonQueryServlet;
 use Apache::Sling::LDAPSynch;
 use Apache::Sling::User;
 
-if ( $ARGV[0] eq 'authz' ) {
+if ( ! defined $ARGV[0] ) {
+  croak "Type '$0 help' for usage.";
+}
+elsif ( $ARGV[0] eq 'authz' ) {
   local $0 = "$0 authz";
   Apache::Sling::Authz::command_line(@ARGV);
 }

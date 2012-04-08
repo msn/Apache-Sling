@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 22;
+use Test::More tests => 29;
 use Test::Exception;
 
 my $sling_host = 'http://localhost:8080';
@@ -82,8 +82,66 @@ ok( ! $authz->del( 'bad_content_does_not_exist', $test_user ),
 ok( $authz->del( $test_content1, $test_user ),
     "Authz Test: Content \"$test_content1\" ACL privileges successfully removed for principal: \"$test_user\"." );
 
+# Authz:
+ok( my $authz_config = Apache::Sling::Authz::config($sling), 'check authz_config function' );
+
+ok( Apache::Sling::Authz::run($sling,$authz_config), 'check authz_run function' );
+
+$authz_config->{'write'} = \1;
+$authz_config->{'read'} = \1;
+$authz_config->{'addChildNodes'} = \1;
+$authz_config->{'delete'} = \1;
+$authz_config->{'lifecycleManage'} = \1;
+$authz_config->{'lockManage'} = \1;
+$authz_config->{'modifyACL'} = \1;
+$authz_config->{'modifyProps'} = \1;
+$authz_config->{'nodeTypeManage'} = \1;
+$authz_config->{'readACL'} = \1;
+$authz_config->{'removeChilds'} = \1;
+$authz_config->{'removeNode'} = \1;
+$authz_config->{'retentionManage'} = \1;
+$authz_config->{'versionManage'} = \1;
+$authz_config->{'view'} = \1;
+$authz_config->{'removeNode'} = \1;
+$authz_config->{'remote'} = \$test_content1;
+$authz_config->{'principal'} = \$test_user;
+
+ok( Apache::Sling::Authz::run($sling,$authz_config), q{check authz_run function adding permissions to $test_content1 for $test_user} );
+
+$authz_config->{'write'} = \0;
+$authz_config->{'read'} = \0;
+$authz_config->{'addChildNodes'} = \0;
+$authz_config->{'delete'} = \0;
+$authz_config->{'lifecycleManage'} = \0;
+$authz_config->{'lockManage'} = \0;
+$authz_config->{'modifyACL'} = \0;
+$authz_config->{'modifyProps'} = \0;
+$authz_config->{'nodeTypeManage'} = \0;
+$authz_config->{'readACL'} = \0;
+$authz_config->{'removeChilds'} = \0;
+$authz_config->{'removeNode'} = \0;
+$authz_config->{'retentionManage'} = \0;
+$authz_config->{'versionManage'} = \0;
+$authz_config->{'view'} = \0;
+$authz_config->{'removeNode'} = \0;
+
+ok( Apache::Sling::Authz::run($sling,$authz_config), q{check authz_run function removing permissions from $test_content1 for $test_user} );
+
+ok( $authz_config = Apache::Sling::Authz::config($sling), 'check authz_config function' );
+
+$authz_config->{'all'} = \1;
+$authz_config->{'remote'} = \$test_content1;
+$authz_config->{'principal'} = \$test_user;
+
+ok( Apache::Sling::Authz::run($sling,$authz_config), q{check authz_run function adding all permissions to $test_content1 for $test_user} );
+
+$authz_config->{'all'} = \0;
+
+ok( Apache::Sling::Authz::run($sling,$authz_config), q{check authz_run function removing all permissions from $test_content1 for $test_user} );
+
 ok( $user->del( $test_user ),
     "User Test: User \"$test_user\" deleted successfully." );
 
 ok( $content->del( $test_content1 ),
     "Content Test: Content \"$test_content1\" deleted successfully." );
+
