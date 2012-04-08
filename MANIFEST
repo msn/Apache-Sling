@@ -36,8 +36,11 @@ t/Local/Apache-Sling-Authz.t
 t/Local/Apache-Sling-AuthzUtil.t
 t/Local/Apache-Sling-Content.t
 t/Local/Apache-Sling-ContentUtil.t
+t/Local/Apache-Sling-GroupMember.t
+t/Local/Apache-Sling-GroupMemberUtil.t
 t/Local/Apache-Sling-Group.t
 t/Local/Apache-Sling-GroupUtil.t
+t/Local/Apache-Sling-JsonQueryServlet.t
 t/Local/Apache-Sling-JsonQueryServletUtil.t
 t/Local/Apache-Sling-LDAPSynch.t
 t/Local/Apache-Sling-Print.t
