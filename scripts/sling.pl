@@ -3,6 +3,7 @@
 use 5.008001;
 use strict;
 use warnings;
+use version; our $VERSION = qv('0.24');
 use Carp;
 use Pod::Usage;
 use Apache::Sling::Authz;
@@ -13,50 +14,39 @@ use Apache::Sling::JsonQueryServlet;
 use Apache::Sling::LDAPSynch;
 use Apache::Sling::User;
 
-if ( ! defined $ARGV[0] ) {
-  croak "Type '$0 help' for usage.";
+# Fail if args are empty or undefined:
+if ( !defined $ARGV[0] || $ARGV[0] eq q{} ) {
+    croak q{Type '$0 help' for usage.};
 }
-elsif ( $ARGV[0] eq 'authz' ) {
-  local $0 = "$0 authz";
-  Apache::Sling::Authz::command_line(@ARGV);
+
+# Give usage info if help or man are requested:
+if ( $ARGV[0] =~ /(--){0,1}help/msx ) {
+    pod2usage( -exitstatus => 0, -verbose => 1 );
 }
-elsif ( $ARGV[0] eq 'content' ) {
-  local $0 = "$0 content";
-  Apache::Sling::Content::command_line(@ARGV);
+elsif ( $ARGV[0] =~ /(--){0,1}man/msx ) {
+    pod2usage( -exitstatus => 0, -verbose => 2 );
 }
-elsif ( $ARGV[0] eq 'group_member' ) {
-  local $0 = "$0 group_member";
-  Apache::Sling::GroupMember::command_line(@ARGV);
+
+# Run command line programs:
+local $0 = "$0 " . $ARGV[0];
+
+my %module_lookup = (
+    'authz',              'Apache::Sling::Authz',
+    'content',            'Apache::Sling::Content',
+    'group_member',       'Apache::Sling::GroupMember',
+    'group',              'Apache::Sling::Group',
+    'json_query_servlet', 'Apache::Sling::JsonQueryServlet',
+    'ldap_synch',         'Apache::Sling::LDAPSynch',
+    'user',               'Apache::Sling::User'
+);
+
+my $module = $module_lookup{ $ARGV[0] };
+
+if ( !defined $module ) {
+    croak "Unknown command: '" . $ARGV[0] . "'\n" . "Type '$0 help' for usage.";
 }
-elsif ( $ARGV[0] eq 'group' ) {
-  local $0 = "$0 group";
-  Apache::Sling::Group::command_line(@ARGV);
-}
-elsif ( $ARGV[0] eq 'json_query_servlet' ) {
-  local $0 = "$0 ";
-  Apache::Sling::JsonQueryServlet::command_line(@ARGV);
-}
-elsif ( $ARGV[0] eq 'ldap_synch' ) {
-  local $0 = "$0 ldap_synch";
-  Apache::Sling::LDAPSynch::command_line(@ARGV);
-}
-elsif ( $ARGV[0] eq 'user' ) {
-  local $0 = "$0 user";
-  Apache::Sling::User::command_line(@ARGV);
-}
-elsif ( $ARGV[0] =~ /(--){0,1}help/x ) {
-  pod2usage( -exitstatus => 0, -verbose => 1 );
-}
-elsif ( $ARGV[0] =~ /(--){0,1}man/x ) {
-  pod2usage( -exitstatus => 0, -verbose => 2 );
-}
-elsif ( $ARGV[0] eq '' ) {
-  croak "Type '$0 help' for usage.";
-}
-else {
-  croak "Unknown command: '" . $ARGV[0] . "'\n" .
-        "Type '$0 help' for usage.";
-}
+
+$module->command_line(@ARGV);
 
 1;
 
@@ -142,6 +132,12 @@ None known (^_-)
 =head1 AUTHOR
 
 Daniel Parry -- daniel@caret.cam.ac.uk
+
+=head1 LICENSE AND COPYRIGHT
+
+LICENSE: http://dev.perl.org/licenses/artistic.html
+
+COPYRIGHT: (c) 2011 Daniel David Parry <perl@ddp.me.uk>
 
 =cut
 

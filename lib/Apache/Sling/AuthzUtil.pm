@@ -73,9 +73,10 @@ a node in JSON format.
 
 sub delete_setup {
     my ( $base_url, $remote_dest, $principal ) = @_;
-    croak "No base url defined!"                      unless defined $base_url;
-    croak "No destination to delete ACL for defined!" unless defined $remote_dest;
-    croak "No principal to delete ACL for defined!"   unless defined $principal;
+    croak "No base url defined!" unless defined $base_url;
+    croak "No destination to delete ACL for defined!"
+      unless defined $remote_dest;
+    croak "No principal to delete ACL for defined!" unless defined $principal;
     my $post_variables = "\$post_variables = [':applyTo','$principal']";
     return "post $base_url/$remote_dest.deleteAce.html $post_variables";
 }

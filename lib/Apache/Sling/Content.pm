@@ -77,18 +77,18 @@ sub command_line {
     my $config = config($sling);
 
     GetOptions(
-    $config,             'auth=s',
-    'help|?',            'log|L=s',
-    'man|M',             'pass|p=s',
-    'threads|t=s',       'url|U=s',
-    'user|u=s',          'verbose|v+',
-    'add|a',             'additions|A=s',
-    'copy|c',            'delete|d',
-    'exists|e',          'filename|n=s',
-    'local|l=s',         'move|m',
-    'property|P=s',      'remote|r=s',
-    'remote-source|S=s', 'replace|R',
-    'view|V'
+        $config,             'auth=s',
+        'help|?',            'log|L=s',
+        'man|M',             'pass|p=s',
+        'threads|t=s',       'url|U=s',
+        'user|u=s',          'verbose|v+',
+        'add|a',             'additions|A=s',
+        'copy|c',            'delete|d',
+        'exists|e',          'filename|n=s',
+        'local|l=s',         'move|m',
+        'property|P=s',      'remote|r=s',
+        'remote-source|S=s', 'replace|R',
+        'view|V'
     ) or help();
 
     if ( $sling->{'Help'} ) { help(); }
@@ -327,6 +327,7 @@ sub run {
       defined $sling->{'Authn'}
       ? ${ $sling->{'Authn'} }
       : Apache::Sling::Authn->new( \$sling );
+    my $success;
 
     if ( defined ${ $config->{'additions'} } ) {
         my $message =
@@ -339,7 +340,7 @@ sub run {
             elsif ( $pid == 0 ) {                # child
                     # Create a new separate user agent per fork in order to
                     # ensure cookie stores are separate, then log the user in:
-                $authn->{'LWP'} = $authn->user_agent($sling->{'Referer'});
+                $authn->{'LWP'} = $authn->user_agent( $sling->{'Referer'} );
                 $authn->login_user();
                 my $content =
                   Apache::Sling::Content->new( \$authn, $sling->{'Verbose'},
@@ -362,41 +363,46 @@ sub run {
         if (   defined ${ $config->{'local'} }
             && defined ${ $config->{'remote'} } )
         {
-            $content->upload_file(
+            $success = $content->upload_file(
                 ${ $config->{'local'} },
                 ${ $config->{'remote'} },
                 ${ $config->{'filename'} }
             );
         }
         elsif ( defined ${ $config->{'exists'} } ) {
-            $content->check_exists( ${ $config->{'remote'} } );
+            $success = $content->check_exists( ${ $config->{'remote'} } );
         }
         elsif ( defined ${ $config->{'add'} } ) {
-            $content->add( ${ $config->{'remote'} }, $config->{'property'} );
+            $success =
+              $content->add( ${ $config->{'remote'} }, $config->{'property'} );
         }
         elsif ( defined ${ $config->{'copy'} } ) {
-            $content->copy(
+            $success = $content->copy(
                 ${ $config->{'remote-source'} },
                 ${ $config->{'remote'} },
                 ${ $config->{'replace'} }
             );
         }
         elsif ( defined ${ $config->{'delete'} } ) {
-            $content->del( ${ $config->{'remote'} } );
+            $success = $content->del( ${ $config->{'remote'} } );
         }
         elsif ( defined ${ $config->{'move'} } ) {
-            $content->move(
+            $success = $content->move(
                 ${ $config->{'remote-source'} },
                 ${ $config->{'remote'} },
                 ${ $config->{'replace'} }
             );
         }
         elsif ( defined ${ $config->{'view'} } ) {
-            $content->view( ${ $config->{'remote'} } );
+            $success = $content->view( ${ $config->{'remote'} } );
+        }
+        else {
+            help();
+            return 1;
         }
         Apache::Sling::Print::print_result($content);
     }
-    return 1;
+    return $success;
 }
 
 #}}}

@@ -156,10 +156,10 @@ sub command_line {
     my $config = config($sling);
 
     GetOptions(
-    $config,      'auth=s',     'help|?',      'log|L=s',
-    'man|M',      'pass|p=s',   'threads|t=s', 'url|U=s',
-    'user|u=s',   'verbose|v+', 'add|a=s',     'additions|A=s',
-    'delete|d=s', 'exists|e=s', 'group|g=s',   'view|V'
+        $config,      'auth=s',     'help|?',      'log|L=s',
+        'man|M',      'pass|p=s',   'threads|t=s', 'url|U=s',
+        'user|u=s',   'verbose|v+', 'add|a=s',     'additions|A=s',
+        'delete|d=s', 'exists|e=s', 'group|g=s',   'view|V'
     ) or help();
 
     if ( $sling->{'Help'} ) { help(); }
@@ -344,6 +344,8 @@ sub run {
       ? ${ $sling->{'Authn'} }
       : new Apache::Sling::Authn( \$sling );
 
+    my $success;
+
     if ( defined ${ $config->{'additions'} } ) {
         my $message =
           "Adding groups from file \"" . ${ $config->{'additions'} } . "\":\n";
@@ -355,7 +357,7 @@ sub run {
             elsif ( $pid == 0 ) {                # child
                     # Create a new separate user agent per fork in order to
                     # ensure cookie stores are separate, then log the user in:
-                $authn->{'LWP'} = $authn->user_agent($sling->{'Referer'});
+                $authn->{'LWP'} = $authn->user_agent( $sling->{'Referer'} );
                 $authn->login_user();
                 my $group_member =
                   new Apache::Sling::GroupMember( \$authn, $sling->{'Verbose'},
@@ -376,23 +378,27 @@ sub run {
           new Apache::Sling::GroupMember( \$authn, $sling->{'Verbose'},
             $sling->{'Log'} );
         if ( defined ${ $config->{'exists'} } ) {
-            $group_member->check_exists( ${ $config->{'group'} },
+            $success = $group_member->check_exists( ${ $config->{'group'} },
                 ${ $config->{'exists'} } );
         }
         elsif ( defined ${ $config->{'add'} } ) {
-            $group_member->add( ${ $config->{'group'} },
+            $success = $group_member->add( ${ $config->{'group'} },
                 ${ $config->{'add'} } );
         }
         elsif ( defined ${ $config->{'delete'} } ) {
-            $group_member->delete( ${ $config->{'group'} },
+            $success = $group_member->delete( ${ $config->{'group'} },
                 ${ $config->{'delete'} } );
         }
         elsif ( defined ${ $config->{'view'} } ) {
-            $group_member->view( ${ $config->{'group'} } );
+            $success = $group_member->view( ${ $config->{'group'} } );
+        }
+        else {
+            help();
+            return 1;
         }
         Apache::Sling::Print::print_result($group_member);
     }
-    return 1;
+    return $success;
 }
 
 #}}}

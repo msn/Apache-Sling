@@ -27,7 +27,7 @@ sub new {
     my $verbose =
       ( defined ${$sling}->{'Verbose'} ? ${$sling}->{'Verbose'} : 0 );
 
-    my $lwp_user_agent = $class->user_agent(${$sling}->{'Referer'});
+    my $lwp_user_agent = $class->user_agent( ${$sling}->{'Referer'} );
 
     my $response;
     my $authn = {

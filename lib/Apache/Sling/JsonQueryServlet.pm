@@ -80,12 +80,9 @@ sub command_line {
     my $config = config($sling);
 
     GetOptions(
-    $config,             'auth=s',
-    'help|?',            'log|L=s',
-    'man|M',             'pass|p=s',
-    'threads|t=s',       'url|U=s',
-    'user|u=s',          'verbose|v+',
-    'all_nodes|a'
+        $config,    'auth=s',     'help|?',      'log|L=s',
+        'man|M',    'pass|p=s',   'threads|t=s', 'url|U=s',
+        'user|u=s', 'verbose|v+', 'all_nodes|a'
     ) or help();
 
     if ( $sling->{'Help'} ) { help(); }
@@ -191,15 +188,19 @@ sub run {
     my $json_query_servlet =
       new Apache::Sling::JsonQueryServlet( \$authn, $sling->{'Verbose'},
         $sling->{'Log'} );
+    my $success;
     if ( defined ${ $config->{'all_nodes'} } ) {
-        $json_query_servlet->all_nodes();
+        $success = $json_query_servlet->all_nodes();
+    }
+    else {
+        help();
+        return 1;
     }
     Apache::Sling::Print::print_result($json_query_servlet);
-    return 1;
+    return $success;
 }
 
 #}}}
-
 
 1;
 

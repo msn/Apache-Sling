@@ -523,18 +523,18 @@ sub command_line {
     my $config = config($sling);
 
     GetOptions(
-    $config,                  'auth=s',
-    'help|?',                 'log|L=s',
-    'man|M',                  'pass|p=s',
-    'threads|t=s',            'url|U=s',
-    'user|u=s',               'verbose|v+',
-    'download-user-list|d=s', 'ldap-attributes|a=s',
-    'ldap-base|b=s',          'ldap-dn|d=s',
-    'ldap-filter|f=s',        'ldap-host|h=s',
-    'ldap-pass|P=s',          'attributes|A=s',
-    'synch-full|s',           'synch-full-since|S=s',
-    'synch-listed|l',         'synch-listed-since|L=s',
-    'upload-user-list|U=s'
+        $config,                  'auth=s',
+        'help|?',                 'log|L=s',
+        'man|M',                  'pass|p=s',
+        'threads|t=s',            'url|U=s',
+        'user|u=s',               'verbose|v+',
+        'download-user-list|d=s', 'ldap-attributes|a=s',
+        'ldap-base|b=s',          'ldap-dn|d=s',
+        'ldap-filter|f=s',        'ldap-host|h=s',
+        'ldap-pass|P=s',          'attributes|A=s',
+        'synch-full|s',           'synch-full-since|S=s',
+        'synch-listed|l',         'synch-listed-since|L=s',
+        'upload-user-list|U=s'
     ) or help();
 
     if ( $sling->{'Help'} ) { help(); }
@@ -690,38 +690,45 @@ sub run {
         $sling->{'Verbose'},
         $sling->{'Log'}
     );
+
+    my $success;
+
     if ( defined ${ $config->{'download-user-list'} } ) {
-        $ldap_synch->download_synch_user_list(
+        $success = $ldap_synch->download_synch_user_list(
             ${ $config->{'download-user-list'} } );
     }
     elsif ( defined ${ $config->{'upload-user-list'} } ) {
-        $ldap_synch->upload_synch_user_list(
+        $success = $ldap_synch->upload_synch_user_list(
             ${ $config->{'upload-user-list'} } );
     }
     elsif ( defined ${ $config->{'synch-full'} } ) {
-        $ldap_synch->synch_full( ${ $config->{'ldap-attributes'} },
+        $success = $ldap_synch->synch_full( ${ $config->{'ldap-attributes'} },
             ${ $config->{'attributes'} } );
     }
     elsif ( defined ${ $config->{'synch-full-since'} } ) {
-        $ldap_synch->synch_full_since(
+        $success = $ldap_synch->synch_full_since(
             ${ $config->{'ldap-attributes'} },
             ${ $config->{'attributes'} },
             ${ $config->{'synch-full-since'} }
         );
     }
     elsif ( defined ${ $config->{'synch-listed'} } ) {
-        $ldap_synch->synch_listed( ${ $config->{'ldap-attributes'} },
+        $success = $ldap_synch->synch_listed( ${ $config->{'ldap-attributes'} },
             ${ $config->{'attributes'} } );
     }
     elsif ( defined ${ $config->{'synch-listed-since'} } ) {
-        $ldap_synch->synch_listed_since(
+        $success = $ldap_synch->synch_listed_since(
             ${ $config->{'ldap-attributes'} },
             ${ $config->{'attributes'} },
             ${ $config->{'synch-listed-since'} }
         );
     }
+    else {
+        help();
+        return 1;
+    }
     Apache::Sling::Print::print_result($ldap_synch);
-    return 1;
+    return $success;
 }
 
 #}}}

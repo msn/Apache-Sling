@@ -194,18 +194,18 @@ sub command_line {
     my $config = config($sling);
 
     GetOptions(
-    $config,               'auth=s',
-    'help|?',              'log|L=s',
-    'man|M',               'pass|p=s',
-    'threads|t=s',         'url|U=s',
-    'user|u=s',            'verbose|v+',
-    'add|a=s',             'additions|A=s',
-    'change-password|c=s', 'delete|d=s',
-    'email|E=s',           'first-name|f=s',
-    'exists|e=s',          'last-name|l=s',
-    'new-password|n=s',    'password|w=s',
-    'property|P=s',        'update=s',
-    'view|V=s'
+        $config,               'auth=s',
+        'help|?',              'log|L=s',
+        'man|M',               'pass|p=s',
+        'threads|t=s',         'url|U=s',
+        'user|u=s',            'verbose|v+',
+        'add|a=s',             'additions|A=s',
+        'change-password|c=s', 'delete|d=s',
+        'email|E=s',           'first-name|f=s',
+        'exists|e=s',          'last-name|l=s',
+        'new-password|n=s',    'password|w=s',
+        'property|P=s',        'update=s',
+        'view|V=s'
     ) or help();
 
     if ( $sling->{'Help'} ) { help(); }
@@ -390,6 +390,8 @@ sub run {
           "lastName=" . ${ $config->{'last-name'} };
     }
 
+    my $success;
+
     if ( defined ${ $config->{'additions'} } ) {
         my $message =
           "Adding users from file \"" . ${ $config->{'additions'} } . "\":\n";
@@ -401,7 +403,7 @@ sub run {
             elsif ( $pid == 0 ) {                # child
                     # Create a new separate user agent per fork in order to
                     # ensure cookie stores are separate, then log the user in:
-                $authn->{'LWP'} = $authn->user_agent($sling->{'Referer'});
+                $authn->{'LWP'} = $authn->user_agent( $sling->{'Referer'} );
                 $authn->login_user();
                 my $user =
                   new Apache::Sling::User( \$authn, $sling->{'Verbose'},
@@ -422,20 +424,21 @@ sub run {
           new Apache::Sling::User( \$authn, $sling->{'Verbose'},
             $sling->{'Log'} );
         if ( defined ${ $config->{'exists'} } ) {
-            $user->check_exists( ${ $config->{'exists'} } );
+            $success = $user->check_exists( ${ $config->{'exists'} } );
         }
         elsif ( defined ${ $config->{'add'} } ) {
-            $user->add(
+            $success = $user->add(
                 ${ $config->{'add'} },
                 ${ $config->{'password'} },
                 $config->{'property'}
             );
         }
         elsif ( defined ${ $config->{'update'} } ) {
-            $user->update( ${ $config->{'update'} }, $config->{'property'} );
+            $success =
+              $user->update( ${ $config->{'update'} }, $config->{'property'} );
         }
         elsif ( defined ${ $config->{'change-password'} } ) {
-            $user->change_password(
+            $success = $user->change_password(
                 ${ $config->{'change-password'} },
                 ${ $config->{'password'} },
                 ${ $config->{'new-password'} },
@@ -443,14 +446,18 @@ sub run {
             );
         }
         elsif ( defined ${ $config->{'delete'} } ) {
-            $user->del( ${ $config->{'delete'} } );
+            $success = $user->del( ${ $config->{'delete'} } );
         }
         elsif ( defined ${ $config->{'view'} } ) {
-            $user->view( ${ $config->{'view'} } );
+            $success = $user->view( ${ $config->{'view'} } );
+        }
+        else {
+            help();
+            return 1;
         }
         Apache::Sling::Print::print_result($user);
     }
-    return 1;
+    return $success;
 }
 
 #}}}

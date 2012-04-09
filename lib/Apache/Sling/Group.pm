@@ -170,10 +170,10 @@ sub command_line {
     my $config = config($sling);
 
     GetOptions(
-    $config,      'auth=s',     'help|?',       'log|L=s',
-    'man|M',      'pass|p=s',   'threads|t=s',  'url|U=s',
-    'user|u=s',   'verbose|v+', 'add|a=s',      'additions|A=s',
-    'delete|d=s', 'exists|e=s', 'property|P=s', 'view|V=s'
+        $config,      'auth=s',     'help|?',       'log|L=s',
+        'man|M',      'pass|p=s',   'threads|t=s',  'url|U=s',
+        'user|u=s',   'verbose|v+', 'add|a=s',      'additions|A=s',
+        'delete|d=s', 'exists|e=s', 'property|P=s', 'view|V=s'
     ) or help();
 
     if ( $sling->{'Help'} ) { help(); }
@@ -324,6 +324,8 @@ sub run {
       ? ${ $sling->{'Authn'} }
       : new Apache::Sling::Authn( \$sling );
 
+    my $success;
+
     if ( defined ${ $config->{'additions'} } ) {
         my $message =
           "Adding groups from file \"" . ${ $config->{'additions'} } . "\":\n";
@@ -335,7 +337,7 @@ sub run {
             elsif ( $pid == 0 ) {                # child
                     # Create a new separate user agent per fork in order to
                     # ensure cookie stores are separate, then log the user in:
-                $authn->{'LWP'} = $authn->user_agent($sling->{'Referer'});
+                $authn->{'LWP'} = $authn->user_agent( $sling->{'Referer'} );
                 $authn->login_user();
                 my $group =
                   new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
@@ -356,20 +358,25 @@ sub run {
           new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
             $sling->{'Log'} );
         if ( defined ${ $config->{'exists'} } ) {
-            $group->check_exists( ${ $config->{'exists'} } );
+            $success = $group->check_exists( ${ $config->{'exists'} } );
         }
         elsif ( defined ${ $config->{'add'} } ) {
-            $group->add( ${ $config->{'add'} }, $config->{'property'} );
+            $success =
+              $group->add( ${ $config->{'add'} }, $config->{'property'} );
         }
         elsif ( defined ${ $config->{'delete'} } ) {
-            $group->del( ${ $config->{'delete'} } );
+            $success = $group->del( ${ $config->{'delete'} } );
         }
         elsif ( defined ${ $config->{'view'} } ) {
-            $group->view( ${ $config->{'view'} } );
+            $success = $group->view( ${ $config->{'view'} } );
+        }
+        else {
+            help();
+            return 1;
         }
         Apache::Sling::Print::print_result($group);
     }
-    return 1;
+    return $success;
 }
 
 #}}}

@@ -350,11 +350,8 @@ sub run {
     my $authn = Apache::Sling::Authn->new( \$sling );
     $authn->login_user();
     my $authz =
-      Apache::Sling::Authz->new( \$authn, $sling->{'Verbose'}, $sling->{'Log'} );
-    if ( defined ${ $config->{'delete'} } ) {
-        $authz->del( ${ $config->{'remote'} }, ${ $config->{'principal'} } );
-        Apache::Sling::Print::print_result($authz);
-    }
+      Apache::Sling::Authz->new( \$authn, $sling->{'Verbose'},
+        $sling->{'Log'} );
     my @grant_privileges;
     my @deny_privileges;
     if ( defined ${ $config->{'read'} } ) {
@@ -419,18 +416,29 @@ sub run {
           ? push @grant_privileges, 'all'
           : push @deny_privileges, 'all';
     }
+
     if ( @grant_privileges || @deny_privileges ) {
-        $authz->modify_privileges(
+        my $success = $authz->modify_privileges(
             ${ $config->{'remote'} }, ${ $config->{'principal'} },
             \@grant_privileges,       \@deny_privileges
         );
         Apache::Sling::Print::print_result($authz);
+        return $success;
     }
-    if ( defined ${ $config->{'view'} } ) {
-        $authz->get_acl( ${ $config->{'remote'} } );
+    elsif ( defined ${ $config->{'view'} } ) {
+        my $success = $authz->get_acl( ${ $config->{'remote'} } );
         Apache::Sling::Print::print_result($authz);
+        return $success;
     }
-
+    elsif ( defined ${ $config->{'delete'} } ) {
+        my $success =
+          $authz->del( ${ $config->{'remote'} }, ${ $config->{'principal'} } );
+        Apache::Sling::Print::print_result($authz);
+        return $success;
+    }
+    else {
+        help();
+    }
     return 1;
 }
 
