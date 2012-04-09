@@ -176,6 +176,34 @@ ok( ! $group_member->check_exists( $test_group2, $test_user ),
 ok( $group_member->view( $test_group2 ) == 0,
     "Group Test: 0 Members in \"$test_group2\"." );
 
+# add group member:
+ok( my $group_member_config = Apache::Sling::GroupMember::config($sling), 'check group_member_config function' );
+$group_member_config->{'add'} = \$test_user;
+$group_member_config->{'group'} = \$test_group1;
+ok( Apache::Sling::GroupMember::run($sling,$group_member_config), q{check group_member_run function add for $test_group1} );
+
+# Test group member additions from file:
+my ( $tmp_group_member_additions_handle, $tmp_group_member_additions_name ) = File::Temp::tempfile();
+ok( $group_member_config = Apache::Sling::GroupMember::config($sling), 'check group_member_config function' );
+$group_member_config->{'additions'} = \$tmp_group_member_additions_name;
+ok( Apache::Sling::GroupMember::run($sling,$group_member_config), q{check group_member_run function additions} );
+unlink( $tmp_group_member_additions_name ); 
+
+ok( $group_member_config = Apache::Sling::GroupMember::config($sling), 'check group_member_config function' );
+$group_member_config->{'view'} = \1;
+$group_member_config->{'group'} = \$test_group1;
+ok( Apache::Sling::GroupMember::run($sling,$group_member_config), q{check group_member_run function view for $test_group1} );
+
+ok( $group_member_config = Apache::Sling::GroupMember::config($sling), 'check group_member_config function' );
+$group_member_config->{'exists'} = \$test_user;
+$group_member_config->{'group'} = \$test_group1;
+ok( Apache::Sling::GroupMember::run($sling,$group_member_config), q{check group_member_run function check exists for $test_group1} );
+
+ok( $group_member_config = Apache::Sling::GroupMember::config($sling), 'check group_member_config function' );
+$group_member_config->{'delete'} = \$test_user;
+$group_member_config->{'group'} = \$test_group1;
+ok( Apache::Sling::GroupMember::run($sling,$group_member_config), q{check group_member_run function delete for $test_group1} );
+
 # Cleanup Users:
 ok( $user->del( $test_user ),
     "Group Test: User \"$test_user\" deleted successfully." );
@@ -214,30 +242,3 @@ ok( ! $group->check_exists( $test_group2 ),
 ok( ! $group->check_exists( $test_group3 ),
     "Group Test: Group \"$test_group3\" should no longer exist." );
 
-# add group member:
-ok( my $group_member_config = Apache::Sling::GroupMember::config($sling), 'check group_member_config function' );
-$group_member_config->{'add'} = \$test_user;
-$group_member_config->{'group'} = \$test_group1;
-ok( Apache::Sling::GroupMember::run($sling,$group_member_config), q{check group_member_run function add for $test_group1} );
-
-# Test group member additions from file:
-my ( $tmp_group_member_additions_handle, $tmp_group_member_additions_name ) = File::Temp::tempfile();
-ok( $group_member_config = Apache::Sling::GroupMember::config($sling), 'check group_member_config function' );
-$group_member_config->{'additions'} = \$tmp_group_member_additions_name;
-ok( Apache::Sling::GroupMember::run($sling,$group_member_config), q{check group_member_run function additions} );
-unlink( $tmp_group_member_additions_name ); 
-
-ok( $group_member_config = Apache::Sling::GroupMember::config($sling), 'check group_member_config function' );
-$group_member_config->{'view'} = \1;
-$group_member_config->{'group'} = \$test_group1;
-ok( Apache::Sling::GroupMember::run($sling,$group_member_config), q{check group_member_run function view for $test_group1} );
-
-ok( $group_member_config = Apache::Sling::GroupMember::config($sling), 'check group_member_config function' );
-$group_member_config->{'exists'} = \$test_user;
-$group_member_config->{'group'} = \$test_group1;
-ok( Apache::Sling::GroupMember::run($sling,$group_member_config), q{check group_member_run function check exists for $test_group1} );
-
-ok( $group_member_config = Apache::Sling::GroupMember::config($sling), 'check group_member_config function' );
-$group_member_config->{'delete'} = \$test_user;
-$group_member_config->{'group'} = \$test_group1;
-ok( Apache::Sling::GroupMember::run($sling,$group_member_config), q{check group_member_run function delete for $test_group1} );

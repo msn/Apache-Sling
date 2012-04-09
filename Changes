@@ -1,5 +1,8 @@
 Revision history for Perl extension Apache::Sling.
 
+0.24  Mon Apr 9 07:35:00 2012
+        - Add command line functionality support.
+
 0.23  Fri Apr 6 06:20:00 2012
         - Fix bug in referer passthrough from subclasses.
 

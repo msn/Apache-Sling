@@ -21,7 +21,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = qw(command_line);
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 #{{{sub new
 
@@ -344,7 +344,7 @@ sub run {
       ? ${ $sling->{'Authn'} }
       : new Apache::Sling::Authn( \$sling );
 
-    my $success;
+    my $success = 1;
 
     if ( defined ${ $config->{'additions'} } ) {
         my $message =

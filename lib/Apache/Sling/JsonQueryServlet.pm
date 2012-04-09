@@ -18,7 +18,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = qw(command_line);
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 #{{{sub new
 sub new {
@@ -188,7 +188,7 @@ sub run {
     my $json_query_servlet =
       new Apache::Sling::JsonQueryServlet( \$authn, $sling->{'Verbose'},
         $sling->{'Log'} );
-    my $success;
+    my $success = 1;
     if ( defined ${ $config->{'all_nodes'} } ) {
         $success = $json_query_servlet->all_nodes();
     }

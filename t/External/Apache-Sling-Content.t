@@ -158,7 +158,7 @@ ok( $content_config = Apache::Sling::Content::config($sling), 'check content_con
 $content_config->{'copy'} = \1;
 $content_config->{'remote-source'} = \$test_content1;
 $content_config->{'remote'} = \$test_content2;
-ok( Apache::Sling::Content::run($sling,$content_config), q{check content_run function copying content $test_content1 to $test_content2} );
+ok( ! Apache::Sling::Content::run($sling,$content_config), q{check content_run function copying content $test_content1 to $test_content2} );
 
 ok( $content_config = Apache::Sling::Content::config($sling), 'check content_config function' );
 $content_config->{'move'} = \1;
@@ -188,7 +188,7 @@ ok( Apache::Sling::Content::run($sling,$content_config), q{check content_run fun
 ok( $content_config = Apache::Sling::Content::config($sling), 'check content_config function' );
 $content_config->{'exists'} = \1;
 $content_config->{'remote'} = \$test_content1;
-ok( Apache::Sling::Content::run($sling,$content_config), q{check content_run function exists test for $test_content1} );
+ok( ! Apache::Sling::Content::run($sling,$content_config), q{check content_run function exists test for $test_content1} );
 
 ok( ! $content->check_exists( $test_content1 ),
     "Sling Test: Content \"$test_content1\" should no longer exist." );

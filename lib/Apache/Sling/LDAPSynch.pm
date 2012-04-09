@@ -22,7 +22,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = qw(command_line);
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 #{{{sub new
 
@@ -691,7 +691,7 @@ sub run {
         $sling->{'Log'}
     );
 
-    my $success;
+    my $success = 1;
 
     if ( defined ${ $config->{'download-user-list'} } ) {
         $success = $ldap_synch->download_synch_user_list(
