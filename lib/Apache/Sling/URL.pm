@@ -12,7 +12,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 #{{{sub add_leading_slash
 

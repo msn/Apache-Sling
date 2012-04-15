@@ -1,5 +1,10 @@
 Revision history for Perl extension Apache::Sling.
 
+0.25  Sun Apr 15 15:38:00 2012
+        - Allowing help(), man() and run() to be overridden.
+        - Fixing variable quoting in command line script.
+        - Changing method name to not use reserved word delete.
+
 0.24  Mon Apr 9 07:35:00 2012
         - Add command line functionality support.
 

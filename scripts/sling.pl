@@ -3,7 +3,7 @@
 use 5.008001;
 use strict;
 use warnings;
-use version; our $VERSION = qv('0.24');
+use version; our $VERSION = qv('0.25');
 use Carp;
 use Pod::Usage;
 use Apache::Sling::Authz;
