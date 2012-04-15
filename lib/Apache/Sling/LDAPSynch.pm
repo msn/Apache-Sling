@@ -516,7 +516,7 @@ sub synch_listed_since {
 
 #{{{ sub command_line
 sub command_line {
-    my @ARGV = @_;
+    my ( $ldap_synch, @ARGV ) = @_;
 
     #options parsing
     my $sling  = Apache::Sling->new;
@@ -535,12 +535,12 @@ sub command_line {
         'synch-full|s',           'synch-full-since|S=s',
         'synch-listed|l',         'synch-listed-since|L=s',
         'upload-user-list|U=s'
-    ) or help();
+    ) or $ldap_synch->help();
 
-    if ( $sling->{'Help'} ) { help(); }
-    if ( $sling->{'Man'} )  { man(); }
+    if ( $sling->{'Help'} ) { $ldap_synch->help(); }
+    if ( $sling->{'Man'} )  { $ldap_synch->man(); }
 
-    return run( $sling, $config );
+    return $ldap_synch->run( $sling, $config );
 }
 
 #}}}
@@ -588,6 +588,8 @@ EOF
 #{{{ sub man
 sub man {
 
+    my ($ldap_synch) = @_;
+
     print <<'EOF';
 LDAP synchronization perl script. Provides a means of synchronizing user
 information from an LDAP server into a running sling instance from the command
@@ -596,7 +598,7 @@ library.
 
 EOF
 
-    help();
+    $ldap_synch->help();
 
     print <<"EOF";
 Example Usage
@@ -671,7 +673,7 @@ sub config {
 
 #{{{sub run
 sub run {
-    my ( $sling, $config ) = @_;
+    my ( $ldap_synch, $sling, $config ) = @_;
     if ( !defined $config ) {
         croak 'No ldap_synch config supplied!';
     }
@@ -679,33 +681,66 @@ sub run {
 
     my $authn = new Apache::Sling::Authn( \$sling );
     $authn->login_user();
-    my $ldap_synch = new Apache::Sling::LDAPSynch(
-        ${ $config->{'ldap-host'} },
-        ${ $config->{'ldap-base'} },
-        ${ $config->{'ldap-filter'} },
-        ${ $config->{'ldap-dn'} },
-        ${ $config->{'ldap-pass'} },
-        \$authn,
-        ${ $config->{'flag-disabled'} },
-        $sling->{'Verbose'},
-        $sling->{'Log'}
-    );
 
     my $success = 1;
 
     if ( defined ${ $config->{'download-user-list'} } ) {
+        $ldap_synch = new Apache::Sling::LDAPSynch(
+            ${ $config->{'ldap-host'} },
+            ${ $config->{'ldap-base'} },
+            ${ $config->{'ldap-filter'} },
+            ${ $config->{'ldap-dn'} },
+            ${ $config->{'ldap-pass'} },
+            \$authn,
+            ${ $config->{'flag-disabled'} },
+            $sling->{'Verbose'},
+            $sling->{'Log'}
+        );
         $success = $ldap_synch->download_synch_user_list(
             ${ $config->{'download-user-list'} } );
     }
     elsif ( defined ${ $config->{'upload-user-list'} } ) {
+        $ldap_synch = new Apache::Sling::LDAPSynch(
+            ${ $config->{'ldap-host'} },
+            ${ $config->{'ldap-base'} },
+            ${ $config->{'ldap-filter'} },
+            ${ $config->{'ldap-dn'} },
+            ${ $config->{'ldap-pass'} },
+            \$authn,
+            ${ $config->{'flag-disabled'} },
+            $sling->{'Verbose'},
+            $sling->{'Log'}
+        );
         $success = $ldap_synch->upload_synch_user_list(
             ${ $config->{'upload-user-list'} } );
     }
     elsif ( defined ${ $config->{'synch-full'} } ) {
+        $ldap_synch = new Apache::Sling::LDAPSynch(
+            ${ $config->{'ldap-host'} },
+            ${ $config->{'ldap-base'} },
+            ${ $config->{'ldap-filter'} },
+            ${ $config->{'ldap-dn'} },
+            ${ $config->{'ldap-pass'} },
+            \$authn,
+            ${ $config->{'flag-disabled'} },
+            $sling->{'Verbose'},
+            $sling->{'Log'}
+        );
         $success = $ldap_synch->synch_full( ${ $config->{'ldap-attributes'} },
             ${ $config->{'attributes'} } );
     }
     elsif ( defined ${ $config->{'synch-full-since'} } ) {
+        $ldap_synch = new Apache::Sling::LDAPSynch(
+            ${ $config->{'ldap-host'} },
+            ${ $config->{'ldap-base'} },
+            ${ $config->{'ldap-filter'} },
+            ${ $config->{'ldap-dn'} },
+            ${ $config->{'ldap-pass'} },
+            \$authn,
+            ${ $config->{'flag-disabled'} },
+            $sling->{'Verbose'},
+            $sling->{'Log'}
+        );
         $success = $ldap_synch->synch_full_since(
             ${ $config->{'ldap-attributes'} },
             ${ $config->{'attributes'} },
@@ -713,10 +748,32 @@ sub run {
         );
     }
     elsif ( defined ${ $config->{'synch-listed'} } ) {
+        $ldap_synch = new Apache::Sling::LDAPSynch(
+            ${ $config->{'ldap-host'} },
+            ${ $config->{'ldap-base'} },
+            ${ $config->{'ldap-filter'} },
+            ${ $config->{'ldap-dn'} },
+            ${ $config->{'ldap-pass'} },
+            \$authn,
+            ${ $config->{'flag-disabled'} },
+            $sling->{'Verbose'},
+            $sling->{'Log'}
+        );
         $success = $ldap_synch->synch_listed( ${ $config->{'ldap-attributes'} },
             ${ $config->{'attributes'} } );
     }
     elsif ( defined ${ $config->{'synch-listed-since'} } ) {
+        $ldap_synch = new Apache::Sling::LDAPSynch(
+            ${ $config->{'ldap-host'} },
+            ${ $config->{'ldap-base'} },
+            ${ $config->{'ldap-filter'} },
+            ${ $config->{'ldap-dn'} },
+            ${ $config->{'ldap-pass'} },
+            \$authn,
+            ${ $config->{'flag-disabled'} },
+            $sling->{'Verbose'},
+            $sling->{'Log'}
+        );
         $success = $ldap_synch->synch_listed_since(
             ${ $config->{'ldap-attributes'} },
             ${ $config->{'attributes'} },
@@ -724,7 +781,7 @@ sub run {
         );
     }
     else {
-        help();
+        $ldap_synch->help();
         return 1;
     }
     Apache::Sling::Print::print_result($ldap_synch);

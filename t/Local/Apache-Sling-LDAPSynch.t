@@ -27,5 +27,5 @@ throws_ok { Apache::Sling::LDAPSynch::parse_attributes($ldap_attrs, $sling_attrs
 ok( $ldap_synch->check_for_property_modifications(), 'Check check_for_property_modifications function' );
 
 ok( my $ldap_synch_config = Apache::Sling::LDAPSynch::config($sling), 'check config function' );
-ok( Apache::Sling::LDAPSynch::run($sling,$ldap_synch_config), 'check run function' );
-throws_ok { Apache::Sling::LDAPSynch::run() } qr/No ldap_synch config supplied!/, 'check run function croaks with no config supplied';
+ok( Apache::Sling::LDAPSynch->run($sling,$ldap_synch_config), 'check run function' );
+throws_ok { Apache::Sling::LDAPSynch->run() } qr/No ldap_synch config supplied!/, 'check run function croaks with no config supplied';

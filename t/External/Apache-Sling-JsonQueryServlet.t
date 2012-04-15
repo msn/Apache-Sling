@@ -50,4 +50,4 @@ ok( $jsonqueryobject->all_nodes(),
 # JSON Query Servlet
 ok( my $json_query_servlet_config = Apache::Sling::JsonQueryServlet::config($sling), 'check json_query_servlet_config function' );
 $json_query_servlet_config->{'all_nodes'} = \1;
-ok( Apache::Sling::JsonQueryServlet::run($sling,$json_query_servlet_config), 'check json_query_servlet_run function' );
+ok( Apache::Sling::JsonQueryServlet->run($sling,$json_query_servlet_config), 'check json_query_servlet_run function' );

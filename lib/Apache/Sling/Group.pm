@@ -163,7 +163,7 @@ sub check_exists {
 
 #{{{ sub command_line
 sub command_line {
-    my @ARGV = @_;
+    my ( $group, @ARGV ) = @_;
 
     #options parsing
     my $sling  = Apache::Sling->new;
@@ -174,12 +174,12 @@ sub command_line {
         'man|M',      'pass|p=s',   'threads|t=s',  'url|U=s',
         'user|u=s',   'verbose|v+', 'add|a=s',      'additions|A=s',
         'delete|d=s', 'exists|e=s', 'property|P=s', 'view|V=s'
-    ) or help();
+    ) or $group->help();
 
-    if ( $sling->{'Help'} ) { help(); }
-    if ( $sling->{'Man'} )  { man(); }
+    if ( $sling->{'Help'} ) { $group->help(); }
+    if ( $sling->{'Man'} )  { $group->man(); }
 
-    return run( $sling, $config );
+    return $group->run( $sling, $config );
 }
 
 #}}}
@@ -273,6 +273,8 @@ EOF
 #{{{ sub man
 sub man {
 
+    my ($group) = @_;
+
     print <<'EOF';
 group perl script. Provides a means of managing groups in sling from the
 command line. The script also acts as a reference implementation for the Group
@@ -280,7 +282,7 @@ perl library.
 
 EOF
 
-    help();
+    $group->help();
 
     print <<"EOF";
 Example Usage
@@ -314,7 +316,7 @@ EOF
 
 #{{{sub run
 sub run {
-    my ( $sling, $config ) = @_;
+    my ( $group, $sling, $config ) = @_;
     if ( !defined $config ) {
         croak 'No group config supplied!';
     }
@@ -354,24 +356,33 @@ sub run {
     }
     else {
         $authn->login_user();
-        my $group =
-          new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
-            $sling->{'Log'} );
         if ( defined ${ $config->{'exists'} } ) {
+            $group =
+              new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $group->check_exists( ${ $config->{'exists'} } );
         }
         elsif ( defined ${ $config->{'add'} } ) {
+            $group =
+              new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success =
               $group->add( ${ $config->{'add'} }, $config->{'property'} );
         }
         elsif ( defined ${ $config->{'delete'} } ) {
+            $group =
+              new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $group->del( ${ $config->{'delete'} } );
         }
         elsif ( defined ${ $config->{'view'} } ) {
+            $group =
+              new Apache::Sling::Group( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $group->view( ${ $config->{'view'} } );
         }
         else {
-            help();
+            $group->help();
             return 1;
         }
         Apache::Sling::Print::print_result($group);

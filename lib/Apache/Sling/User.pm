@@ -187,7 +187,7 @@ sub check_exists {
 
 #{{{ sub command_line
 sub command_line {
-    my @ARGV = @_;
+    my ( $user, @ARGV ) = @_;
 
     #options parsing
     my $sling  = Apache::Sling->new;
@@ -206,12 +206,12 @@ sub command_line {
         'new-password|n=s',    'password|w=s',
         'property|P=s',        'update=s',
         'view|V=s'
-    ) or help();
+    ) or $user->help();
 
-    if ( $sling->{'Help'} ) { help(); }
-    if ( $sling->{'Man'} )  { man(); }
+    if ( $sling->{'Help'} ) { $user->help(); }
+    if ( $sling->{'Man'} )  { $user->man(); }
 
-    return run( $sling, $config );
+    return $user->run( $sling, $config );
 }
 
 #}}}
@@ -327,6 +327,8 @@ EOF
 #{{{ sub man
 sub man {
 
+    my ($user) = @_;
+
     print <<'EOF';
 user perl script. Provides a means of managing users in sling from the command
 line. The script also acts as a reference implementation for the User perl
@@ -334,7 +336,7 @@ library.
 
 EOF
 
-    help();
+    $user->help();
 
     print <<"EOF";
 Example Usage
@@ -367,7 +369,7 @@ EOF
 
 #{{{sub run
 sub run {
-    my ( $sling, $config ) = @_;
+    my ( $user, $sling, $config ) = @_;
     if ( !defined $config ) {
         croak 'No user config supplied!';
     }
@@ -420,13 +422,16 @@ sub run {
     }
     else {
         $authn->login_user();
-        my $user =
-          new Apache::Sling::User( \$authn, $sling->{'Verbose'},
-            $sling->{'Log'} );
         if ( defined ${ $config->{'exists'} } ) {
+            $user =
+              new Apache::Sling::User( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $user->check_exists( ${ $config->{'exists'} } );
         }
         elsif ( defined ${ $config->{'add'} } ) {
+            $user =
+              new Apache::Sling::User( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $user->add(
                 ${ $config->{'add'} },
                 ${ $config->{'password'} },
@@ -434,10 +439,16 @@ sub run {
             );
         }
         elsif ( defined ${ $config->{'update'} } ) {
+            $user =
+              new Apache::Sling::User( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success =
               $user->update( ${ $config->{'update'} }, $config->{'property'} );
         }
         elsif ( defined ${ $config->{'change-password'} } ) {
+            $user =
+              new Apache::Sling::User( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $user->change_password(
                 ${ $config->{'change-password'} },
                 ${ $config->{'password'} },
@@ -446,13 +457,19 @@ sub run {
             );
         }
         elsif ( defined ${ $config->{'delete'} } ) {
+            $user =
+              new Apache::Sling::User( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $user->del( ${ $config->{'delete'} } );
         }
         elsif ( defined ${ $config->{'view'} } ) {
+            $user =
+              new Apache::Sling::User( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $user->view( ${ $config->{'view'} } );
         }
         else {
-            help();
+            $user->help();
             return 1;
         }
         Apache::Sling::Print::print_result($user);

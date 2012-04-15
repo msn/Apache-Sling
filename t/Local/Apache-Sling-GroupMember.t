@@ -26,7 +26,7 @@ ok( defined $group_member->{ 'Authn' },                      'Check authn define
 ok( defined $group_member->{ 'Response' },                   'Check response defined' );
 
 throws_ok { $group_member->add() } qr/No group name defined to add to!/, 'Check add function croaks without group specified';
-throws_ok { $group_member->delete() } qr/No group name defined to delete from!/, 'Check delete function croaks without group specified';
+throws_ok { $group_member->del() } qr/No group name defined to delete from!/, 'Check delete function croaks without group specified';
 throws_ok { $group_member->check_exists() } qr/No group to view defined!/, 'Check exists function croaks without group specified';
 throws_ok { $group_member->view() } qr/No group to view defined!/, 'Check view function croaks without group specified';
 
@@ -37,5 +37,5 @@ throws_ok { $group_member->add_from_file('/tmp/__non__--__tnetsixe__') } qr{Prob
 
 
 ok( my $group_member_config = Apache::Sling::GroupMember::config($sling), 'check config function' );
-ok( Apache::Sling::GroupMember::run($sling,$group_member_config), 'check run function' );
-throws_ok { Apache::Sling::GroupMember::run() } qr/No group_member config supplied!/, 'check run function croaks with no config supplied';
+ok( Apache::Sling::GroupMember->run($sling,$group_member_config), 'check run function' );
+throws_ok { Apache::Sling::GroupMember->run() } qr/No group_member config supplied!/, 'check run function croaks with no config supplied';

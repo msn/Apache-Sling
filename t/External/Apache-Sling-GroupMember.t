@@ -155,13 +155,13 @@ ok( $group_member->view( $test_group2 ) == 1,
     "Group Test: Still 1 Member in \"$test_group2\"." );
 
 # Delete members from groups:
-ok( $group_member->delete( $test_group1, $test_user ),
+ok( $group_member->del( $test_group1, $test_user ),
     "Group Test: Member \"$test_user\" deleted from \"$test_group1\"." );
 ok( $group_member->check_exists( $test_group1, $test_user ),
     "Group Test: Member \"$test_user\" should still exist in \"$test_group1\"." );
 ok( $group_member->view( $test_group1 ) == 2,
     "Group Test: 1 Member in \"$test_group1\"." );
-ok( $group_member->delete( $test_group1, $test_group2 ),
+ok( $group_member->del( $test_group1, $test_group2 ),
     "Group Test: Member \"$test_user\" deleted from \"$test_group1\"." );
 ok( ! $group_member->check_exists( $test_group1, $test_user ),
     "Group Test: Member \"$test_user\" no longer exists in \"$test_group1\"." );
@@ -169,7 +169,7 @@ ok( ! $group_member->check_exists( $test_group1, $test_group2 ),
     "Group Test: Member \"$test_group2\" no longer exists in \"$test_group1\"." );
 ok( $group_member->view( $test_group1 ) == 0,
     "Group Test: 0 Members in \"$test_group1\"." );
-ok( $group_member->delete( $test_group2, $test_user ),
+ok( $group_member->del( $test_group2, $test_user ),
     "Group Test: Member \"$test_user\" deleted from \"$test_group1\"." );
 ok( ! $group_member->check_exists( $test_group2, $test_user ),
     "Group Test: Member \"$test_user\" no longer exists in \"$test_group2\"." );
@@ -180,29 +180,29 @@ ok( $group_member->view( $test_group2 ) == 0,
 ok( my $group_member_config = Apache::Sling::GroupMember::config($sling), 'check group_member_config function' );
 $group_member_config->{'add'} = \$test_user;
 $group_member_config->{'group'} = \$test_group1;
-ok( Apache::Sling::GroupMember::run($sling,$group_member_config), q{check group_member_run function add for $test_group1} );
+ok( Apache::Sling::GroupMember->run($sling,$group_member_config), q{check group_member_run function add for $test_group1} );
 
 # Test group member additions from file:
 my ( $tmp_group_member_additions_handle, $tmp_group_member_additions_name ) = File::Temp::tempfile();
 ok( $group_member_config = Apache::Sling::GroupMember::config($sling), 'check group_member_config function' );
 $group_member_config->{'additions'} = \$tmp_group_member_additions_name;
-ok( Apache::Sling::GroupMember::run($sling,$group_member_config), q{check group_member_run function additions} );
+ok( Apache::Sling::GroupMember->run($sling,$group_member_config), q{check group_member_run function additions} );
 unlink( $tmp_group_member_additions_name ); 
 
 ok( $group_member_config = Apache::Sling::GroupMember::config($sling), 'check group_member_config function' );
 $group_member_config->{'view'} = \1;
 $group_member_config->{'group'} = \$test_group1;
-ok( Apache::Sling::GroupMember::run($sling,$group_member_config), q{check group_member_run function view for $test_group1} );
+ok( Apache::Sling::GroupMember->run($sling,$group_member_config), q{check group_member_run function view for $test_group1} );
 
 ok( $group_member_config = Apache::Sling::GroupMember::config($sling), 'check group_member_config function' );
 $group_member_config->{'exists'} = \$test_user;
 $group_member_config->{'group'} = \$test_group1;
-ok( Apache::Sling::GroupMember::run($sling,$group_member_config), q{check group_member_run function check exists for $test_group1} );
+ok( Apache::Sling::GroupMember->run($sling,$group_member_config), q{check group_member_run function check exists for $test_group1} );
 
 ok( $group_member_config = Apache::Sling::GroupMember::config($sling), 'check group_member_config function' );
 $group_member_config->{'delete'} = \$test_user;
 $group_member_config->{'group'} = \$test_group1;
-ok( Apache::Sling::GroupMember::run($sling,$group_member_config), q{check group_member_run function delete for $test_group1} );
+ok( Apache::Sling::GroupMember->run($sling,$group_member_config), q{check group_member_run function delete for $test_group1} );
 
 # Cleanup Users:
 ok( $user->del( $test_user ),

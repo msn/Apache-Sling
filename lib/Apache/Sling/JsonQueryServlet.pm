@@ -73,7 +73,7 @@ sub all_nodes {
 
 #{{{ sub command_line
 sub command_line {
-    my @ARGV = @_;
+    my ( $json_query_servlet, @ARGV ) = @_;
 
     #options parsing
     my $sling  = Apache::Sling->new;
@@ -83,12 +83,12 @@ sub command_line {
         $config,    'auth=s',     'help|?',      'log|L=s',
         'man|M',    'pass|p=s',   'threads|t=s', 'url|U=s',
         'user|u=s', 'verbose|v+', 'all_nodes|a'
-    ) or help();
+    ) or $json_query_servlet->help();
 
-    if ( $sling->{'Help'} ) { help(); }
-    if ( $sling->{'Man'} )  { man(); }
+    if ( $sling->{'Help'} ) { $json_query_servlet->help(); }
+    if ( $sling->{'Man'} )  { $json_query_servlet->man(); }
 
-    return run( $sling, $config );
+    return $json_query_servlet->run( $sling, $config );
 }
 
 #}}}
@@ -149,6 +149,8 @@ EOF
 #{{{ sub man
 sub man {
 
+    my ($json_query_servlet) = @_;
+
     print <<'EOF';
 json_query_servlet perl script. Provides a means of querying content in sling
 from the command line. The script also acts as a reference implementation for
@@ -156,7 +158,7 @@ the JSON Query Servlet perl library.
 
 EOF
 
-    help();
+    $json_query_servlet->help();
 
     print <<"EOF";
 Example Usage
@@ -173,7 +175,7 @@ EOF
 
 #{{{sub run
 sub run {
-    my ( $sling, $config ) = @_;
+    my ( $json_query_servlet, $sling, $config ) = @_;
     if ( !defined $config ) {
         croak 'No json query servlet config supplied!';
     }
@@ -185,15 +187,15 @@ sub run {
 
     my $authn = new Apache::Sling::Authn( \$sling );
     $authn->login_user();
-    my $json_query_servlet =
-      new Apache::Sling::JsonQueryServlet( \$authn, $sling->{'Verbose'},
-        $sling->{'Log'} );
     my $success = 1;
     if ( defined ${ $config->{'all_nodes'} } ) {
+        $json_query_servlet =
+          new Apache::Sling::JsonQueryServlet( \$authn, $sling->{'Verbose'},
+            $sling->{'Log'} );
         $success = $json_query_servlet->all_nodes();
     }
     else {
-        help();
+        $json_query_servlet->help();
         return 1;
     }
     Apache::Sling::Print::print_result($json_query_servlet);

@@ -70,7 +70,7 @@ sub set_results {
 
 #{{{ sub command_line
 sub command_line {
-    my @ARGV = @_;
+    my ( $authz, @ARGV ) = @_;
 
     #options parsing
     my $sling  = Apache::Sling->new;
@@ -91,12 +91,12 @@ sub command_line {
         'removeChilds!',    'removeNode!',
         'retentionManage!', 'versionManage!',
         'view|V',           'write!'
-    ) or help();
+    ) or $authz->help();
 
-    if ( $sling->{'Help'} ) { help(); }
-    if ( $sling->{'Man'} )  { man(); }
+    if ( $sling->{'Help'} ) { $authz->help(); }
+    if ( $sling->{'Man'} )  { $authz->man(); }
 
-    return run( $sling, $config );
+    return $authz->run( $sling, $config );
 }
 
 #}}}
@@ -261,6 +261,8 @@ EOF
 #{{{ sub man
 sub man {
 
+    my ($authz) = @_;
+
     print <<'EOF';
 authz perl script. Provides a means of manipulating access control on content
 in sling from the command line. This script can be used to get, set, update and
@@ -269,7 +271,7 @@ Authz perl library.
 
 EOF
 
-    help();
+    $authz->help();
 
     print <<"EOF";
 * Authenticate and view the ACL for the /data node:
@@ -339,7 +341,7 @@ sub modify_privileges {
 
 #{{{sub run
 sub run {
-    my ( $sling, $config ) = @_;
+    my ( $authz, $sling, $config ) = @_;
     if ( !defined $config ) {
         croak 'No authz config supplied!';
     }
@@ -349,9 +351,6 @@ sub run {
 
     my $authn = Apache::Sling::Authn->new( \$sling );
     $authn->login_user();
-    my $authz =
-      Apache::Sling::Authz->new( \$authn, $sling->{'Verbose'},
-        $sling->{'Log'} );
     my @grant_privileges;
     my @deny_privileges;
     if ( defined ${ $config->{'read'} } ) {
@@ -418,6 +417,9 @@ sub run {
     }
 
     if ( @grant_privileges || @deny_privileges ) {
+        $authz =
+          Apache::Sling::Authz->new( \$authn, $sling->{'Verbose'},
+            $sling->{'Log'} );
         my $success = $authz->modify_privileges(
             ${ $config->{'remote'} }, ${ $config->{'principal'} },
             \@grant_privileges,       \@deny_privileges
@@ -426,18 +428,24 @@ sub run {
         return $success;
     }
     elsif ( defined ${ $config->{'view'} } ) {
+        $authz =
+          Apache::Sling::Authz->new( \$authn, $sling->{'Verbose'},
+            $sling->{'Log'} );
         my $success = $authz->get_acl( ${ $config->{'remote'} } );
         Apache::Sling::Print::print_result($authz);
         return $success;
     }
     elsif ( defined ${ $config->{'delete'} } ) {
+        $authz =
+          Apache::Sling::Authz->new( \$authn, $sling->{'Verbose'},
+            $sling->{'Log'} );
         my $success =
           $authz->del( ${ $config->{'remote'} }, ${ $config->{'principal'} } );
         Apache::Sling::Print::print_result($authz);
         return $success;
     }
     else {
-        help();
+        $authz->help();
     }
     return 1;
 }

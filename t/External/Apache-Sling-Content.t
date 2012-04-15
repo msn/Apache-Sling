@@ -138,57 +138,57 @@ throws_ok{ $content->upload_from_file($tmp_content_name,0,1)} qr{Problem opening
 ok( my $content_config = Apache::Sling::Content::config($sling), 'check content_config function' );
 $content_config->{'add'} = \$test_content1;
 $content_config->{'remote'} = \$test_content1;
-ok( Apache::Sling::Content::run($sling,$content_config), q{check content_run function adding content $test_content1} );
+ok( Apache::Sling::Content->run($sling,$content_config), q{check content_run function adding content $test_content1} );
 
 # Test content additions from file:
 my ( $tmp_content_additions_handle, $tmp_content_additions_name ) = File::Temp::tempfile();
 ok( $content_config = Apache::Sling::Content::config($sling), 'check content_config function' );
 $content_config->{'additions'} = \$tmp_content_additions_name;
-ok( Apache::Sling::Content::run($sling,$content_config), q{check content_run function additions} );
+ok( Apache::Sling::Content->run($sling,$content_config), q{check content_run function additions} );
 unlink( $tmp_content_additions_name ); 
 
 # Test viewing content:
 ok( $content_config = Apache::Sling::Content::config($sling), 'check content_config function' );
 $content_config->{'view'} = \1;
 $content_config->{'remote'} = \$test_content1;
-ok( Apache::Sling::Content::run($sling,$content_config), q{check content_run function viewing content $test_content1} );
+ok( Apache::Sling::Content->run($sling,$content_config), q{check content_run function viewing content $test_content1} );
 
 # Test copying and moving content:
 ok( $content_config = Apache::Sling::Content::config($sling), 'check content_config function' );
 $content_config->{'copy'} = \1;
 $content_config->{'remote-source'} = \$test_content1;
 $content_config->{'remote'} = \$test_content2;
-ok( ! Apache::Sling::Content::run($sling,$content_config), q{check content_run function copying content $test_content1 to $test_content2} );
+ok( ! Apache::Sling::Content->run($sling,$content_config), q{check content_run function copying content $test_content1 to $test_content2} );
 
 ok( $content_config = Apache::Sling::Content::config($sling), 'check content_config function' );
 $content_config->{'move'} = \1;
 $content_config->{'remote-source'} = \$test_content2;
 $content_config->{'remote'} = \$test_content3;
-ok( Apache::Sling::Content::run($sling,$content_config), q{check content_run function moving content $test_content2 to $test_content1} );
+ok( Apache::Sling::Content->run($sling,$content_config), q{check content_run function moving content $test_content2 to $test_content1} );
 
 # Test uploading file:
 ( $tmp_content_handle, $tmp_content_name ) = File::Temp::tempfile();
 ok( $content_config = Apache::Sling::Content::config($sling), 'check content_config function' );
 $content_config->{'local'} = \$tmp_content_name;
-ok( Apache::Sling::Content::run($sling,$content_config), q{check content_run function with only local defined} );
+ok( Apache::Sling::Content->run($sling,$content_config), q{check content_run function with only local defined} );
 $content_config->{'remote'} = \$test_content2;
-ok( Apache::Sling::Content::run($sling,$content_config), q{check content_run function uploading content $tmp_content_name to $test_content2} );
+ok( Apache::Sling::Content->run($sling,$content_config), q{check content_run function uploading content $tmp_content_name to $test_content2} );
 
 # Cleanup content:
 unlink($tmp_content_name);
 ok( $content_config = Apache::Sling::Content::config($sling), 'check content_config function' );
 $content_config->{'delete'} = \1;
 $content_config->{'remote'} = \$test_content1;
-ok( Apache::Sling::Content::run($sling,$content_config), q{check content_run function deleting content $test_content1} );
+ok( Apache::Sling::Content->run($sling,$content_config), q{check content_run function deleting content $test_content1} );
 $content_config->{'remote'} = \$test_content2;
-ok( Apache::Sling::Content::run($sling,$content_config), q{check content_run function deleting content $test_content2} );
+ok( Apache::Sling::Content->run($sling,$content_config), q{check content_run function deleting content $test_content2} );
 $content_config->{'remote'} = \$test_content3;
-ok( Apache::Sling::Content::run($sling,$content_config), q{check content_run function deleting content $test_content3} );
+ok( Apache::Sling::Content->run($sling,$content_config), q{check content_run function deleting content $test_content3} );
 
 ok( $content_config = Apache::Sling::Content::config($sling), 'check content_config function' );
 $content_config->{'exists'} = \1;
 $content_config->{'remote'} = \$test_content1;
-ok( ! Apache::Sling::Content::run($sling,$content_config), q{check content_run function exists test for $test_content1} );
+ok( ! Apache::Sling::Content->run($sling,$content_config), q{check content_run function exists test for $test_content1} );
 
 ok( ! $content->check_exists( $test_content1 ),
     "Sling Test: Content \"$test_content1\" should no longer exist." );

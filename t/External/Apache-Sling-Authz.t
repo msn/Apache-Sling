@@ -85,7 +85,7 @@ ok( $authz->del( $test_content1, $test_user ),
 # Authz:
 ok( my $authz_config = Apache::Sling::Authz::config($sling), 'check authz_config function' );
 
-ok( Apache::Sling::Authz::run($sling,$authz_config), 'check authz_run function' );
+ok( Apache::Sling::Authz->run($sling,$authz_config), 'check authz_run function' );
 
 $authz_config->{'write'} = \1;
 $authz_config->{'read'} = \1;
@@ -106,7 +106,7 @@ $authz_config->{'removeNode'} = \1;
 $authz_config->{'remote'} = \$test_content1;
 $authz_config->{'principal'} = \$test_user;
 
-ok( Apache::Sling::Authz::run($sling,$authz_config), q{check authz_run function adding permissions to $test_content1 for $test_user} );
+ok( Apache::Sling::Authz->run($sling,$authz_config), q{check authz_run function adding permissions to $test_content1 for $test_user} );
 
 $authz_config->{'write'} = \0;
 $authz_config->{'read'} = \0;
@@ -125,7 +125,7 @@ $authz_config->{'versionManage'} = \0;
 $authz_config->{'view'} = \0;
 $authz_config->{'removeNode'} = \0;
 
-ok( Apache::Sling::Authz::run($sling,$authz_config), q{check authz_run function removing permissions from $test_content1 for $test_user} );
+ok( Apache::Sling::Authz->run($sling,$authz_config), q{check authz_run function removing permissions from $test_content1 for $test_user} );
 
 ok( $authz_config = Apache::Sling::Authz::config($sling), 'check authz_config function' );
 
@@ -133,11 +133,11 @@ $authz_config->{'all'} = \1;
 $authz_config->{'remote'} = \$test_content1;
 $authz_config->{'principal'} = \$test_user;
 
-ok( Apache::Sling::Authz::run($sling,$authz_config), q{check authz_run function adding all permissions to $test_content1 for $test_user} );
+ok( Apache::Sling::Authz->run($sling,$authz_config), q{check authz_run function adding all permissions to $test_content1 for $test_user} );
 
 $authz_config->{'all'} = \0;
 
-ok( Apache::Sling::Authz::run($sling,$authz_config), q{check authz_run function removing all permissions from $test_content1 for $test_user} );
+ok( Apache::Sling::Authz->run($sling,$authz_config), q{check authz_run function removing all permissions from $test_content1 for $test_user} );
 
 ok( $user->del( $test_user ),
     "User Test: User \"$test_user\" deleted successfully." );

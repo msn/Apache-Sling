@@ -149,7 +149,7 @@ sub add_from_file {
 
 #{{{ sub command_line
 sub command_line {
-    my @ARGV = @_;
+    my ( $group_member, @ARGV ) = @_;
 
     #options parsing
     my $sling  = Apache::Sling->new;
@@ -160,12 +160,12 @@ sub command_line {
         'man|M',      'pass|p=s',   'threads|t=s', 'url|U=s',
         'user|u=s',   'verbose|v+', 'add|a=s',     'additions|A=s',
         'delete|d=s', 'exists|e=s', 'group|g=s',   'view|V'
-    ) or help();
+    ) or $group_member->help();
 
-    if ( $sling->{'Help'} ) { help(); }
-    if ( $sling->{'Man'} )  { man(); }
+    if ( $sling->{'Help'} ) { $group_member->help(); }
+    if ( $sling->{'Man'} )  { $group_member->man(); }
 
-    return run( $sling, $config );
+    return $group_member->run( $sling, $config );
 }
 
 #}}}
@@ -242,8 +242,8 @@ sub check_exists {
 
 #}}}
 
-#{{{sub delete
-sub delete {
+#{{{sub del
+sub del {
     my ( $group, $act_on_group, $delete_member ) = @_;
     my $res = Apache::Sling::Request::request(
         \$group,
@@ -298,13 +298,15 @@ EOF
 #{{{ sub man
 sub man {
 
+    my ($group_member) = @_;
+
     print <<'EOF';
 group membership perl script. Provides a means of managing membership of groups
 in sling from the command line.
 
 EOF
 
-    help();
+    $group_member->help();
 
     print <<"EOF";
 Example Usage
@@ -334,7 +336,7 @@ EOF
 
 #{{{sub run
 sub run {
-    my ( $sling, $config ) = @_;
+    my ( $group_member, $sling, $config ) = @_;
     if ( !defined $config ) {
         croak 'No group_member config supplied!';
     }
@@ -374,26 +376,35 @@ sub run {
     }
     else {
         $authn->login_user();
-        my $group_member =
-          new Apache::Sling::GroupMember( \$authn, $sling->{'Verbose'},
-            $sling->{'Log'} );
         if ( defined ${ $config->{'exists'} } ) {
+            $group_member =
+              new Apache::Sling::GroupMember( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $group_member->check_exists( ${ $config->{'group'} },
                 ${ $config->{'exists'} } );
         }
         elsif ( defined ${ $config->{'add'} } ) {
+            $group_member =
+              new Apache::Sling::GroupMember( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $group_member->add( ${ $config->{'group'} },
                 ${ $config->{'add'} } );
         }
         elsif ( defined ${ $config->{'delete'} } ) {
-            $success = $group_member->delete( ${ $config->{'group'} },
+            $group_member =
+              new Apache::Sling::GroupMember( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
+            $success = $group_member->del( ${ $config->{'group'} },
                 ${ $config->{'delete'} } );
         }
         elsif ( defined ${ $config->{'view'} } ) {
+            $group_member =
+              new Apache::Sling::GroupMember( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $group_member->view( ${ $config->{'group'} } );
         }
         else {
-            help();
+            $group_member->help();
             return 1;
         }
         Apache::Sling::Print::print_result($group_member);

@@ -70,7 +70,7 @@ sub add {
 
 #{{{ sub command_line
 sub command_line {
-    my @ARGV = @_;
+    my ( $content, @ARGV ) = @_;
 
     #options parsing
     my $sling  = Apache::Sling->new;
@@ -89,12 +89,12 @@ sub command_line {
         'property|P=s',      'remote|r=s',
         'remote-source|S=s', 'replace|R',
         'view|V'
-    ) or help();
+    ) or $content->help();
 
-    if ( $sling->{'Help'} ) { help(); }
-    if ( $sling->{'Man'} )  { man(); }
+    if ( $sling->{'Help'} ) { $content->help(); }
+    if ( $sling->{'Man'} )  { $content->man(); }
 
-    return run( $sling, $config );
+    return $content->run( $sling, $config );
 }
 
 #}}}
@@ -243,6 +243,7 @@ EOF
 
 #{{{ sub man
 sub man {
+    my ($content) = @_;
 
     print <<'EOF';
 content perl script. Provides a means of uploading content into sling from the
@@ -251,7 +252,7 @@ Content perl library.
 
 EOF
 
-    help();
+    $content->help();
 
     print <<"EOF";
 Example Usage
@@ -314,7 +315,7 @@ sub move {
 
 #{{{sub run
 sub run {
-    my ( $sling, $config ) = @_;
+    my ( $content, $sling, $config ) = @_;
     if ( !defined $config ) {
         croak 'No content config supplied!';
     }
@@ -357,12 +358,12 @@ sub run {
     }
     else {
         $authn->login_user();
-        my $content =
-          Apache::Sling::Content->new( \$authn, $sling->{'Verbose'},
-            $sling->{'Log'} );
         if (   defined ${ $config->{'local'} }
             && defined ${ $config->{'remote'} } )
         {
+            $content =
+              Apache::Sling::Content->new( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $content->upload_file(
                 ${ $config->{'local'} },
                 ${ $config->{'remote'} },
@@ -370,13 +371,22 @@ sub run {
             );
         }
         elsif ( defined ${ $config->{'exists'} } ) {
+            $content =
+              Apache::Sling::Content->new( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $content->check_exists( ${ $config->{'remote'} } );
         }
         elsif ( defined ${ $config->{'add'} } ) {
+            $content =
+              Apache::Sling::Content->new( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success =
               $content->add( ${ $config->{'remote'} }, $config->{'property'} );
         }
         elsif ( defined ${ $config->{'copy'} } ) {
+            $content =
+              Apache::Sling::Content->new( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $content->copy(
                 ${ $config->{'remote-source'} },
                 ${ $config->{'remote'} },
@@ -384,9 +394,15 @@ sub run {
             );
         }
         elsif ( defined ${ $config->{'delete'} } ) {
+            $content =
+              Apache::Sling::Content->new( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $content->del( ${ $config->{'remote'} } );
         }
         elsif ( defined ${ $config->{'move'} } ) {
+            $content =
+              Apache::Sling::Content->new( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $content->move(
                 ${ $config->{'remote-source'} },
                 ${ $config->{'remote'} },
@@ -394,10 +410,13 @@ sub run {
             );
         }
         elsif ( defined ${ $config->{'view'} } ) {
+            $content =
+              Apache::Sling::Content->new( \$authn, $sling->{'Verbose'},
+                $sling->{'Log'} );
             $success = $content->view( ${ $config->{'remote'} } );
         }
         else {
-            help();
+            $content->help();
             return 1;
         }
         Apache::Sling::Print::print_result($content);

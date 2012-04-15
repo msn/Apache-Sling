@@ -39,5 +39,5 @@ throws_ok { $user->add_from_file(\$file) } qr/First CSV column must be the user 
 throws_ok { $user->add_from_file('/tmp/__non__--__tnetsixe__') } qr{Problem opening file: '/tmp/__non__--__tnetsixe__'}, 'Check add_from_file function croaks with non-existent file specified';
 
 ok( my $user_config = Apache::Sling::User::config($sling), 'check config function' );
-ok( Apache::Sling::User::run($sling,$user_config), 'check run function' );
-throws_ok { Apache::Sling::User::run() } qr/No user config supplied!/, 'check run function croaks with no config supplied';
+ok( Apache::Sling::User->run($sling,$user_config), 'check run function' );
+throws_ok { Apache::Sling::User->run() } qr/No user config supplied!/, 'check run function croaks with no config supplied';
