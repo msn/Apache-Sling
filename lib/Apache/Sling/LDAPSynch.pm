@@ -22,7 +22,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = qw(command_line);
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 #{{{sub new
 
@@ -517,30 +517,77 @@ sub synch_listed_since {
 #{{{ sub command_line
 sub command_line {
     my ( $ldap_synch, @ARGV ) = @_;
+    my $sling = Apache::Sling->new;
+    my $config = $ldap_synch->config( $sling, @ARGV );
+    return $ldap_synch->run( $sling, $config );
+}
 
-    #options parsing
-    my $sling  = Apache::Sling->new;
-    my $config = config($sling);
+#}}}
+
+#{{{sub config
+
+sub config {
+    my ( $ldap_synch, $sling, @ARGV ) = @_;
+    my $attributes;
+    my $download_user_list;
+    my $flag_disabled;
+    my $ldap_attributes;
+    my $ldap_base;
+    my $ldap_dn;
+    my $ldap_filter;
+    my $ldap_host;
+    my $ldap_pass;
+    my $synch_full;
+    my $synch_full_since;
+    my $synch_listed;
+    my $synch_listed_since;
+    my $upload_user_list;
+
+    my %ldap_synch_config = (
+        'auth'               => \$sling->{'Auth'},
+        'help'               => \$sling->{'Help'},
+        'log'                => \$sling->{'Log'},
+        'man'                => \$sling->{'Man'},
+        'pass'               => \$sling->{'Pass'},
+        'threads'            => \$sling->{'Threads'},
+        'url'                => \$sling->{'URL'},
+        'user'               => \$sling->{'User'},
+        'verbose'            => \$sling->{'Verbose'},
+        'attributes'         => $attributes,
+        'download-user-list' => $download_user_list,
+        'flag-disabled'      => $flag_disabled,
+        'ldap-attributes'    => $ldap_attributes,
+        'ldap-base'          => $ldap_base,
+        'ldap-dn'            => $ldap_dn,
+        'ldap-filter'        => $ldap_filter,
+        'ldap-host'          => $ldap_host,
+        'ldap-pass'          => $ldap_pass,
+        'synch-full'         => $synch_full,
+        'synch-full-since'   => $synch_full_since,
+        'synch-listed'       => $synch_listed,
+        'synch-listed-since' => $synch_listed_since,
+        'upload-user-list'   => $upload_user_list
+    );
 
     GetOptions(
-        $config,                  'auth=s',
+        \%ldap_synch_config,      'auth=s',
         'help|?',                 'log|L=s',
         'man|M',                  'pass|p=s',
         'threads|t=s',            'url|U=s',
         'user|u=s',               'verbose|v+',
-        'download-user-list|d=s', 'ldap-attributes|a=s',
+        'download-user-list',     'ldap-attributes|a=s',
         'ldap-base|b=s',          'ldap-dn|d=s',
         'ldap-filter|f=s',        'ldap-host|h=s',
         'ldap-pass|P=s',          'attributes|A=s',
         'synch-full|s',           'synch-full-since|S=s',
-        'synch-listed|l',         'synch-listed-since|L=s',
-        'upload-user-list|U=s'
+        'synch-listed|l',         'synch-listed-since',
+        'upload-user-list'
     ) or $ldap_synch->help();
 
     if ( $sling->{'Help'} ) { $ldap_synch->help(); }
     if ( $sling->{'Man'} )  { $ldap_synch->man(); }
 
-    return $ldap_synch->run( $sling, $config );
+    return \%ldap_synch_config;
 }
 
 #}}}
@@ -554,7 +601,7 @@ The following options are accepted:
 
  --attributes or -a (attribs)          - Comma separated list of attributes.
  --auth (type)                         - Specify auth type. If ommitted, default is used.
- --download-user-list or -d (userList) - Download user list to file userList
+ --download-user-list (userList)       - Download user list to file userList
  --flag-disabled or -f                 - property to denote user should be disabled.
  --help or -?                          - View the script synopsis and options.
  --ldap-attributes or -A (attribs)     - Specify ldap attributes to be updated.
@@ -569,8 +616,8 @@ The following options are accepted:
  --synch-full or -s                    - Perform a full synchronization from ldap to sling.
  --synch-full-since or -S (since)      - Perform a full synchronization from ldap to sling using changes since specified time.
  --synch-listed or -l                  - Perform a sychronization of listed users from ldap to sling.
- --synch-listed-since or -L (since)    - Perform a sychronization of listed users from ldap to sling using changes since specified time.
- --upload-user-list or -U (userList)   - Upload user list specified by file userList.
+ --synch-listed-since (since)          - Perform a sychronization of listed users from ldap to sling using changes since specified time.
+ --upload-user-list (userList)         - Upload user list specified by file userList.
  --url or -U (URL)                     - URL for system being tested against.
  --user or -u (username)               - Name of user to perform any actions as.
  --verbose or -v or -vv or -vvv        - Increase verbosity of output.
@@ -617,56 +664,6 @@ Example Usage
 EOF
 
     return 1;
-}
-
-#}}}
-
-#{{{sub config
-
-sub config {
-    my ($sling) = @_;
-    my $attributes;
-    my $download_user_list;
-    my $flag_disabled;
-    my $ldap_attributes;
-    my $ldap_base;
-    my $ldap_dn;
-    my $ldap_filter;
-    my $ldap_host;
-    my $ldap_pass;
-    my $synch_full;
-    my $synch_full_since;
-    my $synch_listed;
-    my $synch_listed_since;
-    my $upload_user_list;
-
-    my %ldap_synch_config = (
-        'auth'               => \$sling->{'Auth'},
-        'help'               => \$sling->{'Help'},
-        'log'                => \$sling->{'Log'},
-        'man'                => \$sling->{'Man'},
-        'pass'               => \$sling->{'Pass'},
-        'threads'            => \$sling->{'Threads'},
-        'url'                => \$sling->{'URL'},
-        'user'               => \$sling->{'User'},
-        'verbose'            => \$sling->{'Verbose'},
-        'attributes'         => $attributes,
-        'download-user-list' => $download_user_list,
-        'flag-disabled'      => $flag_disabled,
-        'ldap-attributes'    => $ldap_attributes,
-        'ldap-base'          => $ldap_base,
-        'ldap-dn'            => $ldap_dn,
-        'ldap-filter'        => $ldap_filter,
-        'ldap-host'          => $ldap_host,
-        'ldap-pass'          => $ldap_pass,
-        'synch-full'         => $synch_full,
-        'synch-full-since'   => $synch_full_since,
-        'synch-listed'       => $synch_listed,
-        'synch-listed-since' => $synch_listed_since,
-        'upload-user-list'   => $upload_user_list
-    );
-
-    return \%ldap_synch_config;
 }
 
 #}}}

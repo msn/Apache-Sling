@@ -1,5 +1,9 @@
 Revision history for Perl extension Apache::Sling.
 
+0.26  Tue Apr 17 07:42:00 2012
+        - Adjusting command_line / config methods to be easier to subclass.
+        - Removing duplicate command line options in ldap synch.
+
 0.25  Sun Apr 15 15:38:00 2012
         - Allowing help(), man() and run() to be overridden.
         - Fixing variable quoting in command line script.

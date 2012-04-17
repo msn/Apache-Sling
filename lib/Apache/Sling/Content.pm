@@ -18,7 +18,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = qw(command_line);
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 #{{{sub new
 sub new {
@@ -71,29 +71,8 @@ sub add {
 #{{{ sub command_line
 sub command_line {
     my ( $content, @ARGV ) = @_;
-
-    #options parsing
-    my $sling  = Apache::Sling->new;
-    my $config = config($sling);
-
-    GetOptions(
-        $config,             'auth=s',
-        'help|?',            'log|L=s',
-        'man|M',             'pass|p=s',
-        'threads|t=s',       'url|U=s',
-        'user|u=s',          'verbose|v+',
-        'add|a',             'additions|A=s',
-        'copy|c',            'delete|d',
-        'exists|e',          'filename|n=s',
-        'local|l=s',         'move|m',
-        'property|P=s',      'remote|r=s',
-        'remote-source|S=s', 'replace|R',
-        'view|V'
-    ) or $content->help();
-
-    if ( $sling->{'Help'} ) { $content->help(); }
-    if ( $sling->{'Man'} )  { $content->man(); }
-
+    my $sling = Apache::Sling->new;
+    my $config = $content->config( $sling, @ARGV );
     return $content->run( $sling, $config );
 }
 
@@ -102,7 +81,7 @@ sub command_line {
 #{{{sub config
 
 sub config {
-    my ($sling) = @_;
+    my ( $content, $sling, @ARGV ) = @_;
     my $add;
     my $additions;
     my $copy;
@@ -141,6 +120,24 @@ sub config {
         'replace'       => \$replace,
         'view'          => \$view
     );
+
+    GetOptions(
+        \%content_config,    'auth=s',
+        'help|?',            'log|L=s',
+        'man|M',             'pass|p=s',
+        'threads|t=s',       'url|U=s',
+        'user|u=s',          'verbose|v+',
+        'add|a',             'additions|A=s',
+        'copy|c',            'delete|d',
+        'exists|e',          'filename|n=s',
+        'local|l=s',         'move|m',
+        'property|P=s',      'remote|r=s',
+        'remote-source|S=s', 'replace|R',
+        'view|V'
+    ) or $content->help();
+
+    if ( $sling->{'Help'} ) { $content->help(); }
+    if ( $sling->{'Man'} )  { $content->man(); }
 
     return \%content_config;
 }

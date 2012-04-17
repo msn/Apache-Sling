@@ -16,7 +16,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 #{{{sub string_to_request
 

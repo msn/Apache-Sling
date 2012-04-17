@@ -21,7 +21,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = qw(command_line);
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 #{{{sub new
 
@@ -150,21 +150,8 @@ sub add_from_file {
 #{{{ sub command_line
 sub command_line {
     my ( $group_member, @ARGV ) = @_;
-
-    #options parsing
-    my $sling  = Apache::Sling->new;
-    my $config = config($sling);
-
-    GetOptions(
-        $config,      'auth=s',     'help|?',      'log|L=s',
-        'man|M',      'pass|p=s',   'threads|t=s', 'url|U=s',
-        'user|u=s',   'verbose|v+', 'add|a=s',     'additions|A=s',
-        'delete|d=s', 'exists|e=s', 'group|g=s',   'view|V'
-    ) or $group_member->help();
-
-    if ( $sling->{'Help'} ) { $group_member->help(); }
-    if ( $sling->{'Man'} )  { $group_member->man(); }
-
+    my $sling = Apache::Sling->new;
+    my $config = $group_member->config( $sling, @ARGV );
     return $group_member->run( $sling, $config );
 }
 
@@ -173,7 +160,7 @@ sub command_line {
 #{{{sub config
 
 sub config {
-    my ($sling) = @_;
+    my ( $group_member, $sling, @ARGV ) = @_;
     my $additions;
     my $add;
     my $delete;
@@ -198,6 +185,20 @@ sub config {
         'group'     => \$group,
         'view'      => \$view
     );
+
+    GetOptions(
+        \%group_member_config, 'auth=s',
+        'help|?',              'log|L=s',
+        'man|M',               'pass|p=s',
+        'threads|t=s',         'url|U=s',
+        'user|u=s',            'verbose|v+',
+        'add|a=s',             'additions|A=s',
+        'delete|d=s',          'exists|e=s',
+        'group|g=s',           'view|V'
+    ) or $group_member->help();
+
+    if ( $sling->{'Help'} ) { $group_member->help(); }
+    if ( $sling->{'Man'} )  { $group_member->man(); }
 
     return \%group_member_config;
 }

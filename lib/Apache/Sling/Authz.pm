@@ -18,7 +18,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = qw(command_line);
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 #{{{sub new
 
@@ -71,31 +71,8 @@ sub set_results {
 #{{{ sub command_line
 sub command_line {
     my ( $authz, @ARGV ) = @_;
-
-    #options parsing
-    my $sling  = Apache::Sling->new;
-    my $config = config($sling);
-
-    GetOptions(
-        $config,            'auth=s',
-        'help|?',           'log|L=s',
-        'man|M',            'pass|p=s',
-        'threads|t=s',      'url|U=s',
-        'user|u=s',         'verbose|v+',
-        'addChildNodes!',   'all!',
-        'delete|d',         'lifecycleManage!',
-        'lockManage!',      'modifyACL!',
-        'modifyProps!',     'nodeTypeManage!',
-        'principal|P=s',    'readACL!',
-        'read!',            'remote|r=s',
-        'removeChilds!',    'removeNode!',
-        'retentionManage!', 'versionManage!',
-        'view|V',           'write!'
-    ) or $authz->help();
-
-    if ( $sling->{'Help'} ) { $authz->help(); }
-    if ( $sling->{'Man'} )  { $authz->man(); }
-
+    my $sling = Apache::Sling->new;
+    my $config = $authz->config( $sling, @ARGV );
     return $authz->run( $sling, $config );
 }
 
@@ -104,7 +81,7 @@ sub command_line {
 #{{{sub config
 
 sub config {
-    my ($sling) = @_;
+    my ( $authz, $sling, @ARGV ) = @_;
     my $delete;
     my $principal;
     my $remote_node;
@@ -155,6 +132,26 @@ sub config {
         'view'            => \$view,
         'write'           => \$write
     );
+
+    GetOptions(
+        \%authz_config,     'auth=s',
+        'help|?',           'log|L=s',
+        'man|M',            'pass|p=s',
+        'threads|t=s',      'url|U=s',
+        'user|u=s',         'verbose|v+',
+        'addChildNodes!',   'all!',
+        'delete|d',         'lifecycleManage!',
+        'lockManage!',      'modifyACL!',
+        'modifyProps!',     'nodeTypeManage!',
+        'principal|P=s',    'readACL!',
+        'read!',            'remote|r=s',
+        'removeChilds!',    'removeNode!',
+        'retentionManage!', 'versionManage!',
+        'view|V',           'write!'
+    ) or $authz->help();
+
+    if ( $sling->{'Help'} ) { $authz->help(); }
+    if ( $sling->{'Man'} )  { $authz->man(); }
 
     return \%authz_config;
 }

@@ -18,7 +18,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = qw(command_line);
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 #{{{sub new
 sub new {
@@ -74,20 +74,8 @@ sub all_nodes {
 #{{{ sub command_line
 sub command_line {
     my ( $json_query_servlet, @ARGV ) = @_;
-
-    #options parsing
-    my $sling  = Apache::Sling->new;
-    my $config = config($sling);
-
-    GetOptions(
-        $config,    'auth=s',     'help|?',      'log|L=s',
-        'man|M',    'pass|p=s',   'threads|t=s', 'url|U=s',
-        'user|u=s', 'verbose|v+', 'all_nodes|a'
-    ) or $json_query_servlet->help();
-
-    if ( $sling->{'Help'} ) { $json_query_servlet->help(); }
-    if ( $sling->{'Man'} )  { $json_query_servlet->man(); }
-
+    my $sling = Apache::Sling->new;
+    my $config = $json_query_servlet->config( $sling, @ARGV );
     return $json_query_servlet->run( $sling, $config );
 }
 
@@ -96,7 +84,7 @@ sub command_line {
 #{{{sub config
 
 sub config {
-    my ($sling) = @_;
+    my ( $json_query_servlet, $sling, @ARGV ) = @_;
     my $all_nodes;
 
     my %json_query_servlet_config = (
@@ -111,6 +99,18 @@ sub config {
         'verbose'   => \$sling->{'Verbose'},
         'all_nodes' => \$all_nodes
     );
+
+    GetOptions(
+        \%json_query_servlet_config, 'auth=s',
+        'help|?',                    'log|L=s',
+        'man|M',                     'pass|p=s',
+        'threads|t=s',               'url|U=s',
+        'user|u=s',                  'verbose|v+',
+        'all_nodes|a'
+    ) or $json_query_servlet->help();
+
+    if ( $sling->{'Help'} ) { $json_query_servlet->help(); }
+    if ( $sling->{'Man'} )  { $json_query_servlet->man(); }
 
     return \%json_query_servlet_config;
 }

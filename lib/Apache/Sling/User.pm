@@ -19,7 +19,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = qw(command_line);
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 #{{{sub new
 
@@ -188,29 +188,8 @@ sub check_exists {
 #{{{ sub command_line
 sub command_line {
     my ( $user, @ARGV ) = @_;
-
-    #options parsing
-    my $sling  = Apache::Sling->new;
-    my $config = config($sling);
-
-    GetOptions(
-        $config,               'auth=s',
-        'help|?',              'log|L=s',
-        'man|M',               'pass|p=s',
-        'threads|t=s',         'url|U=s',
-        'user|u=s',            'verbose|v+',
-        'add|a=s',             'additions|A=s',
-        'change-password|c=s', 'delete|d=s',
-        'email|E=s',           'first-name|f=s',
-        'exists|e=s',          'last-name|l=s',
-        'new-password|n=s',    'password|w=s',
-        'property|P=s',        'update=s',
-        'view|V=s'
-    ) or $user->help();
-
-    if ( $sling->{'Help'} ) { $user->help(); }
-    if ( $sling->{'Man'} )  { $user->man(); }
-
+    my $sling = Apache::Sling->new;
+    my $config = $user->config( $sling, @ARGV );
     return $user->run( $sling, $config );
 }
 
@@ -219,7 +198,7 @@ sub command_line {
 #{{{sub config
 
 sub config {
-    my ($sling) = @_;
+    my ( $user, $sling, @ARGV ) = @_;
     my $password;
     my $additions;
     my $add;
@@ -258,6 +237,24 @@ sub config {
         'update'          => \$update,
         'view'            => \$view
     );
+
+    GetOptions(
+        \%user_config,         'auth=s',
+        'help|?',              'log|L=s',
+        'man|M',               'pass|p=s',
+        'threads|t=s',         'url|U=s',
+        'user|u=s',            'verbose|v+',
+        'add|a=s',             'additions|A=s',
+        'change-password|c=s', 'delete|d=s',
+        'email|E=s',           'first-name|f=s',
+        'exists|e=s',          'last-name|l=s',
+        'new-password|n=s',    'password|w=s',
+        'property|P=s',        'update=s',
+        'view|V=s'
+    ) or $user->help();
+
+    if ( $sling->{'Help'} ) { $user->help(); }
+    if ( $sling->{'Man'} )  { $user->man(); }
 
     return \%user_config;
 }
