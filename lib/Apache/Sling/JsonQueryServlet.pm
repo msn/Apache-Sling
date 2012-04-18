@@ -18,7 +18,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = qw(command_line);
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 #{{{sub new
 sub new {
@@ -85,6 +85,27 @@ sub command_line {
 
 sub config {
     my ( $json_query_servlet, $sling, @ARGV ) = @_;
+
+    my $json_query_servlet_config = $json_query_servlet->config_hash( $sling, @ARGV );
+
+    GetOptions(
+        $json_query_servlet_config, 'auth=s',
+        'help|?',                    'log|L=s',
+        'man|M',                     'pass|p=s',
+        'threads|t=s',               'url|U=s',
+        'user|u=s',                  'verbose|v+',
+        'all_nodes|a'
+    ) or $json_query_servlet->help();
+
+    return $json_query_servlet_config;
+}
+
+#}}}
+
+#{{{sub config_hash
+
+sub config_hash {
+    my ( $json_query_servlet, $sling, @ARGV ) = @_;
     my $all_nodes;
 
     my %json_query_servlet_config = (
@@ -99,18 +120,6 @@ sub config {
         'verbose'   => \$sling->{'Verbose'},
         'all_nodes' => \$all_nodes
     );
-
-    GetOptions(
-        \%json_query_servlet_config, 'auth=s',
-        'help|?',                    'log|L=s',
-        'man|M',                     'pass|p=s',
-        'threads|t=s',               'url|U=s',
-        'user|u=s',                  'verbose|v+',
-        'all_nodes|a'
-    ) or $json_query_servlet->help();
-
-    if ( $sling->{'Help'} ) { $json_query_servlet->help(); }
-    if ( $sling->{'Man'} )  { $json_query_servlet->man(); }
 
     return \%json_query_servlet_config;
 }
@@ -188,7 +197,9 @@ sub run {
     my $authn = new Apache::Sling::Authn( \$sling );
     $authn->login_user();
     my $success = 1;
-    if ( defined ${ $config->{'all_nodes'} } ) {
+    if ( $sling->{'Help'} ) { $json_query_servlet->help(); }
+    elsif ( $sling->{'Man'} )  { $json_query_servlet->man(); }
+    elsif ( defined ${ $config->{'all_nodes'} } ) {
         $json_query_servlet =
           new Apache::Sling::JsonQueryServlet( \$authn, $sling->{'Verbose'},
             $sling->{'Log'} );

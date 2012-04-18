@@ -18,7 +18,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = qw(command_line);
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 #{{{sub new
 
@@ -82,6 +82,34 @@ sub command_line {
 
 sub config {
     my ( $authz, $sling, @ARGV ) = @_;
+    my $authz_config = $authz->config_hash( $sling, @ARGV );
+
+    GetOptions(
+        $authz_config,     'auth=s',
+        'help|?',           'log|L=s',
+        'man|M',            'pass|p=s',
+        'threads|t=s',      'url|U=s',
+        'user|u=s',         'verbose|v+',
+        'addChildNodes!',   'all!',
+        'delete|d',         'lifecycleManage!',
+        'lockManage!',      'modifyACL!',
+        'modifyProps!',     'nodeTypeManage!',
+        'principal|P=s',    'readACL!',
+        'read!',            'remote|r=s',
+        'removeChilds!',    'removeNode!',
+        'retentionManage!', 'versionManage!',
+        'view|V',           'write!'
+    ) or $authz->help();
+
+    return $authz_config;
+}
+
+#}}}
+
+#{{{sub config_hash
+
+sub config_hash {
+    my ( $authz, $sling, @ARGV ) = @_;
     my $delete;
     my $principal;
     my $remote_node;
@@ -132,26 +160,6 @@ sub config {
         'view'            => \$view,
         'write'           => \$write
     );
-
-    GetOptions(
-        \%authz_config,     'auth=s',
-        'help|?',           'log|L=s',
-        'man|M',            'pass|p=s',
-        'threads|t=s',      'url|U=s',
-        'user|u=s',         'verbose|v+',
-        'addChildNodes!',   'all!',
-        'delete|d',         'lifecycleManage!',
-        'lockManage!',      'modifyACL!',
-        'modifyProps!',     'nodeTypeManage!',
-        'principal|P=s',    'readACL!',
-        'read!',            'remote|r=s',
-        'removeChilds!',    'removeNode!',
-        'retentionManage!', 'versionManage!',
-        'view|V',           'write!'
-    ) or $authz->help();
-
-    if ( $sling->{'Help'} ) { $authz->help(); }
-    if ( $sling->{'Man'} )  { $authz->man(); }
 
     return \%authz_config;
 }
@@ -413,7 +421,9 @@ sub run {
           : push @deny_privileges, 'all';
     }
 
-    if ( @grant_privileges || @deny_privileges ) {
+    if ( $sling->{'Help'} ) { $authz->help(); }
+    elsif ( $sling->{'Man'} )  { $authz->man(); }
+    elsif ( @grant_privileges || @deny_privileges ) {
         $authz =
           Apache::Sling::Authz->new( \$authn, $sling->{'Verbose'},
             $sling->{'Log'} );

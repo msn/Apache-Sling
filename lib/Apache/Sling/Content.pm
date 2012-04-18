@@ -18,7 +18,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = qw(command_line);
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 #{{{sub new
 sub new {
@@ -82,6 +82,32 @@ sub command_line {
 
 sub config {
     my ( $content, $sling, @ARGV ) = @_;
+    my $content_config = $content->config_hash( $sling, @ARGV );
+
+    GetOptions(
+        $content_config,    'auth=s',
+        'help|?',            'log|L=s',
+        'man|M',             'pass|p=s',
+        'threads|t=s',       'url|U=s',
+        'user|u=s',          'verbose|v+',
+        'add|a',             'additions|A=s',
+        'copy|c',            'delete|d',
+        'exists|e',          'filename|n=s',
+        'local|l=s',         'move|m',
+        'property|P=s',      'remote|r=s',
+        'remote-source|S=s', 'replace|R',
+        'view|V'
+    ) or $content->help();
+
+    return $content_config;
+}
+
+#}}}
+
+#{{{sub config_hash
+
+sub config_hash {
+    my ( $content, $sling, @ARGV ) = @_;
     my $add;
     my $additions;
     my $copy;
@@ -120,24 +146,6 @@ sub config {
         'replace'       => \$replace,
         'view'          => \$view
     );
-
-    GetOptions(
-        \%content_config,    'auth=s',
-        'help|?',            'log|L=s',
-        'man|M',             'pass|p=s',
-        'threads|t=s',       'url|U=s',
-        'user|u=s',          'verbose|v+',
-        'add|a',             'additions|A=s',
-        'copy|c',            'delete|d',
-        'exists|e',          'filename|n=s',
-        'local|l=s',         'move|m',
-        'property|P=s',      'remote|r=s',
-        'remote-source|S=s', 'replace|R',
-        'view|V'
-    ) or $content->help();
-
-    if ( $sling->{'Help'} ) { $content->help(); }
-    if ( $sling->{'Man'} )  { $content->man(); }
 
     return \%content_config;
 }
@@ -327,7 +335,9 @@ sub run {
       : Apache::Sling::Authn->new( \$sling );
     my $success = 1;
 
-    if ( defined ${ $config->{'additions'} } ) {
+    if ( $sling->{'Help'} ) { $content->help(); }
+    elsif ( $sling->{'Man'} )  { $content->man(); }
+    elsif ( defined ${ $config->{'additions'} } ) {
         my $message =
           "Adding content from file \"" . ${ $config->{'additions'} } . "\":\n";
         Apache::Sling::Print::print_with_lock( "$message", $sling->{'Log'} );

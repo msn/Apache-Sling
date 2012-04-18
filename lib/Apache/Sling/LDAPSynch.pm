@@ -22,7 +22,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = qw(command_line);
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 #{{{sub new
 
@@ -528,6 +528,32 @@ sub command_line {
 
 sub config {
     my ( $ldap_synch, $sling, @ARGV ) = @_;
+    my $ldap_synch_config = $ldap_synch->config_hash( $sling, @ARGV );
+
+    GetOptions(
+        $ldap_synch_config,      'auth=s',
+        'help|?',                 'log|L=s',
+        'man|M',                  'pass|p=s',
+        'threads|t=s',            'url|U=s',
+        'user|u=s',               'verbose|v+',
+        'download-user-list',     'ldap-attributes|a=s',
+        'ldap-base|b=s',          'ldap-dn|d=s',
+        'ldap-filter|f=s',        'ldap-host|h=s',
+        'ldap-pass|P=s',          'attributes|A=s',
+        'synch-full|s',           'synch-full-since|S=s',
+        'synch-listed|l',         'synch-listed-since',
+        'upload-user-list'
+    ) or $ldap_synch->help();
+
+    return $ldap_synch_config;
+}
+
+#}}}
+
+#{{{sub config_hash
+
+sub config_hash {
+    my ( $ldap_synch, $sling, @ARGV ) = @_;
     my $attributes;
     my $download_user_list;
     my $flag_disabled;
@@ -568,24 +594,6 @@ sub config {
         'synch-listed-since' => $synch_listed_since,
         'upload-user-list'   => $upload_user_list
     );
-
-    GetOptions(
-        \%ldap_synch_config,      'auth=s',
-        'help|?',                 'log|L=s',
-        'man|M',                  'pass|p=s',
-        'threads|t=s',            'url|U=s',
-        'user|u=s',               'verbose|v+',
-        'download-user-list',     'ldap-attributes|a=s',
-        'ldap-base|b=s',          'ldap-dn|d=s',
-        'ldap-filter|f=s',        'ldap-host|h=s',
-        'ldap-pass|P=s',          'attributes|A=s',
-        'synch-full|s',           'synch-full-since|S=s',
-        'synch-listed|l',         'synch-listed-since',
-        'upload-user-list'
-    ) or $ldap_synch->help();
-
-    if ( $sling->{'Help'} ) { $ldap_synch->help(); }
-    if ( $sling->{'Man'} )  { $ldap_synch->man(); }
 
     return \%ldap_synch_config;
 }
@@ -681,7 +689,9 @@ sub run {
 
     my $success = 1;
 
-    if ( defined ${ $config->{'download-user-list'} } ) {
+    if ( $sling->{'Help'} ) { $ldap_synch->help(); }
+    elsif ( $sling->{'Man'} )  { $ldap_synch->man(); }
+    elsif ( defined ${ $config->{'download-user-list'} } ) {
         $ldap_synch = new Apache::Sling::LDAPSynch(
             ${ $config->{'ldap-host'} },
             ${ $config->{'ldap-base'} },

@@ -1,5 +1,8 @@
 Revision history for Perl extension Apache::Sling.
 
+0.27  Wed Apr 18 21:00:00 2012
+        - Splitting config into config and config_hash to allow subclassing.
+
 0.26  Tue Apr 17 07:42:00 2012
         - Adjusting command_line / config methods to be easier to subclass.
         - Removing duplicate command line options in ldap synch.

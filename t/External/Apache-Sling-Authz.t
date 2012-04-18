@@ -83,7 +83,7 @@ ok( $authz->del( $test_content1, $test_user ),
     "Authz Test: Content \"$test_content1\" ACL privileges successfully removed for principal: \"$test_user\"." );
 
 # Authz:
-ok( my $authz_config = Apache::Sling::Authz::config($sling), 'check authz_config function' );
+ok( my $authz_config = Apache::Sling::Authz->config($sling), 'check authz_config function' );
 
 ok( Apache::Sling::Authz->run($sling,$authz_config), 'check authz_run function' );
 
@@ -127,7 +127,7 @@ $authz_config->{'removeNode'} = \0;
 
 ok( Apache::Sling::Authz->run($sling,$authz_config), q{check authz_run function removing permissions from $test_content1 for $test_user} );
 
-ok( $authz_config = Apache::Sling::Authz::config($sling), 'check authz_config function' );
+ok( $authz_config = Apache::Sling::Authz->config($sling), 'check authz_config function' );
 
 $authz_config->{'all'} = \1;
 $authz_config->{'remote'} = \$test_content1;

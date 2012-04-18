@@ -20,7 +20,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = qw(command_line);
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 #{{{sub new
 
@@ -175,6 +175,24 @@ sub command_line {
 
 sub config {
     my ( $group, $sling, @ARGV ) = @_;
+    my $group_config = $group->config_hash( $sling, @ARGV );
+
+    GetOptions(
+        $group_config, 'auth=s',     'help|?',       'log|L=s',
+        'man|M',        'pass|p=s',   'threads|t=s',  'url|U=s',
+        'user|u=s',     'verbose|v+', 'add|a=s',      'additions|A=s',
+        'delete|d=s',   'exists|e=s', 'property|P=s', 'view|V=s'
+    ) or $group->help();
+
+    return $group_config;
+}
+
+#}}}
+
+#{{{sub config_hash
+
+sub config_hash {
+    my ( $group, $sling, @ARGV ) = @_;
     my $additions;
     my $add;
     my $delete;
@@ -199,16 +217,6 @@ sub config {
         'property'  => \@property,
         'view'      => \$view
     );
-
-    GetOptions(
-        \%group_config, 'auth=s',     'help|?',       'log|L=s',
-        'man|M',        'pass|p=s',   'threads|t=s',  'url|U=s',
-        'user|u=s',     'verbose|v+', 'add|a=s',      'additions|A=s',
-        'delete|d=s',   'exists|e=s', 'property|P=s', 'view|V=s'
-    ) or $group->help();
-
-    if ( $sling->{'Help'} ) { $group->help(); }
-    if ( $sling->{'Man'} )  { $group->man(); }
 
     return \%group_config;
 }
@@ -325,7 +333,9 @@ sub run {
 
     my $success = 1;
 
-    if ( defined ${ $config->{'additions'} } ) {
+    if ( $sling->{'Help'} ) { $group->help(); }
+    elsif ( $sling->{'Man'} )  { $group->man(); }
+    elsif ( defined ${ $config->{'additions'} } ) {
         my $message =
           "Adding groups from file \"" . ${ $config->{'additions'} } . "\":\n";
         Apache::Sling::Print::print_with_lock( "$message", $sling->{'Log'} );

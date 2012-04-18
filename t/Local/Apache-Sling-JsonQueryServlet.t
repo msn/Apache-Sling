@@ -29,6 +29,6 @@ $json_query_servlet->set_results( 'Test Message', undef );
 ok( $json_query_servlet->{ 'Message' } eq 'Test Message', 'Message now set' );
 ok( ! defined $json_query_servlet->{ 'Response' },        'Check response no longer defined' );
 
-ok( my $json_query_servlet_config = Apache::Sling::JsonQueryServlet::config($sling), 'check config function' );
+ok( my $json_query_servlet_config = Apache::Sling::JsonQueryServlet->config($sling), 'check config function' );
 ok( Apache::Sling::JsonQueryServlet->run($sling,$json_query_servlet_config), 'check run function' );
 throws_ok { Apache::Sling::JsonQueryServlet->run() } qr/No json query servlet config supplied!/, 'check run function croaks with no config supplied';

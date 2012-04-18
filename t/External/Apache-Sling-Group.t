@@ -136,28 +136,28 @@ $group = Apache::Sling::Group->new( \$authn, $verbose, $log );
 isa_ok $group, 'Apache::Sling::Group', 'group';
 
 # add group:
-ok( my $group_config = Apache::Sling::Group::config($sling), 'check group_config function' );
+ok( my $group_config = Apache::Sling::Group->config($sling), 'check group_config function' );
 $group_config->{'add'} = \$test_group1;
 ok( Apache::Sling::Group->run($sling,$group_config), q{check group_run function add for $test_group1} );
 
 # Test group additions from file:
 my ( $tmp_group_additions_handle, $tmp_group_additions_name ) = File::Temp::tempfile();
-ok( $group_config = Apache::Sling::Group::config($sling), 'check group_config function' );
+ok( $group_config = Apache::Sling::Group->config($sling), 'check group_config function' );
 $group_config->{'additions'} = \$tmp_group_additions_name;
 ok( Apache::Sling::Group->run($sling,$group_config), q{check group_run function additions} );
 unlink( $tmp_group_additions_name ); 
 
 # view and check group exists:
-ok( $group_config = Apache::Sling::Group::config($sling), 'check group_config function' );
+ok( $group_config = Apache::Sling::Group->config($sling), 'check group_config function' );
 $group_config->{'view'} = \$test_group1;
 ok( Apache::Sling::Group->run($sling,$group_config), q{check group_run function view for $test_group1} );
 
-ok( $group_config = Apache::Sling::Group::config($sling), 'check group_config function' );
+ok( $group_config = Apache::Sling::Group->config($sling), 'check group_config function' );
 $group_config->{'exists'} = \$test_group1;
 ok( Apache::Sling::Group->run($sling,$group_config), q{check group_run function check exists for $test_group1} );
 
 # Cleanup group:
-ok( $group_config = Apache::Sling::Group::config($sling), 'check group_config function' );
+ok( $group_config = Apache::Sling::Group->config($sling), 'check group_config function' );
 $group_config->{'delete'} = \$test_group1;
 ok( Apache::Sling::Group->run($sling,$group_config), q{check group_run function delete for $test_group1} );
 

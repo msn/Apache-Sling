@@ -183,7 +183,7 @@ isa_ok $user, 'Apache::Sling::User', 'user';
 
 # add user:
 
-ok( my $user_config = Apache::Sling::User::config($sling), 'check user_config function' );
+ok( my $user_config = Apache::Sling::User->config($sling), 'check user_config function' );
 $user_config->{'add'} = \$test_user;
 $user_config->{'email'} = \"test\@example.com";
 $user_config->{'first-name'} = \"test";
@@ -191,32 +191,32 @@ $user_config->{'last-name'} = \"test";
 $user_config->{'password'} = \$test_pass1;
 ok( Apache::Sling::User->run($sling,$user_config), q{check user_run function adding user $test_user} );
 
-ok( $user_config = Apache::Sling::User::config($sling), 'check user_config function' );
+ok( $user_config = Apache::Sling::User->config($sling), 'check user_config function' );
 $user_config->{'exists'} = \$test_user;
 ok( Apache::Sling::User->run($sling,$user_config), q{check user_run function check exists user $test_user} );
 
-ok( $user_config = Apache::Sling::User::config($sling), 'check user_config function' );
+ok( $user_config = Apache::Sling::User->config($sling), 'check user_config function' );
 $user_config->{'view'} = \$test_user;
 ok( Apache::Sling::User->run($sling,$user_config), q{check user_run function view user $test_user} );
 
-ok( $user_config = Apache::Sling::User::config($sling), 'check user_config function' );
+ok( $user_config = Apache::Sling::User->config($sling), 'check user_config function' );
 $user_config->{'update'} = \$test_user;
 ok( Apache::Sling::User->run($sling,$user_config), q{check user_run function update user $test_user} );
 
-ok( $user_config = Apache::Sling::User::config($sling), 'check user_config function' );
+ok( $user_config = Apache::Sling::User->config($sling), 'check user_config function' );
 $user_config->{'change-password'} = \$test_user;
 $user_config->{'password'} = \$test_pass1;
 $user_config->{'new-password'} = \$test_pass2;
 ok( Apache::Sling::User->run($sling,$user_config), q{check user_run function update user $test_user} );
 
 my ( $tmp_user_additions_handle, $tmp_user_additions_name ) = File::Temp::tempfile();
-ok( $user_config = Apache::Sling::User::config($sling), 'check user_config function' );
+ok( $user_config = Apache::Sling::User->config($sling), 'check user_config function' );
 $user_config->{'additions'} = \$tmp_user_additions_name;
 ok( Apache::Sling::User->run($sling,$user_config), q{check user_run function additions} );
 unlink( $tmp_user_additions_name ); 
 
 # Cleanup user:
-ok( $user_config = Apache::Sling::User::config($sling), 'check user_config function' );
+ok( $user_config = Apache::Sling::User->config($sling), 'check user_config function' );
 $user_config->{'delete'} = \$test_user;
 ok( Apache::Sling::User->run($sling,$user_config), q{check user_run function delete user $test_user} );
 ok( ! $user->check_exists( $test_user ),

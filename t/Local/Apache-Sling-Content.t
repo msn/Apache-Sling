@@ -39,6 +39,6 @@ throws_ok { $content->upload_from_file() } qr/File to upload from not defined/, 
 throws_ok { $content->upload_from_file(\$file) } qr/Problem parsing content to add/, 'Check upload_from_file function croaks with blank file';
 throws_ok { $content->upload_from_file('/tmp/__non__--__tnetsixe__') } qr{Problem opening file: '/tmp/__non__--__tnetsixe__'}, 'Check upload_from_file function croaks with non-existent file specified';
 
-ok( my $content_config = Apache::Sling::Content::config($sling), 'check content_config function' );
+ok( my $content_config = Apache::Sling::Content->config($sling), 'check content_config function' );
 ok( Apache::Sling::Content->run($sling,$content_config), 'check run function' );
 throws_ok { Apache::Sling::Content->run() } qr/No content config supplied!/, 'check run function croaks with no config supplied';

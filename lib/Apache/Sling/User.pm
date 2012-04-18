@@ -19,7 +19,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = qw(command_line);
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 #{{{sub new
 
@@ -199,6 +199,33 @@ sub command_line {
 
 sub config {
     my ( $user, $sling, @ARGV ) = @_;
+
+    my $user_config = $user->config_hash( $sling, @ARGV );
+
+    GetOptions(
+        $user_config,         'auth=s',
+        'help|?',              'log|L=s',
+        'man|M',               'pass|p=s',
+        'threads|t=s',         'url|U=s',
+        'user|u=s',            'verbose|v+',
+        'add|a=s',             'additions|A=s',
+        'change-password|c=s', 'delete|d=s',
+        'email|E=s',           'first-name|f=s',
+        'exists|e=s',          'last-name|l=s',
+        'new-password|n=s',    'password|w=s',
+        'property|P=s',        'update=s',
+        'view|V=s'
+    ) or $user->help();
+
+    return $user_config;
+}
+
+#}}}
+
+#{{{sub config_hash
+
+sub config_hash {
+    my ( $user, $sling, @ARGV ) = @_;
     my $password;
     my $additions;
     my $add;
@@ -237,24 +264,6 @@ sub config {
         'update'          => \$update,
         'view'            => \$view
     );
-
-    GetOptions(
-        \%user_config,         'auth=s',
-        'help|?',              'log|L=s',
-        'man|M',               'pass|p=s',
-        'threads|t=s',         'url|U=s',
-        'user|u=s',            'verbose|v+',
-        'add|a=s',             'additions|A=s',
-        'change-password|c=s', 'delete|d=s',
-        'email|E=s',           'first-name|f=s',
-        'exists|e=s',          'last-name|l=s',
-        'new-password|n=s',    'password|w=s',
-        'property|P=s',        'update=s',
-        'view|V=s'
-    ) or $user->help();
-
-    if ( $sling->{'Help'} ) { $user->help(); }
-    if ( $sling->{'Man'} )  { $user->man(); }
 
     return \%user_config;
 }
@@ -391,7 +400,9 @@ sub run {
 
     my $success = 1;
 
-    if ( defined ${ $config->{'additions'} } ) {
+    if ( $sling->{'Help'} ) { $user->help(); }
+    elsif ( $sling->{'Man'} )  { $user->man(); }
+    elsif ( defined ${ $config->{'additions'} } ) {
         my $message =
           "Adding users from file \"" . ${ $config->{'additions'} } . "\":\n";
         Apache::Sling::Print::print_with_lock( "$message", $sling->{'Log'} );

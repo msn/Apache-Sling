@@ -15,7 +15,7 @@ use base qw(Exporter);
 
 our @EXPORT_OK = ();
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 #{{{sub print_with_lock
 
